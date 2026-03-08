@@ -9,6 +9,7 @@ ARG PICOCLAW_VERSION=main
 RUN git clone --depth 1 --branch ${PICOCLAW_VERSION} https://github.com/sipeed/picoclaw.git .
 RUN go mod download
 RUN make build
+RUN go install github.com/steipete/gogcli/cmd/gog@latest
 
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
@@ -17,6 +18,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /src/build/picoclaw /usr/local/bin/picoclaw
+COPY --from=builder /go/bin/gog /usr/local/bin/gog
 
 COPY requirements.txt /app/requirements.txt
 RUN uv pip install --system --no-cache -r /app/requirements.txt
@@ -25,6 +27,7 @@ RUN mkdir -p /data/.picoclaw
 
 COPY server.py /app/server.py
 COPY templates/ /app/templates/
+COPY skills/ /app/skills/
 COPY start.sh /app/start.sh
 RUN chmod +x /app/start.sh
 
