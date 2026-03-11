@@ -484,7 +484,7 @@ Max Concurrent: 3 (Wave 1)
   - Pre-commit: `ls -d skills/*/ | wc -l` (expect 14)
 
 
-- [ ] 4. Fix Gog OAuth Token Persistence Across Redeploys
+- [x] 4. Fix Gog OAuth Token Persistence Across Redeploys
 
   **What to do**:
   - Based on Task 1 research findings, implement the OAuth token persistence fix
@@ -909,7 +909,7 @@ Max Concurrent: 3 (Wave 1)
   - Files: All `skills/*/` directories
   - Pre-commit: `ls -d skills/*/ | wc -l` (expect 14)
 
-- [ ] 9. Update start.sh for New Skills and OAuth Bootstrap
+- [x] 9. Update start.sh for New Skills and OAuth Bootstrap
 
   **What to do**:
   - Add OAuth persistence directory creation to start.sh (before the skill copy):

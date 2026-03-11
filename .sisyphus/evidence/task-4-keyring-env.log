@@ -1,0 +1,11 @@
+Task 4 - Scenario: GOG keyring env vars configured correctly
+Date: 2026-03-11
+
+Command:
+grep -n 'GOG_KEYRING_BACKEND\|GOG_KEYRING_PASSWORD' Dockerfile
+
+Output:
+42:ENV GOG_KEYRING_BACKEND=file
+43:ENV GOG_KEYRING_PASSWORD=picoclaw_default_keyring_secret
+
+Result: PASS (both required env vars are present and non-empty in Dockerfile)

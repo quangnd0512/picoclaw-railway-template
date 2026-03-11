@@ -5,9 +5,11 @@ mkdir -p /data/.picoclaw/workspace
 mkdir -p /data/.picoclaw/sessions
 mkdir -p /data/.picoclaw/cron
 mkdir -p /data/.picoclaw/workspace/skills
+mkdir -p /data/.config/gogcli
 if [ -d /app/skills ]; then
     cp -rn /app/skills/* /data/.picoclaw/workspace/skills/ || true
 fi
+echo "Bootstrapped $(ls -d /data/.picoclaw/workspace/skills/*/ 2>/dev/null | wc -l) skills"
 
 if [ ! -f /data/.picoclaw/config.json ]; then
     picoclaw onboard

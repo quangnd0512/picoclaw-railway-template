@@ -74,3 +74,16 @@ done
 - Verified no nested skill directories exist (e.g., `skills/web-search/web-search/`).
 - Verified `Dockerfile` correctly copies all skills using `COPY skills/ /app/skills/` (line 36).
 - Created evidence file at `.sisyphus/evidence/skill_verification.txt`.
+
+## 2026-03-11 — Task 4 gog OAuth persistence bootstrap
+
+- Added `mkdir -p /data/.config/gogcli` to `start.sh` bootstrapping section alongside existing persistent directory creation.
+- Verified required acceptance check passes: `grep -q 'mkdir -p /data/.config/gogcli' start.sh`.
+- Captured evidence at:
+  - `.sisyphus/evidence/task-4-oauth-persistence.log`
+  - `.sisyphus/evidence/task-4-keyring-env.log`
+
+## Task 9: Update start.sh for New Skills and OAuth Bootstrap
+- Added a log line to `start.sh` to indicate successful skill bootstrap.
+- The log line uses `ls -d /data/.picoclaw/workspace/skills/*/ 2>/dev/null | wc -l` to count the number of bootstrapped skills.
+- Verified that the existing `cp -rn` behavior is preserved.

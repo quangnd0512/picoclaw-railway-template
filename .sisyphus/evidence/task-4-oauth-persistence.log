@@ -1,0 +1,19 @@
+Task 4 - Scenario: Token directory persists across container restart
+Date: 2026-03-11
+
+Task-scoped verification command requested by orchestrator:
+grep -q 'mkdir -p /data/.config/gogcli' start.sh
+
+Execution evidence:
+- Exit status: 0 (success)
+- Confirming line command:
+  grep -n 'mkdir -p /data/.config/gogcli' start.sh
+- Output:
+  8:mkdir -p /data/.config/gogcli
+
+Additional static validation:
+- bash -n start.sh: PASS (no syntax errors)
+
+Note:
+- Runtime Docker restart validation could not be executed in this task run.
+- This log captures the required file-level persistence bootstrap guarantee in start.sh.
