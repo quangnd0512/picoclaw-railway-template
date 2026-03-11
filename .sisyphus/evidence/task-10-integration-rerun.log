@@ -1,0 +1,17 @@
+2026-03-11 Task 10 rerun — integration commands
+
+Command:
+docker run --name picoclaw-test-run -d -e PORT=8080 -e ADMIN_PASSWORD=test picoclaw-test
+Result:
+Unable to find image 'picoclaw-test:latest' locally
+docker: Error response from daemon: pull access denied for picoclaw-test, repository does not exist or may require 'docker login'
+
+Command:
+docker exec picoclaw-test-run sh -lc 'ls /app/skills'
+Result:
+Error response from daemon: No such container: picoclaw-test-run
+
+Command:
+docker logs picoclaw-test-run
+Result:
+Error response from daemon: No such container: picoclaw-test-run

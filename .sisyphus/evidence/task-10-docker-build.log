@@ -1,0 +1,7 @@
+2026-03-11 Task 10 — Full Docker Build and Integration Test
+
+Command:
+docker build -t picoclaw-test .
+
+Result:
+ERROR: Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?

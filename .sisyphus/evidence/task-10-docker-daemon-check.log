@@ -1,0 +1,10 @@
+Command: docker --version
+Output: Docker version 29.1.4-rd, build 3c6914c
+
+Command: docker images picoclaw-test --format '{{.Size}}'
+Output:
+failed to connect to the docker API at unix:///var/run/docker.sock; check if the path is correct and if the daemon is running: dial unix /var/run/docker.sock: connect: no such file or directory
+
+Command: docker ps -a
+Output:
+failed to connect to the docker API at unix:///var/run/docker.sock; check if the path is correct and if the daemon is running: dial unix /var/run/docker.sock: connect: no such file or directory

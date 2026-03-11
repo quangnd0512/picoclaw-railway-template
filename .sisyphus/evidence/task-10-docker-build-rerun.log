@@ -1,0 +1,13 @@
+2026-03-11 Task 10 rerun — docker build evidence
+
+Command:
+docker build -t picoclaw-test .
+
+Outcome:
+FAILED
+
+Key failure:
+go: github.com/steipete/gogcli/cmd/gog@latest: github.com/steipete/gogcli@v0.12.0 requires go >= 1.25.8 (running go 1.25.7; GOTOOLCHAIN=local)
+
+Final error:
+ERROR: failed to build: failed to solve: process "/bin/sh -c go install github.com/steipete/gogcli/cmd/gog@latest" did not complete successfully: exit code: 1

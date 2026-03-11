@@ -1,0 +1,10 @@
+Integration command attempts and outputs:
+
+1) docker run --name picoclaw-test-int --rm -d -e PORT=8080 -e ADMIN_PASSWORD=test -v /home/kakavip/Developers/picoclaw-bot/.tmpdata-task10:/data picoclaw-test
+-> failed to connect to the docker API at unix:///var/run/docker.sock; check if the path is correct and if the daemon is running: dial unix /var/run/docker.sock: connect: no such file or directory
+
+2) docker exec picoclaw-test-int picoclaw --version
+-> failed to connect to the docker API at unix:///var/run/docker.sock; check if the path is correct and if the daemon is running: dial unix /var/run/docker.sock: connect: no such file or directory
+
+3) docker logs picoclaw-test-int
+-> failed to connect to the docker API at unix:///var/run/docker.sock; check if the path is correct and if the daemon is running: dial unix /var/run/docker.sock: connect: no such file or directory

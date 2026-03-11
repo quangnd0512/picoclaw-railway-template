@@ -1,0 +1,10 @@
+2026-03-11 Task 10 rerun — image size check
+
+Command:
+docker images picoclaw-test --format '{{.Size}}'
+
+Output:
+<empty>
+
+Interpretation:
+No local image tagged picoclaw-test exists because the build failed before completion.

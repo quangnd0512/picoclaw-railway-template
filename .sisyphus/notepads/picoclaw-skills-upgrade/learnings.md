@@ -87,3 +87,14 @@ done
 - Added a log line to `start.sh` to indicate successful skill bootstrap.
 - The log line uses `ls -d /data/.picoclaw/workspace/skills/*/ 2>/dev/null | wc -l` to count the number of bootstrapped skills.
 - Verified that the existing `cp -rn` behavior is preserved.
+
+## 2026-03-11 — Task 10 verification process learning
+
+- For verification-only tasks, create dedicated evidence logs per command group (build, daemon status/image-size checks, integration command attempts) to preserve exact failure context for handoff.
+- Docker client availability (`docker --version`) does not imply daemon availability; explicit daemon connectivity checks are required before interpreting verification failures as image/runtime issues.
+
+## 2026-03-11 — Task 10 rerun learning
+
+- Task 10 build now reaches Docker daemon, but fails during builder stage because `github.com/steipete/gogcli@v0.12.0` requires Go `>=1.25.8` while base image provides Go `1.25.7`.
+- When build fails before final image creation, all downstream runtime/integration checks (container startup, `/app/skills` verification, logs, exec checks) become structurally blocked; this should be reported as dependency-chain failure, not test omission.
+- When building Go tools like gogcli that require newer Go versions (e.g., >= 1.25.8), use a major.minor tag like `golang:1.25-alpine` instead of a specific patch version like `1.25.7-alpine` to automatically get patch updates and avoid build failures.
