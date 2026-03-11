@@ -1129,7 +1129,7 @@ Max Concurrent: 3 (Wave 1)
 
 > 4 review agents run in PARALLEL. ALL must APPROVE. Rejection → fix → re-run.
 
-- [ ] F1. **Plan Compliance Audit** — `oracle`
+- [x] F1. **Plan Compliance Audit** — `oracle`
   Read the plan end-to-end. For each "Must Have": verify implementation exists (read file, run docker command). For each "Must NOT Have": search codebase for forbidden patterns — reject with file:line if found. Check evidence files exist in .sisyphus/evidence/. Compare deliverables against plan.
   Output: `Must Have [N/N] | Must NOT Have [N/N] | Tasks [N/N] | VERDICT: APPROVE/REJECT`
 
@@ -1137,11 +1137,11 @@ Max Concurrent: 3 (Wave 1)
   Review all changed files (Dockerfile, start.sh, skill SKILL.md files) for: syntax errors, missing dependencies, incorrect paths, commented-out code, security issues (exposed secrets). Verify Dockerfile builds clean. Check start.sh for error handling.
   Output: `Build [PASS/FAIL] | Files [N clean/N issues] | VERDICT`
 
-- [ ] F3. **Real Manual QA** — `unspecified-high`
+- [x] F3. **Real Manual QA** — `unspecified-high`
   Start from clean state. Build Docker image. Run container with test volume. Verify: all 14 skills present in /data/.picoclaw/workspace/skills/, all CLI binaries accessible, gateway starts without skill loading errors, gog token persistence works across container restart. Capture evidence screenshots/logs.
   Output: `Skills [14/14] | CLIs [4/4] | Gateway [PASS/FAIL] | OAuth [PASS/FAIL] | VERDICT`
 
-- [ ] F4. **Scope Fidelity Check** — `deep`
+- [x] F4. **Scope Fidelity Check** — `deep`
   For each task: read "What to do", read actual diff (git log/diff). Verify 1:1 — everything in spec was built (no missing), nothing beyond spec was built (no creep). Check "Must NOT do" compliance. Detect cross-task contamination: Task N touching Task M's files. Flag unaccounted changes.
   Output: `Tasks [N/N compliant] | Contamination [CLEAN/N issues] | Unaccounted [CLEAN/N files] | VERDICT`
 
