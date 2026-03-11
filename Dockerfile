@@ -91,6 +91,7 @@ RUN chmod +x /app/start.sh
 ENV HOME=/data
 ENV PICOCLAW_AGENTS_DEFAULTS_WORKSPACE=/data/.picoclaw/workspace
 ENV FINANCE_NEWS_VENV_BOOTSTRAPPED=1
+ENV TZ="Asia/Saigon"
 # ENV GOG_KEYRING_BACKEND=file
 # ENV GOG_KEYRING_PASSWORD=picoclaw_default_keyring_secret
 
