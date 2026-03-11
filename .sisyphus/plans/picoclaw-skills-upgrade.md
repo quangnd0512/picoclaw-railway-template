@@ -580,7 +580,7 @@ Max Concurrent: 3 (Wave 1)
   - Files: `start.sh`
   - Pre-commit: `docker build -t picoclaw-test . && docker run --rm picoclaw-test env | grep GOG_KEYRING`
 
-- [ ] 5. Install Python Dependencies for Skills
+- [x] 5. Install Python Dependencies for Skills
 
   **What to do**:
   - Identify which skills need Python packages installed at the system level:
@@ -842,7 +842,7 @@ Max Concurrent: 3 (Wave 1)
   - Files: blogwatcher config file(s)
   - Pre-commit: Feed URL count verification
 
-- [ ] 8. Verify and Organize All 13 Skill Directories
+- [x] 8. Verify and Organize All 13 Skill Directories
 
   **What to do**:
   - After Task 3 downloads all skills and Task 7 configures RSS feeds:

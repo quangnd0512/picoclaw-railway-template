@@ -66,3 +66,11 @@ done
 - The correct approach for pre-configuring `blogwatcher` feeds is to run the `blogwatcher add` CLI commands during the container's first-boot setup.
 - Added 12 `blogwatcher add` commands to `start.sh` inside the `if [ ! -f /data/.picoclaw/config.json ]; then` block.
 - Documented the pre-configured feeds in `skills/blogwatcher/SKILL.md` under a new "Pre-configured Feeds" section.
+- Added yfinance and pandas for stock-analysis skill, and requests and beautifulsoup4 for news-aggregator-skill to Dockerfile.
+
+## Skill Directories Verification
+- Verified all 14 skill directories are present in `skills/`.
+- Verified each directory contains `SKILL.md` and `_meta.json`.
+- Verified no nested skill directories exist (e.g., `skills/web-search/web-search/`).
+- Verified `Dockerfile` correctly copies all skills using `COPY skills/ /app/skills/` (line 36).
+- Created evidence file at `.sisyphus/evidence/skill_verification.txt`.
