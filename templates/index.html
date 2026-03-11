@@ -301,6 +301,26 @@
             </div>
           </div>
         </section>
+        <section>
+          <h2 class="text-lg font-semibold mb-3">System Settings</h2>
+          <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-medium">Heartbeat</h3>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.heartbeat.enabled">
+                <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+              </label>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.heartbeat.enabled">
+              <div>
+                <label class="block text-xs text-gray-500 mb-1">Interval (seconds)</label>
+                <input type="number" min="1" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                       x-model.number="config.heartbeat.interval">
+              </div>
+            </div>
+          </div>
+        </section>
+
 
         <div class="flex items-center justify-between bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
           <label class="flex items-center gap-2">
