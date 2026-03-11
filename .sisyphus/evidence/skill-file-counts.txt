@@ -1,0 +1,14 @@
+blogwatcher: 2 files
+crypto-market-data: 4 files
+finance-news: 14 files
+find-skills: 2 files
+gemini-deep-research: 3 files
+github: 2 files
+gog: 2 files
+news-aggregator-skill: 6 files
+reddit-insights: 2 files
+self-improving-agent: 6 files
+stock-analysis: 7 files
+summarize: 2 files
+web-search: 3 files
+x-research: 8 files

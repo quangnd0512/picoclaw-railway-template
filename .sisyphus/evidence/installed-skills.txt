@@ -1,0 +1,14 @@
+blogwatcher
+crypto-market-data
+finance-news
+find-skills
+gemini-deep-research
+github
+gog
+news-aggregator-skill
+reddit-insights
+self-improving-agent
+stock-analysis
+summarize
+web-search
+x-research

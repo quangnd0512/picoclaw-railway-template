@@ -1,18 +1,4 @@
-#!/bin/bash
-set -e
-
-mkdir -p /data/.picoclaw/workspace
-mkdir -p /data/.picoclaw/sessions
-mkdir -p /data/.picoclaw/cron
-mkdir -p /data/.picoclaw/workspace/skills
-if [ -d /app/skills ]; then
-    cp -rn /app/skills/* /data/.picoclaw/workspace/skills/ || true
-fi
-
-if [ ! -f /data/.picoclaw/config.json ]; then
-    picoclaw onboard
-
-    # Pre-configure blogwatcher feeds
+start.sh feeds:
     blogwatcher add "Medium Python" https://medium.com/feed/tag/python || true
     blogwatcher add "Medium TypeScript" https://medium.com/feed/tag/typescript || true
     blogwatcher add "Medium ReactJS" https://medium.com/feed/tag/reactjs || true
@@ -25,6 +11,17 @@ if [ ! -f /data/.picoclaw/config.json ]; then
     blogwatcher add "Medium DevOps" https://medium.com/feed/tag/devops || true
     blogwatcher add "Medium React Native" https://medium.com/feed/tag/react-native || true
     blogwatcher add "Medium Indie Hacker" https://medium.com/feed/tag/indie-hacker || true
-fi
 
-exec python /app/server.py
+SKILL.md feeds:
+- `blogwatcher add "Medium Python" https://medium.com/feed/tag/python`
+- `blogwatcher add "Medium TypeScript" https://medium.com/feed/tag/typescript`
+- `blogwatcher add "Medium ReactJS" https://medium.com/feed/tag/reactjs`
+- `blogwatcher add "Medium NextJS" https://medium.com/feed/tag/nextjs`
+- `blogwatcher add "Medium Golang" https://medium.com/feed/tag/golang`
+- `blogwatcher add "Medium Docker" https://medium.com/feed/tag/docker`
+- `blogwatcher add "Medium Kubernetes" https://medium.com/feed/tag/kubernetes`
+- `blogwatcher add "Medium AI" https://medium.com/feed/tag/artificial-intelligence`
+- `blogwatcher add "Medium LLM" https://medium.com/feed/tag/llm`
+- `blogwatcher add "Medium DevOps" https://medium.com/feed/tag/devops`
+- `blogwatcher add "Medium React Native" https://medium.com/feed/tag/react-native`
+- `blogwatcher add "Medium Indie Hacker" https://medium.com/feed/tag/indie-hacker`
