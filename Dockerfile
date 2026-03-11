@@ -24,6 +24,9 @@ COPY --from=builder /go/bin/blogwatcher /usr/local/bin/blogwatcher
 
 COPY requirements.txt /app/requirements.txt
 RUN uv pip install --system --no-cache -r /app/requirements.txt
+COPY skills/news-aggregator-skill/requirements.txt /tmp/news-requirements.txt
+RUN uv pip install --system --no-cache -r /tmp/news-requirements.txt
+RUN uv pip install --system --no-cache yfinance pandas
 RUN npm install -g @steipete/summarize
 
 RUN mkdir -p /data/.picoclaw
