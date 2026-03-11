@@ -5,7 +5,7 @@ mkdir -p /data/.picoclaw/workspace
 mkdir -p /data/.picoclaw/sessions
 mkdir -p /data/.picoclaw/cron
 mkdir -p /data/.picoclaw/workspace/skills
-mkdir -p /data/.config/gogcli
+# mkdir -p /data/.config/gogcli
 if [ -d /app/skills ]; then
     cp -rn /app/skills/* /data/.picoclaw/workspace/skills/ || true
 fi
