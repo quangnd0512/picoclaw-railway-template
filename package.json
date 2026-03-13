@@ -1,0 +1,24 @@
+{
+  "name": "picoclaw-bot",
+  "version": "1.0.0",
+  "description": "This repo packages **PicoClaw** for Railway with a web-based configuration UI and gateway management dashboard.",
+  "main": "test_ui.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://kakavip@github.com/quangnd0512/picoclaw-railway-template.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/quangnd0512/picoclaw-railway-template/issues"
+  },
+  "homepage": "https://github.com/quangnd0512/picoclaw-railway-template#readme",
+  "dependencies": {
+    "playwright": "^1.58.2"
+  }
+}
