@@ -129,6 +129,50 @@ def default_config():
             "web": {
                 "brave": {"enabled": False, "api_key": "", "max_results": 5},
                 "duckduckgo": {"enabled": True, "max_results": 5},
+                "perplexity": {"enabled": False, "api_key": "", "max_results": 5},
+                "tavily": {"enabled": False, "api_key": "", "base_url": "", "max_results": 5},
+                "proxy": "",
+                "fetch_limit_bytes": 10485760
+            },
+            "mcp": {
+                "enabled": False,
+                "servers": {
+                "context7": {
+                    "enabled": False,
+                    "type": "http",
+                    "url": "https://mcp.context7.com/mcp"
+                },
+                "filesystem": {
+                    "enabled": False,
+                    "command": "npx",
+                    "args": ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]
+                },
+                "github": {
+                    "enabled": False,
+                    "command": "npx",
+                    "args": ["-y", "@modelcontextprotocol/server-github"],
+                    "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "" }
+                }
+                }
+            },
+            "cron": {
+                "exec_timeout_minutes": 5
+            },
+            "exec": {
+                "enable_deny_patterns": True,
+                "custom_deny_patterns": [],
+                "custom_allow_patterns": []
+            },
+            "skills": {
+                "registries": {
+                    "clawhub": {
+                        "enabled": True,
+                        "base_url": "https://clawhub.ai",
+                        "search_path": "/api/v1/search",
+                        "skills_path": "/api/v1/skills",
+                        "download_path": "/api/v1/download"
+                    }
+                }
             }
         },
         "heartbeat": {"enabled": True, "interval": 30},
@@ -139,8 +183,9 @@ def default_config():
 def mask_secrets(data, _path=""):
     if isinstance(data, dict):
         result = {}
+        is_mcp_env = re.search(r"\.servers\.[^.]+\.env$", _path) is not None
         for k, v in data.items():
-            if k in SECRET_FIELDS and isinstance(v, str) and v:
+            if (k in SECRET_FIELDS or is_mcp_env) and isinstance(v, str) and v:
                 result[k] = v[:8] + "***" if len(v) > 8 else "***"
             else:
                 result[k] = mask_secrets(v, f"{_path}.{k}")
@@ -150,14 +195,15 @@ def mask_secrets(data, _path=""):
     return data
 
 
-def merge_secrets(new_data, existing_data):
+def merge_secrets(new_data, existing_data, _path=""):
     if isinstance(new_data, dict) and isinstance(existing_data, dict):
         result = {}
+        is_mcp_env = re.search(r"\.servers\.[^.]+\.env$", _path) is not None
         for k, v in new_data.items():
-            if k in SECRET_FIELDS and isinstance(v, str) and (v.endswith("***") or v == ""):
+            if (k in SECRET_FIELDS or is_mcp_env) and isinstance(v, str) and (v.endswith("***") or v == ""):
                 result[k] = existing_data.get(k, "")
             else:
-                result[k] = merge_secrets(v, existing_data.get(k, {}))
+                result[k] = merge_secrets(v, existing_data.get(k, {}), f"{_path}.{k}")
         return result
     return new_data
 
