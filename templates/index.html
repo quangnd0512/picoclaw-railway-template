@@ -767,7 +767,7 @@
                                                 </div>
                                                 <div>
                                                     <label class="block text-xs text-gray-500 mb-1">Args (one per line)</label>
-                                                    <textarea class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" rows="3" :value="(server.args || []).join('\n')" @input="server.args = $event.target.value.split('\n').filter(Boolean)"></textarea>
+                                                    <textarea class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" rows="3" :value="(server.args || []).join('\n')" @change="server.args = $event.target.value.split('\n').filter(Boolean)"></textarea>
                                                 </div>
                                                 <div>
                                                     <label class="block text-xs text-gray-500 mb-1">Env File (optional)</label>
@@ -901,7 +901,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label
-                                        class="block text-xs text-gray-500 mb-1"
+                                        class="block text-xs text-gray-500 dark:text-gray-400 mb-1"
                                         >Execution Timeout (minutes)</label
                                     >
                                     <input
@@ -910,7 +910,7 @@
                                         class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                                         x-model.number="config.tools.cron.exec_timeout_minutes"
                                     />
-                                    <p class="text-xs text-gray-400 mt-1">Execution timeout in minutes. 0 = no limit.</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Execution timeout in minutes. 0 = no limit.</p>
                                 </div>
                             </div>
                         </div>
