@@ -183,9 +183,9 @@ def default_config():
 def mask_secrets(data, _path=""):
     if isinstance(data, dict):
         result = {}
-        is_mcp_env = re.search(r"\.servers\.[^.]+\.env$", _path) is not None
+        is_mcp_secret = (re.search(r"\.mcp_servers\.[^.]+\.env$", _path) is not None or re.search(r"\.mcp_servers\.[^.]+\.headers$", _path) is not None)
         for k, v in data.items():
-            if (k in SECRET_FIELDS or is_mcp_env) and isinstance(v, str) and v:
+            if (k in SECRET_FIELDS or is_mcp_secret) and isinstance(v, str) and v:
                 result[k] = v[:8] + "***" if len(v) > 8 else "***"
             else:
                 result[k] = mask_secrets(v, f"{_path}.{k}")
@@ -198,9 +198,9 @@ def mask_secrets(data, _path=""):
 def merge_secrets(new_data, existing_data, _path=""):
     if isinstance(new_data, dict) and isinstance(existing_data, dict):
         result = {}
-        is_mcp_env = re.search(r"\.servers\.[^.]+\.env$", _path) is not None
+        is_mcp_secret = (re.search(r"\.mcp_servers\.[^.]+\.env$", _path) is not None or re.search(r"\.mcp_servers\.[^.]+\.headers$", _path) is not None)
         for k, v in new_data.items():
-            if (k in SECRET_FIELDS or is_mcp_env) and isinstance(v, str) and (v.endswith("***") or v == ""):
+            if (k in SECRET_FIELDS or is_mcp_secret) and isinstance(v, str) and (v.endswith("***") or v == ""):
                 result[k] = existing_data.get(k, "")
             else:
                 result[k] = merge_secrets(v, existing_data.get(k, {}), f"{_path}.{k}")
