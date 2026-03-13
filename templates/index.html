@@ -597,9 +597,9 @@
                     </section>
 
                     <section>
-                        <h2 class="text-lg font-semibold mb-3">Tools</h2>
+                        <h2 class="text-lg font-semibold mb-3">Web Search</h2>
                         <div
-                            class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
+                            class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4 mb-4"
                         >
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
@@ -617,13 +617,373 @@
                                 <div class="flex items-center gap-2">
                                     <input
                                         type="checkbox"
-                                        class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
+                                        class="rounded bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-600"
                                         x-model="config.tools.web.duckduckgo.enabled"
                                     />
                                     <label
                                         class="text-sm text-gray-500 dark:text-gray-400"
                                         >DuckDuckGo Search</label
                                     >
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div
+                                class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
+                            >
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-medium">Perplexity Search</h3>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            class="rounded bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-600"
+                                            x-model="config.tools.web.perplexity.enabled"
+                                        />
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                    </label>
+                                </div>
+                                <div class="space-y-3" x-show="config.tools.web.perplexity.enabled">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">API Key</label>
+                                        <input
+                                            type="password"
+                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            x-model="config.tools.web.perplexity.api_key"
+                                            placeholder="Enter API key"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Max Results</label>
+                                        <input
+                                            type="number"
+                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            x-model.number="config.tools.web.perplexity.max_results"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div
+                                class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
+                            >
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-medium">Tavily Search</h3>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            class="rounded bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-600"
+                                            x-model="config.tools.web.tavily.enabled"
+                                        />
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                    </label>
+                                </div>
+                                <div class="space-y-3" x-show="config.tools.web.tavily.enabled">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">API Key</label>
+                                        <input
+                                            type="password"
+                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            x-model="config.tools.web.tavily.api_key"
+                                            placeholder="Enter API key"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Base URL</label>
+                                        <input
+                                            type="text"
+                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            x-model="config.tools.web.tavily.base_url"
+                                            placeholder="Optional"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Max Results</label>
+                                        <input
+                                            type="number"
+                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            x-model.number="config.tools.web.tavily.max_results"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3 class="text-md font-semibold mb-3">Web Settings</h3>
+                        <div
+                            class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
+                        >
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs text-gray-500 mb-1">Web Proxy</label>
+                                    <input
+                                        type="text"
+                                        class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        x-model="config.tools.web.proxy"
+                                        placeholder="socks5://127.0.0.1:1080"
+                                    />
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500 mb-1">Fetch Limit (bytes)</label>
+                                    <input
+                                        type="number"
+                                        class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        x-model.number="config.tools.web.fetch_limit_bytes"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section>
+                        <div class="flex items-center justify-between mb-3">
+                            <h2 class="text-lg font-semibold">MCP Servers</h2>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.tools.mcp.enabled" />
+                                <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                            </label>
+                        </div>
+                        <div class="space-y-4" x-show="config.tools.mcp.enabled">
+                            <template x-for="(server, name) in config.tools.mcp.servers" :key="name">
+                                <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4" x-data="{ expanded: false }">
+                                    <div class="flex items-center justify-between cursor-pointer" @click="expanded = !expanded">
+                                        <div class="flex items-center gap-3">
+                                            <h3 class="font-medium" x-text="name"></h3>
+                                            <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400" x-text="server.type === 'http' || server.type === 'sse' ? 'HTTP/SSE' : 'stdio'"></span>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <label class="flex items-center gap-2 cursor-pointer" @click.stop>
+                                                <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="server.enabled" />
+                                                <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                            </label>
+                                            <svg class="w-5 h-5 text-gray-400 transition-transform" :class="expanded ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                        </div>
+                                    </div>
+                                    <div x-show="expanded" class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800 space-y-4" @click.stop>
+                                        <template x-if="!server.type || (server.type !== 'http' && server.type !== 'sse')">
+                                            <div class="space-y-4">
+                                                <div>
+                                                    <label class="block text-xs text-gray-500 mb-1">Command</label>
+                                                    <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="server.command" />
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs text-gray-500 mb-1">Args (one per line)</label>
+                                                    <textarea class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" rows="3" :value="(server.args || []).join('\n')" @input="server.args = $event.target.value.split('\n').filter(Boolean)"></textarea>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs text-gray-500 mb-1">Env File (optional)</label>
+                                                    <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="server.env_file" />
+                                                </div>
+                                                <div x-data="{ envArray: objectToArray(server.env) }" x-effect="server.env = arrayToObject(envArray)">
+                                                    <div class="flex items-center justify-between mb-1">
+                                                        <label class="block text-xs text-gray-500">Environment Variables</label>
+                                                        <button @click="envArray.push({key: '', value: ''})" class="text-xs text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">+ Add Env</button>
+                                                    </div>
+                                                    <div class="space-y-2">
+                                                        <template x-for="(item, index) in envArray" :key="index">
+                                                            <div class="flex gap-2">
+                                                                <input type="text" class="w-1/3 bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="item.key" placeholder="Key" />
+                                                                <input type="password" class="flex-1 bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="item.value" placeholder="Value" />
+                                                                <button @click="envArray.splice(index, 1)" class="px-2 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300">
+                                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                                </button>
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template x-if="server.type === 'http' || server.type === 'sse'">
+                                            <div class="space-y-4">
+                                                <div>
+                                                    <label class="block text-xs text-gray-500 mb-1">Type</label>
+                                                    <select class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="server.type">
+                                                        <option value="http">HTTP</option>
+                                                        <option value="sse">SSE</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs text-gray-500 mb-1">URL</label>
+                                                    <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="server.url" />
+                                                </div>
+                                                <div x-data="{ headersArray: objectToArray(server.headers) }" x-effect="server.headers = arrayToObject(headersArray)">
+                                                    <div class="flex items-center justify-between mb-1">
+                                                        <label class="block text-xs text-gray-500">Headers</label>
+                                                        <button @click="headersArray.push({key: '', value: ''})" class="text-xs text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">+ Add Header</button>
+                                                    </div>
+                                                    <div class="space-y-2">
+                                                        <template x-for="(item, index) in headersArray" :key="index">
+                                                            <div class="flex gap-2">
+                                                                <input type="text" class="w-1/3 bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="item.key" placeholder="Key" />
+                                                                <input type="password" class="flex-1 bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="item.value" placeholder="Value" />
+                                                                <button @click="headersArray.splice(index, 1)" class="px-2 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300">
+                                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                                </button>
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <div class="pt-4 flex justify-end">
+                                            <button @click="if(confirm('Delete server ' + name + '?')) { delete config.tools.mcp.servers[name]; }" class="text-sm px-3 py-1.5 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 rounded-lg transition">
+                                                Delete Server
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                            <div class="flex justify-center">
+                                <button @click="const name = prompt('Enter new server name (slug):'); if(name && !config.tools.mcp.servers[name]) { config.tools.mcp.servers[name] = { enabled: true, command: '', args: [] }; }" class="text-sm px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg transition font-medium">
+                                    + Add Server
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+                    <section>
+                        <h2 class="text-lg font-semibold mb-3">Exec Tool</h2>
+                        <div
+                            class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
+                        >
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-medium">Default Deny Patterns</h3>
+                                <label
+                                    class="flex items-center gap-2 cursor-pointer"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
+                                        x-model="config.tools.exec.enable_deny_patterns"
+                                    />
+                                    <span
+                                        class="text-xs text-gray-500 dark:text-gray-400"
+                                        >Enabled</span
+                                    >
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                                Deny patterns block matching commands. Allow patterns override deny for specific commands. Patterns are regular expressions.
+                            </p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label
+                                        class="block text-xs text-gray-500 mb-1"
+                                        >Custom Deny Patterns (one per line)</label
+                                    >
+                                    <textarea
+                                        class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono"
+                                        rows="4"
+                                        :value="(config.tools?.exec?.custom_deny_patterns || []).join('\n')"
+                                        @change="config.tools.exec.custom_deny_patterns = $event.target.value.split('\n').map(p => p.trim()).filter(p => p !== '')"
+                                        placeholder="^rm -rf&#10;^mkfs"
+                                    ></textarea>
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs text-gray-500 mb-1"
+                                        >Custom Allow Patterns (one per line)</label
+                                    >
+                                    <textarea
+                                        class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono"
+                                        rows="4"
+                                        :value="(config.tools?.exec?.custom_allow_patterns || []).join('\n')"
+                                        @change="config.tools.exec.custom_allow_patterns = $event.target.value.split('\n').map(p => p.trim()).filter(p => p !== '')"
+                                        placeholder="^rm -rf /tmp/&#10;^docker"
+                                    ></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section>
+                        <h2 class="text-lg font-semibold mb-3">Cron</h2>
+                        <div
+                            class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
+                        >
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label
+                                        class="block text-xs text-gray-500 mb-1"
+                                        >Execution Timeout (minutes)</label
+                                    >
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        x-model.number="config.tools.cron.exec_timeout_minutes"
+                                    />
+                                    <p class="text-xs text-gray-400 mt-1">Execution timeout in minutes. 0 = no limit.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2 class="text-lg font-semibold mb-3">Skills</h2>
+                        <div
+                            class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
+                        >
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-medium">ClawHub Registry</h3>
+                                <label
+                                    class="flex items-center gap-2 cursor-pointer"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
+                                        x-model="config.tools.skills.registries.clawhub.enabled"
+                                    />
+                                    <span
+                                        class="text-xs text-gray-500 dark:text-gray-400"
+                                        >Enabled</span
+                                    >
+                                </label>
+                            </div>
+                            <div
+                                class="grid grid-cols-1 md:grid-cols-2 gap-3"
+                                x-show="config.tools.skills.registries.clawhub.enabled"
+                            >
+                                <div>
+                                    <label
+                                        class="block text-xs text-gray-500 mb-1"
+                                        >Base URL</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        x-model="config.tools.skills.registries.clawhub.base_url"
+                                    />
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs text-gray-500 mb-1"
+                                        >Search Path</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        x-model="config.tools.skills.registries.clawhub.search_path"
+                                    />
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs text-gray-500 mb-1"
+                                        >Skills Path</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        x-model="config.tools.skills.registries.clawhub.skills_path"
+                                    />
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs text-gray-500 mb-1"
+                                        >Download Path</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        x-model="config.tools.skills.registries.clawhub.download_path"
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -967,6 +1327,86 @@
                   this.config.providers[key][field] = value;
                 },
 
+                addMcpServer() {
+                  const name = window.prompt('Enter new MCP server name:');
+                  if (!name || !name.trim()) return;
+                  const key = name.trim();
+                  if (this.config.tools.mcp.servers[key]) {
+                    this.showToast('Server already exists', 'error');
+                    return;
+                  }
+                  this.config.tools.mcp.servers[key] = {
+                    enabled: false,
+                    command: '',
+                    args: [],
+                    env: {}
+                  };
+                },
+                removeMcpServer(name) {
+                  if (window.confirm(`Remove MCP server "${name}"?`)) {
+                    delete this.config.tools.mcp.servers[name];
+                  }
+                },
+                getMcpServerType(server) {
+                  return (server.type === 'http' || server.type === 'sse') ? 'http' : 'stdio';
+                },
+                setMcpServerType(name, type) {
+                  const server = this.config.tools.mcp.servers[name];
+                  if (type === 'http') {
+                    delete server.command;
+                    delete server.args;
+                    delete server.env;
+                    delete server.env_file;
+                    server.type = 'http';
+                    server.url = '';
+                    server.headers = {};
+                  } else {
+                    delete server.type;
+                    delete server.url;
+                    delete server.headers;
+                    server.command = '';
+                    server.args = [];
+                    server.env = {};
+                  }
+                },
+                addMcpEnvRow(name) {
+                  const server = this.config.tools.mcp.servers[name];
+                  if (!server.env) server.env = {};
+                  server.env[''] = '';
+                },
+                removeMcpEnvRow(name, key) {
+                  const server = this.config.tools.mcp.servers[name];
+                  if (server.env && server.env[key] !== undefined) {
+                    delete server.env[key];
+                  }
+                },
+                addMcpHeaderRow(name) {
+                  const server = this.config.tools.mcp.servers[name];
+                  if (!server.headers) server.headers = {};
+                  server.headers[''] = '';
+                },
+                removeMcpHeaderRow(name, key) {
+                  const server = this.config.tools.mcp.servers[name];
+                  if (server.headers && server.headers[key] !== undefined) {
+                    delete server.headers[key];
+                  }
+                },
+                getExecPatterns(field) {
+                  return (this.config.tools.exec?.[field] || []).join('\n');
+                },
+                setExecPatterns(field, text) {
+                  if (!this.config.tools.exec) this.config.tools.exec = {};
+                  this.config.tools.exec[field] = text.split('\n').map(s => s.trim()).filter(Boolean);
+                },
+                getMcpArgs(name) {
+                  return (this.config.tools.mcp.servers[name]?.args || []).join('\n');
+                },
+                setMcpArgs(name, text) {
+                  if (this.config.tools.mcp.servers[name]) {
+                    this.config.tools.mcp.servers[name].args = text.split('\n').map(s => s.trim()).filter(Boolean);
+                  }
+                },
+
                 async init() {
                   await this.loadConfig();
                   await this.loadStatus();
@@ -1069,6 +1509,21 @@
                   type = type || 'success';
                   this.toast = { show: true, message: message, type: type };
                   setTimeout(() => { this.toast.show = false; }, 3000);
+                },
+
+                objectToArray(obj) {
+                  if (!obj) return [];
+                  return Object.entries(obj).map(([key, value]) => ({ key, value }));
+                },
+
+                arrayToObject(arr) {
+                  const obj = {};
+                  if (arr) {
+                    arr.forEach(item => {
+                      if (item.key) obj[item.key] = item.value;
+                    });
+                  }
+                  return obj;
                 }
               };
             }
