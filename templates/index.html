@@ -191,6 +191,14 @@
                                         x-model.number="config.agents.defaults.max_tool_iterations"
                                     />
                                 </div>
+                                <div class="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
+                                        x-model="config.agents.defaults.restrict_to_workspace"
+                                    />
+                                    <label class="text-sm text-gray-700 dark:text-gray-300">Restrict to Workspace</label>
+                                </div>
                             </div>
                         </div>
                     </section>
