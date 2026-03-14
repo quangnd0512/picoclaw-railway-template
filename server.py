@@ -94,6 +94,7 @@ def default_config():
             "defaults": {
                 "workspace": "~/.picoclaw/workspace",
                 "restrict_to_workspace": True,
+                "allow_read_outside_workspace": False,
                 "provider": "",
                 "model": "glm-4.7",
                 "max_tokens": 8192,

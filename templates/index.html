@@ -199,6 +199,14 @@
                                     />
                                     <label class="text-sm text-gray-700 dark:text-gray-300">Restrict to Workspace</label>
                                 </div>
+                                <div class="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
+                                        x-model="config.agents.defaults.allow_read_outside_workspace"
+                                    />
+                                    <label class="text-sm text-gray-700 dark:text-gray-300">Allow Read Outside Workspace</label>
+                                </div>
                             </div>
                         </div>
                     </section>
@@ -1538,7 +1546,7 @@
 
             function defaultConfig() {
               return {
-                agents: { defaults: { workspace: '~/.picoclaw/workspace', restrict_to_workspace: true, provider: '', model: 'glm-4.7', max_tokens: 8192, temperature: 0.7, max_tool_iterations: 20 } },
+                agents: { defaults: { workspace: '~/.picoclaw/workspace', restrict_to_workspace: true, allow_read_outside_workspace: false, provider: '', model: 'glm-4.7', max_tokens: 8192, temperature: 0.7, max_tool_iterations: 20 } },
                 channels: {
                   telegram: { enabled: false, token: '', proxy: '', allow_from: [] },
                   discord: { enabled: false, token: '', allow_from: [] },
