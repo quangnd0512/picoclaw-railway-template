@@ -36,7 +36,7 @@ mkdir -p /data/.hermes
 if [ ! -f /data/.hermes/config.yaml ]; then
     cat > /data/.hermes/config.yaml << 'EOF'
 model:
-  provider: "openrouter"
+  provider: "auto"
   default: "anthropic/claude-3.5-sonnet"
 auxiliary:
   vision:
