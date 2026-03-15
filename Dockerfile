@@ -15,7 +15,7 @@ RUN go install github.com/Hyaxia/blogwatcher/cmd/blogwatcher@latest
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl ca-certificates git nodejs npm gh && \
+    apt-get install -y --no-install-recommends curl ca-certificates git nodejs npm gh jq bc && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /src/build/picoclaw /usr/local/bin/picoclaw
