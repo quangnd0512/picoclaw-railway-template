@@ -29,4 +29,31 @@ if [ ! -f /data/.picoclaw/config.json ]; then
     blogwatcher add "Medium Indie Hacker" https://medium.com/feed/tag/indie-hacker || true
 fi
 
+# Create Hermes directories
+mkdir -p /data/.hermes
+
+# Create default Hermes config if not exists
+if [ ! -f /data/.hermes/config.yaml ]; then
+    cat > /data/.hermes/config.yaml << 'EOF'
+model:
+  provider: "openrouter"
+  default: "anthropic/claude-3.5-sonnet"
+auxiliary:
+  vision:
+    provider: "auto"
+  web_extract:
+    provider: "auto"
+EOF
+fi
+
+# Create empty .env if not exists
+if [ ! -f /data/.hermes/.env ]; then
+    touch /data/.hermes/.env
+fi
+
+# Create gateway meta file if not exists
+if [ ! -f /data/.gateway-meta.json ]; then
+    echo '{"backend": "picoclaw"}' > /data/.gateway-meta.json
+fi
+
 exec python /app/server.py

@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PicoClaw</title>
+        <title>KKV Claw</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
             tailwind.config = { darkMode: "class" };
@@ -64,6 +64,7 @@
                     ></span>
                 </div>
                 <button
+                    type="button"
                     @click="restartGateway()"
                     class="text-sm px-3 py-1.5 bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg transition"
                 >
@@ -72,67 +73,180 @@
             </header>
 
             <div
-                class="flex gap-1 mb-6 border-b border-gray-200 dark:border-gray-800"
+                class="flex items-center justify-between mb-6 border-b border-gray-200 dark:border-gray-800"
             >
-                <button
-                    @click="tab = 'config'"
-                    class="px-4 py-2 text-sm font-medium rounded-t-lg transition"
-                    :class="tab === 'config' ? 'bg-gray-200 text-gray-900 dark:bg-gray-800 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
-                >
-                    Configuration
-                </button>
-                <button
-                    @click="tab = 'status'"
-                    class="px-4 py-2 text-sm font-medium rounded-t-lg transition"
-                    :class="tab === 'status' ? 'bg-gray-200 text-gray-900 dark:bg-gray-800 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
-                >
-                    Status
-                </button>
+                <div class="flex gap-1">
+                    <button
+                        type="button"
+                        @click="tab = 'config'"
+                        class="px-4 py-2 text-sm font-medium rounded-t-lg transition"
+                        :class="tab === 'config' ? 'bg-gray-200 text-gray-900 dark:bg-gray-800 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
+                    >
+                        Configuration
+                    </button>
+                    <button
+                        type="button"
+                        @click="tab = 'status'"
+                        class="px-4 py-2 text-sm font-medium rounded-t-lg transition"
+                        :class="tab === 'status' ? 'bg-gray-200 text-gray-900 dark:bg-gray-800 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
+                    >
+                        Status
+                    </button>
+                </div>
+                <div class="flex items-center space-x-2 mb-2">
+                    <span class="text-sm text-gray-600 dark:text-gray-400" x-text="switchingBackend ? 'Switching...' : 'Backend:'"></span>
+                    <div class="flex bg-gray-200 dark:bg-gray-800 rounded-lg p-1">
+                        <button 
+                            type="button"
+                            @click="switchBackend('picoclaw')"
+                            :disabled="switchingBackend"
+                            :class="backend === 'picoclaw' ? 'bg-white text-gray-900 dark:bg-gray-700 dark:text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'"
+                            class="px-3 py-1 rounded-md text-sm font-medium transition disabled:opacity-50">
+                            🐾 PicoClaw
+                        </button>
+                        <button 
+                            type="button"
+                            @click="switchBackend('hermes')"
+                            :disabled="switchingBackend"
+                            :class="backend === 'hermes' ? 'bg-white text-gray-900 dark:bg-gray-700 dark:text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'"
+                            class="px-3 py-1 rounded-md text-sm font-medium transition disabled:opacity-50">
+                            🔮 Hermes
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div x-show="tab === 'config'">
                 <div class="space-y-6">
                     <section>
                         <h2 class="text-lg font-semibold mb-3">Providers</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <template x-for="p in providerList" :key="p.key">
-                                <div
-                                    class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
-                                >
-                                    <h3
-                                        class="font-medium mb-3 capitalize"
-                                        x-text="p.label"
-                                    ></h3>
+                        <div x-show="backend === 'picoclaw'">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <template x-for="p in providerList" :key="p.key">
+                                    <div
+                                        class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
+                                    >
+                                        <h3
+                                            class="font-medium mb-3 capitalize"
+                                            x-text="p.label"
+                                        ></h3>
+                                        <div class="space-y-3">
+                                            <div>
+                                                <label
+                                                    class="block text-xs text-gray-500 mb-1"
+                                                    >API Key</label
+                                                >
+                                                <input
+                                                    type="password"
+                                                    class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                    :value="getProvider(p.key, 'api_key')"
+                                                    @input="setProvider(p.key, 'api_key', $event.target.value)"
+                                                    placeholder="Enter API key"
+                                                />
+                                            </div>
+                                            <div x-show="p.hasBase">
+                                                <label
+                                                    class="block text-xs text-gray-500 mb-1"
+                                                    >Base URL</label
+                                                >
+                                                <input
+                                                    type="text"
+                                                    class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                    :value="getProvider(p.key, 'api_base')"
+                                                    @input="setProvider(p.key, 'api_base', $event.target.value)"
+                                                    :placeholder="p.basePlaceholder || 'Optional'"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                        <div x-show="backend === 'hermes'">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- OpenRouter -->
+                                <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                    <h3 class="font-medium mb-3">OpenRouter</h3>
                                     <div class="space-y-3">
                                         <div>
-                                            <label
-                                                class="block text-xs text-gray-500 mb-1"
-                                                >API Key</label
-                                            >
-                                            <input
-                                                type="password"
-                                                class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                                :value="getProvider(p.key, 'api_key')"
-                                                @input="setProvider(p.key, 'api_key', $event.target.value)"
-                                                placeholder="Enter API key"
-                                            />
-                                        </div>
-                                        <div x-show="p.hasBase">
-                                            <label
-                                                class="block text-xs text-gray-500 mb-1"
-                                                >Base URL</label
-                                            >
-                                            <input
-                                                type="text"
-                                                class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                                :value="getProvider(p.key, 'api_base')"
-                                                @input="setProvider(p.key, 'api_base', $event.target.value)"
-                                                :placeholder="p.basePlaceholder || 'Optional'"
-                                            />
+                                            <label class="block text-xs text-gray-500 mb-1">API Key</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.providers.openrouter.api_key" placeholder="Enter API key" />
                                         </div>
                                     </div>
                                 </div>
-                            </template>
+                                <!-- Anthropic -->
+                                <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                    <h3 class="font-medium mb-3">Anthropic</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">API Key</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.providers.anthropic.api_key" placeholder="Enter API key" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- OpenAI/Codex -->
+                                <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                    <h3 class="font-medium mb-3">OpenAI / Codex</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">API Key</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.providers.openai.api_key" placeholder="Enter API key" />
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Base URL</label>
+                                            <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.providers.openai.api_base" placeholder="Optional" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- z.ai/GLM -->
+                                <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                    <h3 class="font-medium mb-3">z.ai / GLM</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">API Key</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.providers.zhipu.api_key" placeholder="Enter API key" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Kimi/Moonshot -->
+                                <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                    <h3 class="font-medium mb-3">Kimi / Moonshot</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">API Key</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.providers.moonshot.api_key" placeholder="Enter API key" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- MiniMax -->
+                                <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                    <h3 class="font-medium mb-3">MiniMax</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">API Key</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.providers.minimax.api_key" placeholder="Enter API key" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Custom -->
+                                <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                    <h3 class="font-medium mb-3">Custom</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">API Key</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.providers.custom.api_key" placeholder="API Key" />
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Base URL</label>
+                                            <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.providers.custom.base_url" placeholder="Base URL (e.g., http://localhost:8000/v1)" />
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Model</label>
+                                            <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.providers.custom.model" placeholder="Model name" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </section>
 
@@ -213,7 +327,7 @@
 
                     <section>
                         <h2 class="text-lg font-semibold mb-3">Channels</h2>
-                        <div class="space-y-4">
+                        <div x-show="backend === 'picoclaw'" class="space-y-4">
                             <div
                                 class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
                             >
@@ -610,6 +724,76 @@
                                 </div>
                             </div>
                         </div>
+                        <div x-show="backend === 'hermes'" class="space-y-4" x-cloak>
+                            <!-- Telegram -->
+                            <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-medium">Telegram</h3>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.channels.telegram.enabled" />
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                    </label>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.channels.telegram.enabled">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Bot Token</label>
+                                        <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.channels.telegram.token" placeholder="Token from @BotFather" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Allowed Users (comma-separated)</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" :value="(config.channels.telegram.allow_from || []).join(', ')" @input="config.channels.telegram.allow_from = $event.target.value.split(',').map(s => s.trim()).filter(Boolean)" placeholder="123456789,987654321" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Discord -->
+                            <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-medium">Discord</h3>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.channels.discord.enabled" />
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                    </label>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.channels.discord.enabled">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Bot Token</label>
+                                        <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.channels.discord.token" placeholder="Token from Developer Portal" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Allowed Users (comma-separated)</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" :value="(config.channels.discord.allow_from || []).join(', ')" @input="config.channels.discord.allow_from = $event.target.value.split(',').map(s => s.trim()).filter(Boolean)" placeholder="284102345871466496" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Signal (Coming Soon) -->
+                            <div class="opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-medium">Signal</h3>
+                                    <span class="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded">Coming Soon</span>
+                                </div>
+                                <p class="text-sm text-gray-500">Signal integration coming in a future update.</p>
+                            </div>
+
+                            <!-- Email (Coming Soon) -->
+                            <div class="opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-medium">Email</h3>
+                                    <span class="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded">Coming Soon</span>
+                                </div>
+                                <p class="text-sm text-gray-500">Email integration coming in a future update.</p>
+                            </div>
+
+                            <!-- Home Assistant (Coming Soon) -->
+                            <div class="opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-medium">Home Assistant</h3>
+                                    <span class="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded">Coming Soon</span>
+                                </div>
+                                <p class="text-sm text-gray-500">Home Assistant integration coming in a future update.</p>
+                            </div>
+                        </div>
                     </section>
 
                     <section>
@@ -771,7 +955,7 @@
                                                 <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="server.enabled" />
                                                 <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
                                             </label>
-                                            <svg class="w-5 h-5 text-gray-400 transition-transform" :class="expanded ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                            <svg class="w-5 h-5 text-gray-400 transition-transform" :class="expanded ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><title>Toggle MCP server details</title><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                         </div>
                                     </div>
                                     <div x-show="expanded" class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800 space-y-4" @click.stop>
@@ -792,15 +976,15 @@
                                                 <div x-data="{ envArray: objectToArray(server.env) }" x-effect="server.env = arrayToObject(envArray)">
                                                     <div class="flex items-center justify-between mb-1">
                                                         <label class="block text-xs text-gray-500">Environment Variables</label>
-                                                        <button @click="envArray.push({key: '', value: ''})" class="text-xs text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">+ Add Env</button>
+                                                        <button type="button" @click="envArray.push({key: '', value: ''})" class="text-xs text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">+ Add Env</button>
                                                     </div>
                                                     <div class="space-y-2">
                                                         <template x-for="(item, index) in envArray" :key="index">
                                                             <div class="flex gap-2">
                                                                 <input type="text" class="w-1/3 bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="item.key" placeholder="Key" />
                                                                 <input type="password" class="flex-1 bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="item.value" placeholder="Value" />
-                                                                <button @click="envArray.splice(index, 1)" class="px-2 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300">
-                                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                                <button type="button" @click="envArray.splice(index, 1)" class="px-2 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300">
+                                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><title>Remove environment variable</title><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                                                 </button>
                                                             </div>
                                                         </template>
@@ -824,15 +1008,15 @@
                                                 <div x-data="{ headersArray: objectToArray(server.headers) }" x-effect="server.headers = arrayToObject(headersArray)">
                                                     <div class="flex items-center justify-between mb-1">
                                                         <label class="block text-xs text-gray-500">Headers</label>
-                                                        <button @click="headersArray.push({key: '', value: ''})" class="text-xs text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">+ Add Header</button>
+                                                        <button type="button" @click="headersArray.push({key: '', value: ''})" class="text-xs text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">+ Add Header</button>
                                                     </div>
                                                     <div class="space-y-2">
                                                         <template x-for="(item, index) in headersArray" :key="index">
                                                             <div class="flex gap-2">
                                                                 <input type="text" class="w-1/3 bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="item.key" placeholder="Key" />
                                                                 <input type="password" class="flex-1 bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="item.value" placeholder="Value" />
-                                                                <button @click="headersArray.splice(index, 1)" class="px-2 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300">
-                                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                                <button type="button" @click="headersArray.splice(index, 1)" class="px-2 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300">
+                                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><title>Remove header</title><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                                                 </button>
                                                             </div>
                                                         </template>
@@ -841,7 +1025,7 @@
                                             </div>
                                         </template>
                                         <div class="pt-4 flex justify-end">
-                                            <button @click="if(confirm('Delete server ' + name + '?')) { delete config.tools.mcp.servers[name]; }" class="text-sm px-3 py-1.5 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 rounded-lg transition">
+                                            <button type="button" @click="if(confirm('Delete server ' + name + '?')) { delete config.tools.mcp.servers[name]; }" class="text-sm px-3 py-1.5 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 rounded-lg transition">
                                                 Delete Server
                                             </button>
                                         </div>
@@ -849,7 +1033,7 @@
                                 </div>
                             </template>
                             <div class="flex justify-center">
-                                <button @click="const name = prompt('Enter new server name (slug):'); if(name && !config.tools.mcp.servers[name]) { config.tools.mcp.servers[name] = { enabled: true, command: '', args: [] }; }" class="text-sm px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg transition font-medium">
+                                <button type="button" @click="const name = prompt('Enter new server name (slug):'); if(name && !config.tools.mcp.servers[name]) { config.tools.mcp.servers[name] = { enabled: true, command: '', args: [] }; }" class="text-sm px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg transition font-medium">
                                     + Add Server
                                 </button>
                             </div>
@@ -1062,6 +1246,7 @@
                             >
                         </label>
                         <button
+                            type="button"
                             @click="saveConfig()"
                             :disabled="saving"
                             class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-50 rounded-lg text-sm font-medium transition"
@@ -1076,7 +1261,14 @@
             <div x-show="tab === 'status'">
                 <div class="space-y-6">
                     <section>
-                        <h2 class="text-lg font-semibold mb-3">Gateway</h2>
+                        <div class="flex items-center justify-between mb-3">
+                            <h2 class="text-lg font-semibold">Gateway</h2>
+                            <div class="flex items-center gap-2 text-sm font-medium px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                                <span x-show="backend === 'picoclaw'">Backend: 🐾 PicoClaw</span>
+                                <span x-show="backend === 'hermes'">Backend: 🔮 Hermes</span>
+                                <span x-show="backend !== 'picoclaw' && backend !== 'hermes'" x-text="'Backend: ❓ ' + (backend || 'Unknown')"></span>
+                            </div>
+                        </div>
                         <div
                             class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
                         >
@@ -1129,6 +1321,7 @@
                                 </div>
                                 <div class="flex gap-2">
                                     <button
+                                        type="button"
                                         @click="startGateway()"
                                         class="text-xs px-3 py-1.5 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-600/20 dark:text-emerald-400 dark:hover:bg-emerald-600/30 rounded-lg transition"
                                         :disabled="status.gateway?.state === 'running'"
@@ -1136,6 +1329,7 @@
                                         Start
                                     </button>
                                     <button
+                                        type="button"
                                         @click="stopGateway()"
                                         class="text-xs px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-600/20 dark:text-red-400 dark:hover:bg-red-600/30 rounded-lg transition"
                                         :disabled="status.gateway?.state === 'stopped'"
@@ -1143,6 +1337,7 @@
                                         Stop
                                     </button>
                                     <button
+                                        type="button"
                                         @click="restartGateway()"
                                         class="text-xs px-3 py-1.5 bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-600/20 dark:text-blue-400 dark:hover:bg-blue-600/30 rounded-lg transition"
                                     >
@@ -1315,6 +1510,9 @@
             function app() {
               return {
                 tab: 'config',
+                backend: 'picoclaw',
+                availableBackends: ['picoclaw', 'hermes'],
+                switchingBackend: false,
                 config: defaultConfig(),
                 status: {},
                 logs: [],
@@ -1424,11 +1622,49 @@
                 },
 
                 async init() {
+                  try {
+                    const res = await fetch('/api/backend');
+                    if (res.ok) {
+                      const data = await res.json();
+                      this.backend = data.backend;
+                      this.availableBackends = data.available;
+                    }
+                  } catch (e) {}
+
                   await this.loadConfig();
                   await this.loadStatus();
                   await this.loadLogs();
                   setInterval(() => this.loadStatus(), 5000);
                   setInterval(() => this.loadLogs(), 3000);
+                },
+
+                async switchBackend(newBackend) {
+                  if (this.switchingBackend) return;
+                  if (this.backend === newBackend) return;
+                  
+                  if (this.status.gateway?.state === 'running') {
+                    if (!confirm('Gateway is running. Stop it and switch?')) return;
+                  }
+                  
+                  this.switchingBackend = true;
+                  try {
+                    const res = await fetch('/api/backend', {
+                      method: 'POST',
+                      headers: {'Content-Type': 'application/json'},
+                      body: JSON.stringify({backend: newBackend})
+                    });
+                    if (res.ok) {
+                      this.backend = newBackend;
+                      await this.loadConfig();
+                      this.showToast(`Switched to ${newBackend} backend`, 'success');
+                    } else {
+                      this.showToast('Failed to switch backend', 'error');
+                    }
+                  } catch (e) {
+                    this.showToast('Error switching backend: ' + e.message, 'error');
+                  } finally {
+                    this.switchingBackend = false;
+                  }
                 },
 
                 async loadConfig() {
@@ -1560,15 +1796,18 @@
                 },
                 providers: {
                   anthropic: { api_key: '' },
-                  openai: { api_key: '', api_base: '' },
+                  openai: { api_key: '', api_base: '', base_url: '' },
                   openrouter: { api_key: '' },
                   deepseek: { api_key: '' },
                   groq: { api_key: '' },
                   gemini: { api_key: '' },
                   zhipu: { api_key: '', api_base: '' },
+                  zai: { api_key: '' },
                   vllm: { api_key: '', api_base: '' },
                   nvidia: { api_key: '', api_base: '' },
                   moonshot: { api_key: '' },
+                  minimax: { api_key: '' },
+                  custom: { api_key: '', base_url: '', model: '' },
                 },
                 gateway: { host: '0.0.0.0', port: 18790 },
                 tools: {

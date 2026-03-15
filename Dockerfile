@@ -1,4 +1,4 @@
-FROM golang:1.25-alpine AS builder
+FROM golang:1.25-alpine AS picoclaw-builder
 
 RUN apk add --no-cache git make
 
@@ -12,15 +12,38 @@ RUN make build
 # RUN go install github.com/steipete/gogcli/cmd/gog@latest
 RUN go install github.com/Hyaxia/blogwatcher/cmd/blogwatcher@latest
 
+FROM python:3.12-bookworm AS hermes-builder
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends git ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install uv for fast Python package installation
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+WORKDIR /hermes-src
+
+# Clone Hermes Agent and initialize submodules
+RUN git clone https://github.com/NousResearch/hermes-agent.git . && \
+    git submodule update --init --recursive
+
+# Create venv and install Hermes with all dependencies
+RUN uv venv /opt/hermes/venv && \
+    . /opt/hermes/venv/bin/activate && \
+    uv pip install --no-cache -e ".[all]"
+
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends curl ca-certificates git nodejs npm gh jq bc && \
     rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /src/build/picoclaw /usr/local/bin/picoclaw
-# COPY --from=builder /go/bin/gog /usr/local/bin/gog
-COPY --from=builder /go/bin/blogwatcher /usr/local/bin/blogwatcher
+COPY --from=picoclaw-builder /src/build/picoclaw /usr/local/bin/picoclaw
+# COPY --from=picoclaw-builder /go/bin/gog /usr/local/bin/gog
+COPY --from=picoclaw-builder /go/bin/blogwatcher /usr/local/bin/blogwatcher
+
+COPY --from=hermes-builder /opt/hermes/venv /opt/hermes/venv
+COPY --from=hermes-builder /hermes-src /hermes-src
 
 COPY requirements.txt /app/requirements.txt
 RUN uv pip install --system --no-cache -r /app/requirements.txt
@@ -92,6 +115,8 @@ ENV HOME=/data
 ENV PICOCLAW_AGENTS_DEFAULTS_WORKSPACE=/data/.picoclaw/workspace
 ENV FINANCE_NEWS_VENV_BOOTSTRAPPED=1
 ENV TZ="Asia/Saigon"
+ENV PATH="/opt/hermes/venv/bin:${PATH}"
+ENV PYTHONPATH="/opt/hermes/venv/lib/python3.12/site-packages:${PYTHONPATH}"
 # ENV GOG_KEYRING_BACKEND=file
 # ENV GOG_KEYRING_PASSWORD=picoclaw_default_keyring_secret
 
