@@ -420,6 +420,12 @@ class HermesManager(BaseGatewayManager):
                 "provider": "openrouter",
                 "default": "anthropic/claude-3.5-sonnet",
             },
+            "agent": {
+                "max_turns": 90,
+                "system_prompt": "",
+                "reasoning_effort": "medium",
+                "personalities": "",
+            },
             "auxiliary": {
                 "vision": {
                     "provider": "auto",
@@ -443,6 +449,19 @@ class HermesManager(BaseGatewayManager):
                 "bell_on_complete": False,
                 "show_reasoning": False,
                 "skin": "",
+            },
+            "mcp_servers": {},
+            "provider_routing": {
+                "sort": "price",
+                "only": "",
+                "ignore": "",
+                "order": "",
+                "require_parameters": False,
+                "data_collection": "deny",
+            },
+            "fallback_model": {
+                "provider": "",
+                "model": "",
             },
         }
 
@@ -510,6 +529,8 @@ class HermesManager(BaseGatewayManager):
         env_data = self._read_env_file()
         config = default_config()
         config["agents"]["defaults"]["provider"] = "auto"
+        if "hermes" not in config:
+            config["hermes"] = {}
 
         model = yaml_data.get("model", {}) if isinstance(yaml_data, dict) else {}
         if isinstance(model, dict):
@@ -519,7 +540,7 @@ class HermesManager(BaseGatewayManager):
 
         auxiliary = yaml_data.get("auxiliary", {}) if isinstance(yaml_data, dict) else {}
         if isinstance(auxiliary, dict):
-            config["agents"]["auxiliary"] = auxiliary
+            config["hermes"]["auxiliary"] = auxiliary
 
         config["providers"]["openrouter"]["api_key"] = env_data.get("OPENROUTER_API_KEY", "")
         config["providers"]["anthropic"]["api_key"] = env_data.get("ANTHROPIC_API_KEY", "")
@@ -634,9 +655,33 @@ class HermesManager(BaseGatewayManager):
         if isinstance(display, dict):
             config["hermes"]["display"] = display
 
+        mcp_servers_dict = yaml_data.get("mcp_servers", {}) if isinstance(yaml_data, dict) else {}
+        mcp_servers_list = []
+        for name, srv in mcp_servers_dict.items():
+            srv_copy = dict(srv)
+            srv_copy["name"] = name
+            if isinstance(srv_copy.get("args"), list):
+                srv_copy["args"] = ",".join(srv_copy["args"])
+            if isinstance(srv_copy.get("env"), dict):
+                srv_copy["env"] = ",".join(f"{k}={v}" for k, v in srv_copy["env"].items())
+            mcp_servers_list.append(srv_copy)
+        config["hermes"]["mcp_servers"] = mcp_servers_list
+
+        provider_routing = yaml_data.get("provider_routing", {}) if isinstance(yaml_data, dict) else {}
+        if isinstance(provider_routing, dict):
+            config["hermes"]["provider_routing"] = provider_routing
+
+        fallback_model = yaml_data.get("fallback_model", {}) if isinstance(yaml_data, dict) else {}
+        if isinstance(fallback_model, dict):
+            config["hermes"]["fallback_model"] = fallback_model
+
         if "gateway" not in config["hermes"]:
             config["hermes"]["gateway"] = {}
             
+        agent = yaml_data.get("agent", {}) if isinstance(yaml_data, dict) else {}
+        if isinstance(agent, dict):
+            config["hermes"]["agent"] = agent
+
         # Priority logic:
         # 1. Platform allow-all (e.g., TELEGRAM_ALLOW_ALL_USERS=true)
         # 2. DM pairing
@@ -678,7 +723,7 @@ class HermesManager(BaseGatewayManager):
         model_out["default"] = model_default or "anthropic/claude-3.5-sonnet"
         yaml_out["model"] = model_out
 
-        auxiliary = ((data.get("agents") or {}).get("auxiliary")) if isinstance(data, dict) else None
+        auxiliary = ((data.get("hermes") or {}).get("auxiliary")) if isinstance(data, dict) else None
         if isinstance(auxiliary, dict):
             yaml_out["auxiliary"] = self._strip_secrets_for_yaml(auxiliary)
         elif "auxiliary" not in yaml_out:
@@ -695,6 +740,52 @@ class HermesManager(BaseGatewayManager):
             yaml_out["display"] = display
         elif "display" not in yaml_out:
             yaml_out["display"] = self._default_hermes_yaml()["display"]
+
+        agent = hermes_data.get("agent") if isinstance(hermes_data, dict) else None
+        if isinstance(agent, dict):
+            yaml_out["agent"] = agent
+        elif "agent" not in yaml_out:
+            yaml_out["agent"] = self._default_hermes_yaml()["agent"]
+
+        mcp_servers_list = hermes_data.get("mcp_servers", []) if isinstance(hermes_data, dict) else []
+        mcp_servers_dict = {}
+        for srv in mcp_servers_list:
+            name = srv.get("name")
+            if not name: continue
+            srv_out = {
+                "command": srv.get("command", ""),
+                "url": srv.get("url", ""),
+                "timeout": int(srv.get("timeout", 0)) if srv.get("timeout") else 0,
+            }
+            args_str = srv.get("args", "")
+            if args_str:
+                srv_out["args"] = [a.strip() for a in args_str.split(",") if a.strip()]
+            else:
+                srv_out["args"] = []
+                
+            env_str = srv.get("env", "")
+            env_dict = {}
+            if env_str:
+                for pair in env_str.split(","):
+                    if "=" in pair:
+                        k, v = pair.split("=", 1)
+                        env_dict[k.strip()] = v.strip()
+            srv_out["env"] = env_dict
+            mcp_servers_dict[name] = srv_out
+            
+        yaml_out["mcp_servers"] = mcp_servers_dict
+
+        provider_routing = hermes_data.get("provider_routing") if isinstance(hermes_data, dict) else None
+        if isinstance(provider_routing, dict):
+            yaml_out["provider_routing"] = provider_routing
+        elif "provider_routing" not in yaml_out:
+            yaml_out["provider_routing"] = self._default_hermes_yaml()["provider_routing"]
+
+        fallback_model = hermes_data.get("fallback_model") if isinstance(hermes_data, dict) else None
+        if isinstance(fallback_model, dict):
+            yaml_out["fallback_model"] = fallback_model
+        elif "fallback_model" not in yaml_out:
+            yaml_out["fallback_model"] = self._default_hermes_yaml()["fallback_model"]
 
         env_out = dict(existing_env)
 
