@@ -440,111 +440,6 @@
                                 <div
                                     class="flex items-center justify-between mb-3"
                                 >
-                                    <h3 class="font-medium">Slack</h3>
-                                    <label
-                                        class="flex items-center gap-2 cursor-pointer"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
-                                            x-model="config.channels.slack.enabled"
-                                        />
-                                        <span
-                                            class="text-xs text-gray-500 dark:text-gray-400"
-                                            >Enabled</span
-                                        >
-                                    </label>
-                                </div>
-                                <div
-                                    class="grid grid-cols-1 md:grid-cols-2 gap-3"
-                                    x-show="config.channels.slack.enabled"
-                                >
-                                    <div>
-                                        <label
-                                            class="block text-xs text-gray-500 mb-1"
-                                            >Bot Token</label
-                                        >
-                                        <input
-                                            type="password"
-                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                            x-model="config.channels.slack.bot_token"
-                                            placeholder="xoxb-..."
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="block text-xs text-gray-500 mb-1"
-                                            >App Token</label
-                                        >
-                                        <input
-                                            type="password"
-                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                            x-model="config.channels.slack.app_token"
-                                            placeholder="xapp-..."
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div
-                                class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
-                            >
-                                <div
-                                    class="flex items-center justify-between mb-3"
-                                >
-                                    <h3 class="font-medium">WhatsApp</h3>
-                                    <label
-                                        class="flex items-center gap-2 cursor-pointer"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
-                                            x-model="config.channels.whatsapp.enabled"
-                                        />
-                                        <span
-                                            class="text-xs text-gray-500 dark:text-gray-400"
-                                            >Enabled</span
-                                        >
-                                    </label>
-                                </div>
-                                <div
-                                    class="grid grid-cols-1 md:grid-cols-2 gap-3"
-                                    x-show="config.channels.whatsapp.enabled"
-                                >
-                                    <div>
-                                        <label
-                                            class="block text-xs text-gray-500 mb-1"
-                                            >Bridge URL</label
-                                        >
-                                        <input
-                                            type="text"
-                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                            x-model="config.channels.whatsapp.bridge_url"
-                                            placeholder="ws://localhost:3001"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="block text-xs text-gray-500 mb-1"
-                                            >Allowed Numbers
-                                            (comma-separated)</label
-                                        >
-                                        <input
-                                            type="text"
-                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                            :value="(config.channels.whatsapp.allow_from || []).join(', ')"
-                                            @input="config.channels.whatsapp.allow_from = $event.target.value.split(',').map(s => s.trim()).filter(Boolean)"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div
-                                class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
-                            >
-                                <div
-                                    class="flex items-center justify-between mb-3"
-                                >
                                     <h3 class="font-medium">Feishu</h3>
                                     <label
                                         class="flex items-center gap-2 cursor-pointer"
@@ -767,31 +662,199 @@
                                 </div>
                             </div>
 
-                            <!-- Signal (Coming Soon) -->
-                            <div class="opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800 rounded-xl p-4">
+                            <!-- Slack -->
+                            <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-medium">Slack</h3>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.slack.enabled" />
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                    </label>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.hermes.channels.slack.enabled">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Bot Token</label>
+                                        <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.slack.bot_token" placeholder="xoxb-..." />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">App Token</label>
+                                        <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.slack.app_token" placeholder="xapp-..." />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Home Channel</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.slack.home_channel" placeholder="C12345678" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Home Channel Name</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.slack.home_channel_name" placeholder="general" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Allowed Users (comma-separated)</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.slack.allowed_users" placeholder="U12345678,U87654321" />
+                                    </div>
+                                    <div class="flex items-center mt-6">
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.slack.allow_all_users" />
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Allow All Users</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- WhatsApp -->
+                            <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-medium">WhatsApp</h3>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.whatsapp.enabled" />
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                    </label>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.hermes.channels.whatsapp.enabled">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Mode</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.whatsapp.mode" placeholder="local" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Allowed Users (comma-separated)</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.whatsapp.allowed_users" placeholder="1234567890,0987654321" />
+                                    </div>
+                                    <div class="flex items-center mt-6">
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.whatsapp.allow_all_users" />
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Allow All Users</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Signal -->
+                            <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
                                 <div class="flex items-center justify-between mb-3">
                                     <h3 class="font-medium">Signal</h3>
-                                    <span class="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded">Coming Soon</span>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.signal.enabled" />
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                    </label>
                                 </div>
-                                <p class="text-sm text-gray-500">Signal integration coming in a future update.</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.hermes.channels.signal.enabled">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">HTTP URL</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.signal.http_url" placeholder="http://localhost:8080" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Account</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.signal.account" placeholder="+1234567890" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Home Channel</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.signal.home_channel" placeholder="group_id" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Home Channel Name</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.signal.home_channel_name" placeholder="general" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Group Allowed Users (comma-separated)</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.signal.group_allowed_users" placeholder="group_id1,group_id2" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Allowed Users (comma-separated)</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.signal.allowed_users" placeholder="+1234567890,+0987654321" />
+                                    </div>
+                                    <div class="flex items-center mt-6">
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.signal.ignore_stories" />
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Ignore Stories</span>
+                                        </label>
+                                    </div>
+                                    <div class="flex items-center mt-6">
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.signal.allow_all_users" />
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Allow All Users</span>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
 
-                            <!-- Email (Coming Soon) -->
-                            <div class="opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800 rounded-xl p-4">
+                            <!-- Email -->
+                            <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
                                 <div class="flex items-center justify-between mb-3">
                                     <h3 class="font-medium">Email</h3>
-                                    <span class="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded">Coming Soon</span>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.email.enabled" />
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                    </label>
                                 </div>
-                                <p class="text-sm text-gray-500">Email integration coming in a future update.</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.hermes.channels.email.enabled">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Address</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.email.address" placeholder="bot@example.com" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Password</label>
+                                        <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.email.password" placeholder="password" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">IMAP Host</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.email.imap_host" placeholder="imap.example.com" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">SMTP Host</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.email.smtp_host" placeholder="smtp.example.com" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">IMAP Port</label>
+                                        <input type="number" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model.number="config.hermes.channels.email.imap_port" placeholder="993" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">SMTP Port</label>
+                                        <input type="number" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model.number="config.hermes.channels.email.smtp_port" placeholder="465" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Poll Interval (seconds)</label>
+                                        <input type="number" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model.number="config.hermes.channels.email.poll_interval" placeholder="60" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Home Address</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.email.home_address" placeholder="admin@example.com" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Home Address Name</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.email.home_address_name" placeholder="Admin" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Allowed Users (comma-separated)</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.email.allowed_users" placeholder="user1@example.com,user2@example.com" />
+                                    </div>
+                                    <div class="flex items-center mt-6">
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.email.allow_all_users" />
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Allow All Users</span>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
 
-                            <!-- Home Assistant (Coming Soon) -->
-                            <div class="opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800 rounded-xl p-4">
+                            <!-- Home Assistant -->
+                            <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
                                 <div class="flex items-center justify-between mb-3">
                                     <h3 class="font-medium">Home Assistant</h3>
-                                    <span class="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded">Coming Soon</span>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.homeassistant.enabled" />
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                    </label>
                                 </div>
-                                <p class="text-sm text-gray-500">Home Assistant integration coming in a future update.</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.hermes.channels.homeassistant.enabled">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">URL</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.homeassistant.url" placeholder="http://homeassistant.local:8123" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Token</label>
+                                        <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.homeassistant.token" placeholder="Long-Lived Access Token" />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </section>
@@ -1793,6 +1856,15 @@
                   qq: { enabled: false, app_id: '', app_secret: '', allow_from: [] },
                   line: { enabled: false, channel_secret: '', channel_access_token: '', webhook_host: '0.0.0.0', webhook_port: 18791, webhook_path: '/webhook/line', allow_from: [] },
                   maixcam: { enabled: false, host: '0.0.0.0', port: 18790, allow_from: [] },
+                },
+                hermes: {
+                  channels: {
+                    slack: { enabled: false, bot_token: '', app_token: '', home_channel: '', home_channel_name: '', allowed_users: '', allow_all_users: false },
+                    whatsapp: { enabled: false, mode: 'local', allowed_users: '', allow_all_users: false },
+                    signal: { enabled: false, http_url: '', account: '', ignore_stories: true, home_channel: '', home_channel_name: '', group_allowed_users: '', allowed_users: '', allow_all_users: false },
+                    email: { enabled: false, address: '', password: '', imap_host: '', smtp_host: '', imap_port: 993, smtp_port: 465, poll_interval: 60, home_address: '', home_address_name: '', allowed_users: '', allow_all_users: false },
+                    homeassistant: { enabled: false, token: '', url: '' }
+                  }
                 },
                 providers: {
                   anthropic: { api_key: '' },
