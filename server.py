@@ -430,6 +430,20 @@ class HermesManager(BaseGatewayManager):
                     "model": "google/gemini-2.5-flash",
                 },
             },
+            "compression": {
+                "enabled": True,
+                "threshold": 0.50,
+                "summary_model": "",
+                "summary_provider": "",
+            },
+            "display": {
+                "compact": False,
+                "personality": "kawaii",
+                "resume_display": "full",
+                "bell_on_complete": False,
+                "show_reasoning": False,
+                "skin": "",
+            },
         }
 
     def _ensure_default_files(self):
@@ -612,6 +626,14 @@ class HermesManager(BaseGatewayManager):
             "homeassistant": homeassistant_channel,
         }
 
+        compression = yaml_data.get("compression", {}) if isinstance(yaml_data, dict) else {}
+        if isinstance(compression, dict):
+            config["hermes"]["compression"] = compression
+
+        display = yaml_data.get("display", {}) if isinstance(yaml_data, dict) else {}
+        if isinstance(display, dict):
+            config["hermes"]["display"] = display
+
         if "gateway" not in config["hermes"]:
             config["hermes"]["gateway"] = {}
             
@@ -661,6 +683,18 @@ class HermesManager(BaseGatewayManager):
             yaml_out["auxiliary"] = self._strip_secrets_for_yaml(auxiliary)
         elif "auxiliary" not in yaml_out:
             yaml_out["auxiliary"] = self._default_hermes_yaml()["auxiliary"]
+
+        compression = hermes_data.get("compression") if isinstance(hermes_data, dict) else None
+        if isinstance(compression, dict):
+            yaml_out["compression"] = compression
+        elif "compression" not in yaml_out:
+            yaml_out["compression"] = self._default_hermes_yaml()["compression"]
+
+        display = hermes_data.get("display") if isinstance(hermes_data, dict) else None
+        if isinstance(display, dict):
+            yaml_out["display"] = display
+        elif "display" not in yaml_out:
+            yaml_out["display"] = self._default_hermes_yaml()["display"]
 
         env_out = dict(existing_env)
 

@@ -250,6 +250,170 @@
                         </div>
                     </section>
 
+                    <section x-show="backend === 'hermes'">
+                        <h2 class="text-lg font-semibold mb-3">Auxiliary Models</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                <h3 class="font-medium mb-3">Vision</h3>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Provider</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.auxiliary.vision.provider" placeholder="e.g., openrouter" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Model</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.auxiliary.vision.model" placeholder="e.g., openai/gpt-4o" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Base URL</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.auxiliary.vision.base_url" placeholder="Optional" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">API Key</label>
+                                        <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.auxiliary.vision.api_key" placeholder="Enter API key" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                <h3 class="font-medium mb-3">Web Extract</h3>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Provider</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.auxiliary.web_extract.provider" placeholder="e.g., openrouter" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Model</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.auxiliary.web_extract.model" placeholder="e.g., openai/gpt-4o" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Base URL</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.auxiliary.web_extract.base_url" placeholder="Optional" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">API Key</label>
+                                        <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.auxiliary.web_extract.api_key" placeholder="Enter API key" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section x-show="backend === 'hermes'">
+                        <h2 class="text-lg font-semibold mb-3">Terminal</h2>
+                        <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs text-gray-500 mb-1">Backend</label>
+                                    <select class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.terminal.backend">
+                                        <option value="native">Native</option>
+                                        <option value="docker">Docker</option>
+                                        <option value="ssh">SSH</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Working Directory (CWD)</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.terminal.cwd" placeholder="e.g. /app" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Timeout (seconds)</label>
+                                        <input type="number" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model.number="config.hermes.terminal.timeout" />
+                                    </div>
+                                </div>
+
+                                <!-- Docker specific fields -->
+                                <div x-show="config.hermes.terminal.backend === 'docker'" class="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-800">
+                                    <h3 class="font-medium text-sm">Docker Settings</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Docker Image</label>
+                                            <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.terminal.docker_image" placeholder="e.g. ubuntu:latest" />
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">CPU Limit</label>
+                                            <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.terminal.container_cpu" placeholder="e.g. 1.0" />
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Memory Limit</label>
+                                            <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.terminal.container_memory" placeholder="e.g. 512m" />
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Disk Limit</label>
+                                            <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.terminal.container_disk" placeholder="e.g. 10g" />
+                                        </div>
+                                    </div>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.terminal.container_persistent" />
+                                        <span class="text-sm text-gray-700 dark:text-gray-300">Persistent Container</span>
+                                    </label>
+                                </div>
+
+                                <!-- SSH specific fields -->
+                                <div x-show="config.hermes.terminal.backend === 'ssh'" class="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-800">
+                                    <h3 class="font-medium text-sm">SSH Settings</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Host</label>
+                                            <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.terminal.ssh_host" placeholder="e.g. 192.168.1.10" />
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Port</label>
+                                            <input type="number" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model.number="config.hermes.terminal.ssh_port" />
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">User</label>
+                                            <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.terminal.ssh_user" placeholder="e.g. root" />
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Key Path</label>
+                                            <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.terminal.ssh_key_path" placeholder="e.g. ~/.ssh/id_rsa" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section x-show="backend === 'hermes'">
+                        <h2 class="text-lg font-semibold mb-3">Security</h2>
+                        <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                            <div class="space-y-4">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.security.redact_secrets" />
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">Redact Secrets</span>
+                                </label>
+                                
+                                <div class="pt-4 border-t border-gray-200 dark:border-gray-800">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h3 class="font-medium text-sm">Tirith Integration</h3>
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.security.tirith_enabled" />
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div x-show="config.hermes.security.tirith_enabled" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Tirith Path</label>
+                                            <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.security.tirith_path" placeholder="e.g. /usr/local/bin/tirith" />
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Timeout (seconds)</label>
+                                            <input type="number" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model.number="config.hermes.security.tirith_timeout" />
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label class="flex items-center gap-2 cursor-pointer">
+                                                <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.security.tirith_fail_open" />
+                                                <span class="text-sm text-gray-700 dark:text-gray-300">Fail Open (allow execution if Tirith fails)</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                     <section>
                         <h2 class="text-lg font-semibold mb-3">
                             Agent Defaults
@@ -854,6 +1018,66 @@
                                         <label class="block text-xs text-gray-500 mb-1">Token</label>
                                         <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.homeassistant.token" placeholder="Long-Lived Access Token" />
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section x-show="backend === 'hermes'">
+                        <h2 class="text-lg font-semibold mb-3">Context Compression</h2>
+                        <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4 mb-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.compression.enabled" />
+                                    <label class="text-sm text-gray-700 dark:text-gray-300">Enabled</label>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500 mb-1">Threshold (0-1)</label>
+                                    <input type="number" min="0" max="1" step="0.1" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model.number="config.hermes.compression.threshold" />
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500 mb-1">Summary Model</label>
+                                    <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.compression.summary_model" placeholder="e.g. gpt-4o-mini" />
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500 mb-1">Summary Provider</label>
+                                    <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.compression.summary_provider" placeholder="e.g. openai" />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section x-show="backend === 'hermes'">
+                        <h2 class="text-lg font-semibold mb-3">Display</h2>
+                        <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4 mb-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.display.compact" />
+                                    <label class="text-sm text-gray-700 dark:text-gray-300">Compact Mode</label>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.display.bell_on_complete" />
+                                    <label class="text-sm text-gray-700 dark:text-gray-300">Bell on Complete</label>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.display.show_reasoning" />
+                                    <label class="text-sm text-gray-700 dark:text-gray-300">Show Reasoning</label>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500 mb-1">Personality</label>
+                                    <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.display.personality" placeholder="kawaii" />
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500 mb-1">Resume Display</label>
+                                    <select class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.display.resume_display">
+                                        <option value="full">Full</option>
+                                        <option value="compact">Compact</option>
+                                        <option value="none">None</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500 mb-1">Skin</label>
+                                    <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.display.skin" placeholder="e.g. default" />
                                 </div>
                             </div>
                         </div>
@@ -1858,12 +2082,39 @@
                   maixcam: { enabled: false, host: '0.0.0.0', port: 18790, allow_from: [] },
                 },
                 hermes: {
+                  compression: { enabled: true, threshold: 0.50, summary_model: '', summary_provider: '' },
+                  display: { compact: false, personality: 'kawaii', resume_display: 'full', bell_on_complete: false, show_reasoning: false, skin: '' },
+                  auxiliary: {
+                    vision: { provider: '', model: '', base_url: '', api_key: '' },
+                    web_extract: { provider: '', model: '', base_url: '', api_key: '' }
+                  },
                   channels: {
                     slack: { enabled: false, bot_token: '', app_token: '', home_channel: '', home_channel_name: '', allowed_users: '', allow_all_users: false },
                     whatsapp: { enabled: false, mode: 'local', allowed_users: '', allow_all_users: false },
                     signal: { enabled: false, http_url: '', account: '', ignore_stories: true, home_channel: '', home_channel_name: '', group_allowed_users: '', allowed_users: '', allow_all_users: false },
                     email: { enabled: false, address: '', password: '', imap_host: '', smtp_host: '', imap_port: 993, smtp_port: 465, poll_interval: 60, home_address: '', home_address_name: '', allowed_users: '', allow_all_users: false },
                     homeassistant: { enabled: false, token: '', url: '' }
+                  },
+                  terminal: {
+                    backend: 'native',
+                    cwd: '',
+                    timeout: 300,
+                    docker_image: '',
+                    container_cpu: '',
+                    container_memory: '',
+                    container_disk: '',
+                    container_persistent: false,
+                    ssh_host: '',
+                    ssh_port: 22,
+                    ssh_user: '',
+                    ssh_key_path: ''
+                  },
+                  security: {
+                    redact_secrets: true,
+                    tirith_enabled: false,
+                    tirith_path: '',
+                    tirith_timeout: 30,
+                    tirith_fail_open: false
                   }
                 },
                 providers: {
