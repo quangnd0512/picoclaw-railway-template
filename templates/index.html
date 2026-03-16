@@ -228,21 +228,134 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Custom -->
-                                <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
-                                    <h3 class="font-medium mb-3">Custom</h3>
-                                    <div class="space-y-3">
+                            </div>
+                        </div>
+                    </section>
+
+                    <section x-show="backend === 'picoclaw'">
+                        <h2 class="text-lg font-semibold mb-3">Channels</h2>
+                        <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                            <div class="space-y-4">
+                                <!-- Telegram -->
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h3 class="font-medium">Telegram</h3>
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.channels.telegram.enabled" />
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                        </label>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.channels.telegram.enabled">
                                         <div>
-                                            <label class="block text-xs text-gray-500 mb-1">API Key</label>
-                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.providers.custom.api_key" placeholder="API Key" />
+                                            <label class="block text-xs text-gray-500 mb-1">Bot Token</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.channels.telegram.token" placeholder="Token from @BotFather" />
                                         </div>
                                         <div>
-                                            <label class="block text-xs text-gray-500 mb-1">Base URL</label>
-                                            <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.providers.custom.base_url" placeholder="Base URL (e.g., http://localhost:8000/v1)" />
+                                            <label class="block text-xs text-gray-500 mb-1">Proxy</label>
+                                            <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.channels.telegram.proxy" placeholder="http://proxy:8080" />
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label class="block text-xs text-gray-500 mb-1">Allow From</label>
+                                            <div class="flex flex-wrap gap-2">
+                                                <template x-for="(user, index) in config.channels.telegram.allow_from" :key="index">
+                                                    <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">
+                                                        <span x-text="user"></span>
+                                                        <button type="button" @click="config.channels.telegram.allow_from.splice(index, 1)" class="text-gray-400 hover:text-red-500">×</button>
+                                                    </div>
+                                                </template>
+                                                <input type="text" class="flex-1 min-w-[120px] bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded px-2 py-1 text-sm" placeholder="Add user ID and press Enter" @keydown.enter="if ($event.target.value) { config.channels.telegram.allow_from.push($event.target.value); $event.target.value = ''; }" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Discord -->
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h3 class="font-medium">Discord</h3>
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.channels.discord.enabled" />
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                        </label>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.channels.discord.enabled">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Bot Token</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.channels.discord.token" placeholder="Token from Developer Portal" />
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label class="block text-xs text-gray-500 mb-1">Allow From</label>
+                                            <div class="flex flex-wrap gap-2">
+                                                <template x-for="(user, index) in config.channels.discord.allow_from" :key="index">
+                                                    <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">
+                                                        <span x-text="user"></span>
+                                                        <button type="button" @click="config.channels.discord.allow_from.splice(index, 1)" class="text-gray-400 hover:text-red-500">×</button>
+                                                    </div>
+                                                </template>
+                                                <input type="text" class="flex-1 min-w-[120px] bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded px-2 py-1 text-sm" placeholder="Add user ID and press Enter" @keydown.enter="if ($event.target.value) { config.channels.discord.allow_from.push($event.target.value); $event.target.value = ''; }" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Slack -->
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h3 class="font-medium">Slack</h3>
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.channels.slack.enabled" />
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                        </label>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.channels.slack.enabled">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Bot Token</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.channels.slack.bot_token" placeholder="xoxb-..." />
                                         </div>
                                         <div>
-                                            <label class="block text-xs text-gray-500 mb-1">Model</label>
-                                            <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.providers.custom.model" placeholder="Model name" />
+                                            <label class="block text-xs text-gray-500 mb-1">App Token</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.channels.slack.app_token" placeholder="xapp-..." />
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label class="block text-xs text-gray-500 mb-1">Allow From</label>
+                                            <div class="flex flex-wrap gap-2">
+                                                <template x-for="(user, index) in config.channels.slack.allow_from" :key="index">
+                                                    <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">
+                                                        <span x-text="user"></span>
+                                                        <button type="button" @click="config.channels.slack.allow_from.splice(index, 1)" class="text-gray-400 hover:text-red-500">×</button>
+                                                    </div>
+                                                </template>
+                                                <input type="text" class="flex-1 min-w-[120px] bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded px-2 py-1 text-sm" placeholder="Add user ID and press Enter" @keydown.enter="if ($event.target.value) { config.channels.slack.allow_from.push($event.target.value); $event.target.value = ''; }" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- WhatsApp -->
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h3 class="font-medium">WhatsApp</h3>
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.channels.whatsapp.enabled" />
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                        </label>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.channels.whatsapp.enabled">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Bridge URL</label>
+                                            <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.channels.whatsapp.bridge_url" placeholder="ws://localhost:3001" />
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label class="block text-xs text-gray-500 mb-1">Allow From</label>
+                                            <div class="flex flex-wrap gap-2">
+                                                <template x-for="(user, index) in config.channels.whatsapp.allow_from" :key="index">
+                                                    <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">
+                                                        <span x-text="user"></span>
+                                                        <button type="button" @click="config.channels.whatsapp.allow_from.splice(index, 1)" class="text-gray-400 hover:text-red-500">×</button>
+                                                    </div>
+                                                </template>
+                                                <input type="text" class="flex-1 min-w-[120px] bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded px-2 py-1 text-sm" placeholder="Add phone number and press Enter" @keydown.enter="if ($event.target.value) { config.channels.whatsapp.allow_from.push($event.target.value); $event.target.value = ''; }" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -856,18 +969,18 @@
                                 <div class="flex items-center justify-between mb-3">
                                     <h3 class="font-medium">Telegram</h3>
                                     <label class="flex items-center gap-2 cursor-pointer">
-                                        <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.channels.telegram.enabled" />
+                                        <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.telegram.enabled" />
                                         <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
                                     </label>
                                 </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.channels.telegram.enabled">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.hermes.channels.telegram.enabled">
                                     <div>
                                         <label class="block text-xs text-gray-500 mb-1">Bot Token</label>
-                                        <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.channels.telegram.token" placeholder="Token from @BotFather" />
+                                        <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.telegram.bot_token" placeholder="Token from @BotFather" />
                                     </div>
                                     <div>
                                         <label class="block text-xs text-gray-500 mb-1">Allowed Users (comma-separated)</label>
-                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" :value="(config.channels.telegram.allow_from || []).join(', ')" @input="config.channels.telegram.allow_from = $event.target.value.split(',').map(s => s.trim()).filter(Boolean)" placeholder="123456789,987654321" />
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.telegram.allowed_users" placeholder="123456789,987654321" />
                                     </div>
                                 </div>
                             </div>
@@ -877,18 +990,18 @@
                                 <div class="flex items-center justify-between mb-3">
                                     <h3 class="font-medium">Discord</h3>
                                     <label class="flex items-center gap-2 cursor-pointer">
-                                        <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.channels.discord.enabled" />
+                                        <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.discord.enabled" />
                                         <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
                                     </label>
                                 </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.channels.discord.enabled">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.hermes.channels.discord.enabled">
                                     <div>
                                         <label class="block text-xs text-gray-500 mb-1">Bot Token</label>
-                                        <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.channels.discord.token" placeholder="Token from Developer Portal" />
+                                        <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.discord.bot_token" placeholder="Token from Developer Portal" />
                                     </div>
                                     <div>
                                         <label class="block text-xs text-gray-500 mb-1">Allowed Users (comma-separated)</label>
-                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" :value="(config.channels.discord.allow_from || []).join(', ')" @input="config.channels.discord.allow_from = $event.target.value.split(',').map(s => s.trim()).filter(Boolean)" placeholder="284102345871466496" />
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.discord.allowed_users" placeholder="284102345871466496" />
                                     </div>
                                 </div>
                             </div>
@@ -2262,6 +2375,8 @@
                     web_extract: { provider: '', model: '', base_url: '', api_key: '' }
                   },
                   channels: {
+                    telegram: { enabled: false, bot_token: '', token: '', home_channel: '', home_channel_name: '', allowed_users: '', allow_from: [], allow_all_users: false },
+                    discord: { enabled: false, bot_token: '', token: '', allowed_users: '', allow_from: [], allow_bots: false, require_mention: false, free_response_channels: '', auto_thread: false },
                     slack: { enabled: false, bot_token: '', app_token: '', home_channel: '', home_channel_name: '', allowed_users: '', allow_all_users: false },
                     whatsapp: { enabled: false, mode: 'local', allowed_users: '', allow_all_users: false },
                     signal: { enabled: false, http_url: '', account: '', ignore_stories: true, home_channel: '', home_channel_name: '', group_allowed_users: '', allowed_users: '', allow_all_users: false },
