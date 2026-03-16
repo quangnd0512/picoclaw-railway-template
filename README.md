@@ -73,3 +73,59 @@ A: Go to the Configuration tab → Agent Defaults → Model field. Set it to `pr
 **Q: The gateway isn't starting. What should I check?**
 
 A: Make sure at least one provider has an API key configured. The gateway auto-starts only when an API key is present. You can also manually start it from the Status tab.
+
+## When Shell Access is Still Required
+
+Most operations can be performed via the Web UI, but some channels still require shell access for initial setup:
+
+| Channel | Setup | Pairing Operations | Notes |
+|---------|-------|-------------------|-------|
+| Telegram | Web UI | Web UI | Pairing via UI |
+| Discord | Web UI | Web UI | Pairing via UI |
+| Slack | Web UI | Web UI | Pairing via UI |
+| WhatsApp | **Shell** | Web UI | Initial setup requires shell |
+| Signal | **Shell** | Web UI | Initial setup requires shell |
+| Email | Web UI | N/A | No pairing needed |
+| HomeAssistant | Web UI | N/A | No pairing needed |
+
+**V1 Scope**: The Web UI pairing operations cover Telegram, Discord, and Slack. WhatsApp and Signal initial setup is **out of scope for V1** and still requires shell access.
+
+## Pairing Operations from Web UI
+
+When using the Hermes backend, you can manage pairings directly from the Status tab:
+
+### Prerequisites
+1. Ensure your backend is set to **Hermes** (Configuration → Agent Defaults → Backend)
+2. Navigate to the **Status** tab
+
+### Available Operations
+
+**Refresh List** - View current pairings
+- Click "Refresh List" to see all active and pending pairings
+- Results display in JSON format below the buttons
+
+**Approve Pairing** - Approve a pending pairing code
+1. Select the platform from the dropdown
+2. Enter the 8-character pairing code (uppercase letters and numbers, excluding 0, 1, O, I)
+3. Click "Approve"
+4. The list refreshes automatically on success
+
+**Revoke Pairing** - Remove a user's pairing
+1. Select the platform from the dropdown
+2. Enter the user ID to revoke
+3. Click "Revoke"
+4. The list refreshes automatically on success
+
+**Clear Pending** - Clear all pending pairing requests
+- Click "Clear Pending" to remove all pending pairing requests
+- Use with caution - this affects all platforms
+
+## Security Notes
+
+- **No arbitrary command execution**: The Web UI only allows predefined pairing operations
+- **Allowlisted operations**: Only `list`, `approve`, `revoke`, and `clear-pending` are available
+- **Audit logging**: All pairing operations are logged to `~/.hermes/pairing-audit.log`
+- **Code redaction**: Pairing codes are partially redacted in logs (only last 2 characters stored)
+- **Authentication required**: All pairing endpoints require valid Basic Auth credentials
+- **Backend guard**: Operations only work when Hermes is the active backend
+- **Input validation**: All inputs are validated against strict patterns before processing
