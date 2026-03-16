@@ -751,7 +751,8 @@ class HermesManager(BaseGatewayManager):
         mcp_servers_dict = {}
         for srv in mcp_servers_list:
             name = srv.get("name")
-            if not name: continue
+            if not name:
+                continue
             srv_out = {
                 "command": srv.get("command", ""),
                 "url": srv.get("url", ""),
@@ -789,15 +790,22 @@ class HermesManager(BaseGatewayManager):
 
         env_out = dict(existing_env)
 
+        def _safe_env_write(key: str, new_val: str) -> None:
+            if isinstance(new_val, str) and new_val.endswith("***"):
+                return
+            if new_val == "" and existing_env.get(key, ""):
+                return
+            env_out[key] = new_val
+
         for our_name, env_key in self.PROVIDER_ENV_KEYS.items():
             provider_obj = providers.get(our_name, {}) if isinstance(providers, dict) else {}
             if isinstance(provider_obj, dict):
-                env_out[env_key] = str(provider_obj.get("api_key", "") or "")
+                _safe_env_write(env_key, str(provider_obj.get("api_key", "") or ""))
 
         openai = providers.get("openai", {}) if isinstance(providers, dict) else {}
         if isinstance(openai, dict):
-            env_out["OPENAI_API_KEY"] = str(openai.get("api_key", "") or "")
-            env_out["OPENAI_BASE_URL"] = str(openai.get("api_base", "") or "")
+            _safe_env_write("OPENAI_API_KEY", str(openai.get("api_key", "") or ""))
+            _safe_env_write("OPENAI_BASE_URL", str(openai.get("api_base", "") or ""))
         if model_default:
             env_out["HERMES_MODEL"] = model_default
             env_out.pop("LLM_MODEL", None)
@@ -806,54 +814,54 @@ class HermesManager(BaseGatewayManager):
         if not isinstance(telegram, dict) or not telegram:
             telegram = channels.get("telegram", {}) if isinstance(channels, dict) else {}
         if isinstance(telegram, dict):
-            env_out["TELEGRAM_BOT_TOKEN"] = str(telegram.get("bot_token", telegram.get("token", "")) or "")
-            env_out["TELEGRAM_HOME_CHANNEL"] = str(telegram.get("home_channel", "") or "")
-            env_out["TELEGRAM_HOME_CHANNEL_NAME"] = str(telegram.get("home_channel_name", "") or "")
+            _safe_env_write("TELEGRAM_BOT_TOKEN", str(telegram.get("bot_token", telegram.get("token", "")) or ""))
+            _safe_env_write("TELEGRAM_HOME_CHANNEL", str(telegram.get("home_channel", "") or ""))
+            _safe_env_write("TELEGRAM_HOME_CHANNEL_NAME", str(telegram.get("home_channel_name", "") or ""))
             allowed_users = telegram.get("allowed_users")
             if isinstance(allowed_users, list):
-                env_out["TELEGRAM_ALLOWED_USERS"] = self._join_csv(allowed_users)
+                _safe_env_write("TELEGRAM_ALLOWED_USERS", self._join_csv(allowed_users))
             elif isinstance(allowed_users, str):
-                env_out["TELEGRAM_ALLOWED_USERS"] = allowed_users
+                _safe_env_write("TELEGRAM_ALLOWED_USERS", allowed_users)
             else:
-                env_out["TELEGRAM_ALLOWED_USERS"] = self._join_csv(telegram.get("allow_from", []))
+                _safe_env_write("TELEGRAM_ALLOWED_USERS", self._join_csv(telegram.get("allow_from", [])))
             env_out["TELEGRAM_ALLOW_ALL_USERS"] = "true" if telegram.get("allow_all_users", False) else "false"
 
         discord = hermes_channels.get("discord", {}) if isinstance(hermes_channels, dict) else {}
         if not isinstance(discord, dict) or not discord:
             discord = channels.get("discord", {}) if isinstance(channels, dict) else {}
         if isinstance(discord, dict):
-            env_out["DISCORD_BOT_TOKEN"] = str(discord.get("bot_token", discord.get("token", "")) or "")
+            _safe_env_write("DISCORD_BOT_TOKEN", str(discord.get("bot_token", discord.get("token", "")) or ""))
             allowed_users = discord.get("allowed_users")
             if isinstance(allowed_users, list):
-                env_out["DISCORD_ALLOWED_USERS"] = self._join_csv(allowed_users)
+                _safe_env_write("DISCORD_ALLOWED_USERS", self._join_csv(allowed_users))
             elif isinstance(allowed_users, str):
-                env_out["DISCORD_ALLOWED_USERS"] = allowed_users
+                _safe_env_write("DISCORD_ALLOWED_USERS", allowed_users)
             else:
-                env_out["DISCORD_ALLOWED_USERS"] = self._join_csv(discord.get("allow_from", []))
+                _safe_env_write("DISCORD_ALLOWED_USERS", self._join_csv(discord.get("allow_from", [])))
             env_out["DISCORD_ALLOW_BOTS"] = "true" if discord.get("allow_bots", False) else "false"
             env_out["DISCORD_REQUIRE_MENTION"] = "true" if discord.get("require_mention", False) else "false"
             free_response_channels = discord.get("free_response_channels", "")
             if isinstance(free_response_channels, list):
-                env_out["DISCORD_FREE_RESPONSE_CHANNELS"] = self._join_csv(free_response_channels)
+                _safe_env_write("DISCORD_FREE_RESPONSE_CHANNELS", self._join_csv(free_response_channels))
             else:
-                env_out["DISCORD_FREE_RESPONSE_CHANNELS"] = str(free_response_channels or "")
+                _safe_env_write("DISCORD_FREE_RESPONSE_CHANNELS", str(free_response_channels or ""))
             env_out["DISCORD_AUTO_THREAD"] = "true" if discord.get("auto_thread", False) else "false"
 
         slack = hermes_channels.get("slack", {}) if isinstance(hermes_channels, dict) else {}
         if not isinstance(slack, dict) or not slack:
             slack = channels.get("slack", {}) if isinstance(channels, dict) else {}
         if isinstance(slack, dict):
-            env_out["SLACK_BOT_TOKEN"] = str(slack.get("bot_token", "") or "")
-            env_out["SLACK_APP_TOKEN"] = str(slack.get("app_token", "") or "")
-            env_out["SLACK_HOME_CHANNEL"] = str(slack.get("home_channel", "") or "")
-            env_out["SLACK_HOME_CHANNEL_NAME"] = str(slack.get("home_channel_name", "") or "")
+            _safe_env_write("SLACK_BOT_TOKEN", str(slack.get("bot_token", "") or ""))
+            _safe_env_write("SLACK_APP_TOKEN", str(slack.get("app_token", "") or ""))
+            _safe_env_write("SLACK_HOME_CHANNEL", str(slack.get("home_channel", "") or ""))
+            _safe_env_write("SLACK_HOME_CHANNEL_NAME", str(slack.get("home_channel_name", "") or ""))
             allowed_users = slack.get("allowed_users")
             if isinstance(allowed_users, list):
-                env_out["SLACK_ALLOWED_USERS"] = self._join_csv(allowed_users)
+                _safe_env_write("SLACK_ALLOWED_USERS", self._join_csv(allowed_users))
             elif isinstance(allowed_users, str):
-                env_out["SLACK_ALLOWED_USERS"] = allowed_users
+                _safe_env_write("SLACK_ALLOWED_USERS", allowed_users)
             else:
-                env_out["SLACK_ALLOWED_USERS"] = self._join_csv(slack.get("allow_from", []))
+                _safe_env_write("SLACK_ALLOWED_USERS", self._join_csv(slack.get("allow_from", [])))
             env_out["SLACK_ALLOW_ALL_USERS"] = "true" if slack.get("allow_all_users", False) else "false"
 
         whatsapp = hermes_channels.get("whatsapp", {}) if isinstance(hermes_channels, dict) else {}
@@ -861,71 +869,71 @@ class HermesManager(BaseGatewayManager):
             whatsapp = channels.get("whatsapp", {}) if isinstance(channels, dict) else {}
         if isinstance(whatsapp, dict):
             env_out["WHATSAPP_ENABLED"] = "true" if whatsapp.get("enabled", False) else "false"
-            env_out["WHATSAPP_MODE"] = str(whatsapp.get("mode", "") or "")
+            _safe_env_write("WHATSAPP_MODE", str(whatsapp.get("mode", "") or ""))
             allowed_users = whatsapp.get("allowed_users")
             if isinstance(allowed_users, list):
-                env_out["WHATSAPP_ALLOWED_USERS"] = self._join_csv(allowed_users)
+                _safe_env_write("WHATSAPP_ALLOWED_USERS", self._join_csv(allowed_users))
             elif isinstance(allowed_users, str):
-                env_out["WHATSAPP_ALLOWED_USERS"] = allowed_users
+                _safe_env_write("WHATSAPP_ALLOWED_USERS", allowed_users)
             else:
-                env_out["WHATSAPP_ALLOWED_USERS"] = self._join_csv(whatsapp.get("allow_from", []))
+                _safe_env_write("WHATSAPP_ALLOWED_USERS", self._join_csv(whatsapp.get("allow_from", [])))
             env_out["WHATSAPP_ALLOW_ALL_USERS"] = "true" if whatsapp.get("allow_all_users", False) else "false"
 
         signal_data = hermes_channels.get("signal", {}) if isinstance(hermes_channels, dict) else {}
         if not isinstance(signal_data, dict) or not signal_data:
             signal_data = channels.get("signal", {}) if isinstance(channels, dict) else {}
         if isinstance(signal_data, dict):
-            env_out["SIGNAL_HTTP_URL"] = str(signal_data.get("http_url", "") or "")
-            env_out["SIGNAL_ACCOUNT"] = str(signal_data.get("account", "") or "")
+            _safe_env_write("SIGNAL_HTTP_URL", str(signal_data.get("http_url", "") or ""))
+            _safe_env_write("SIGNAL_ACCOUNT", str(signal_data.get("account", "") or ""))
             env_out["SIGNAL_IGNORE_STORIES"] = "true" if signal_data.get("ignore_stories", False) else "false"
-            env_out["SIGNAL_HOME_CHANNEL"] = str(signal_data.get("home_channel", "") or "")
-            env_out["SIGNAL_HOME_CHANNEL_NAME"] = str(signal_data.get("home_channel_name", "") or "")
+            _safe_env_write("SIGNAL_HOME_CHANNEL", str(signal_data.get("home_channel", "") or ""))
+            _safe_env_write("SIGNAL_HOME_CHANNEL_NAME", str(signal_data.get("home_channel_name", "") or ""))
             group_allowed_users = signal_data.get("group_allowed_users", "")
             if isinstance(group_allowed_users, list):
-                env_out["SIGNAL_GROUP_ALLOWED_USERS"] = self._join_csv(group_allowed_users)
+                _safe_env_write("SIGNAL_GROUP_ALLOWED_USERS", self._join_csv(group_allowed_users))
             else:
-                env_out["SIGNAL_GROUP_ALLOWED_USERS"] = str(group_allowed_users or "")
+                _safe_env_write("SIGNAL_GROUP_ALLOWED_USERS", str(group_allowed_users or ""))
             allowed_users = signal_data.get("allowed_users")
             if isinstance(allowed_users, list):
-                env_out["SIGNAL_ALLOWED_USERS"] = self._join_csv(allowed_users)
+                _safe_env_write("SIGNAL_ALLOWED_USERS", self._join_csv(allowed_users))
             elif isinstance(allowed_users, str):
-                env_out["SIGNAL_ALLOWED_USERS"] = allowed_users
+                _safe_env_write("SIGNAL_ALLOWED_USERS", allowed_users)
             else:
-                env_out["SIGNAL_ALLOWED_USERS"] = self._join_csv(signal_data.get("allow_from", []))
+                _safe_env_write("SIGNAL_ALLOWED_USERS", self._join_csv(signal_data.get("allow_from", [])))
             env_out["SIGNAL_ALLOW_ALL_USERS"] = "true" if signal_data.get("allow_all_users", False) else "false"
 
         email = hermes_channels.get("email", {}) if isinstance(hermes_channels, dict) else {}
         if not isinstance(email, dict) or not email:
             email = channels.get("email", {}) if isinstance(channels, dict) else {}
         if isinstance(email, dict):
-            env_out["EMAIL_ADDRESS"] = str(email.get("address", "") or "")
-            env_out["EMAIL_PASSWORD"] = str(email.get("password", "") or "")
-            env_out["EMAIL_IMAP_HOST"] = str(email.get("imap_host", "") or "")
-            env_out["EMAIL_SMTP_HOST"] = str(email.get("smtp_host", "") or "")
-            env_out["EMAIL_IMAP_PORT"] = str(email.get("imap_port", "") or "")
-            env_out["EMAIL_SMTP_PORT"] = str(email.get("smtp_port", "") or "")
-            env_out["EMAIL_POLL_INTERVAL"] = str(email.get("poll_interval", "") or "")
-            env_out["EMAIL_HOME_ADDRESS"] = str(email.get("home_address", "") or "")
-            env_out["EMAIL_HOME_ADDRESS_NAME"] = str(email.get("home_address_name", "") or "")
+            _safe_env_write("EMAIL_ADDRESS", str(email.get("address", "") or ""))
+            _safe_env_write("EMAIL_PASSWORD", str(email.get("password", "") or ""))
+            _safe_env_write("EMAIL_IMAP_HOST", str(email.get("imap_host", "") or ""))
+            _safe_env_write("EMAIL_SMTP_HOST", str(email.get("smtp_host", "") or ""))
+            _safe_env_write("EMAIL_IMAP_PORT", str(email.get("imap_port", "") or ""))
+            _safe_env_write("EMAIL_SMTP_PORT", str(email.get("smtp_port", "") or ""))
+            _safe_env_write("EMAIL_POLL_INTERVAL", str(email.get("poll_interval", "") or ""))
+            _safe_env_write("EMAIL_HOME_ADDRESS", str(email.get("home_address", "") or ""))
+            _safe_env_write("EMAIL_HOME_ADDRESS_NAME", str(email.get("home_address_name", "") or ""))
             allowed_users = email.get("allowed_users")
             if isinstance(allowed_users, list):
-                env_out["EMAIL_ALLOWED_USERS"] = self._join_csv(allowed_users)
+                _safe_env_write("EMAIL_ALLOWED_USERS", self._join_csv(allowed_users))
             elif isinstance(allowed_users, str):
-                env_out["EMAIL_ALLOWED_USERS"] = allowed_users
+                _safe_env_write("EMAIL_ALLOWED_USERS", allowed_users)
             else:
-                env_out["EMAIL_ALLOWED_USERS"] = self._join_csv(email.get("allow_from", []))
+                _safe_env_write("EMAIL_ALLOWED_USERS", self._join_csv(email.get("allow_from", [])))
             env_out["EMAIL_ALLOW_ALL_USERS"] = "true" if email.get("allow_all_users", False) else "false"
 
         homeassistant = hermes_channels.get("homeassistant", {}) if isinstance(hermes_channels, dict) else {}
         if not isinstance(homeassistant, dict) or not homeassistant:
             homeassistant = channels.get("homeassistant", {}) if isinstance(channels, dict) else {}
         if isinstance(homeassistant, dict):
-            env_out["HASS_TOKEN"] = str(homeassistant.get("token", homeassistant.get("hass_token", "")) or "")
-            env_out["HASS_URL"] = str(homeassistant.get("url", "") or "")
+            _safe_env_write("HASS_TOKEN", str(homeassistant.get("token", homeassistant.get("hass_token", "")) or ""))
+            _safe_env_write("HASS_URL", str(homeassistant.get("url", "") or ""))
 
         gateway_data = hermes_data.get("gateway", {}) if isinstance(hermes_data, dict) else {}
         if isinstance(gateway_data, dict):
-            env_out["GATEWAY_ALLOWED_USERS"] = self._join_csv(gateway_data.get("allowed_users", []))
+            _safe_env_write("GATEWAY_ALLOWED_USERS", self._join_csv(gateway_data.get("allowed_users", [])))
             allow_all = gateway_data.get("allow_all_users", False)
             if isinstance(allow_all, str):
                 allow_all = allow_all.lower() == "true"
