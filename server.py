@@ -675,6 +675,10 @@ class HermesManager(BaseGatewayManager):
         if isinstance(fallback_model, dict):
             config["hermes"]["fallback_model"] = fallback_model
 
+        custom_providers = yaml_data.get("custom_providers", []) if isinstance(yaml_data, dict) else []
+        if isinstance(custom_providers, list):
+            config["hermes"]["custom_providers"] = custom_providers
+
         if "gateway" not in config["hermes"]:
             config["hermes"]["gateway"] = {}
             
@@ -787,6 +791,10 @@ class HermesManager(BaseGatewayManager):
             yaml_out["fallback_model"] = fallback_model
         elif "fallback_model" not in yaml_out:
             yaml_out["fallback_model"] = self._default_hermes_yaml()["fallback_model"]
+
+        custom_providers = hermes_data.get("custom_providers") if isinstance(hermes_data, dict) else None
+        if isinstance(custom_providers, list):
+            yaml_out["custom_providers"] = custom_providers
 
         env_out = dict(existing_env)
 
