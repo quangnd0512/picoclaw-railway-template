@@ -56,6 +56,63 @@ HERMES_SECRET_FIELDS = {
     "AUXILIARY_WEB_EXTRACT_API_KEY",
 }
 
+# Hermes pairing operation constants
+HERMES_PAIRING_PLATFORMS = ("telegram", "discord", "slack", "whatsapp", "signal", "email", "homeassistant")
+PAIRING_CODE_RE = re.compile(r"^[A-Z2-9]{8}$")
+PAIRING_USER_ID_RE = re.compile(r"^[A-Za-z0-9_:+@.-]{1,128}$")
+
+
+def _validate_pairing_platform(value: str) -> str:
+    """Validate and return the pairing platform value.
+
+    Args:
+        value: The platform string to validate.
+
+    Returns:
+        The validated platform string.
+
+    Raises:
+        ValueError: If the platform is not valid.
+    """
+    if value not in HERMES_PAIRING_PLATFORMS:
+        raise ValueError(f"Invalid platform: {value}. Must be one of {HERMES_PAIRING_PLATFORMS}")
+    return value
+
+
+def _validate_pairing_code(value: str) -> str:
+    """Validate and return the pairing code value.
+
+    Args:
+        value: The pairing code string to validate.
+
+    Returns:
+        The validated pairing code string.
+
+    Raises:
+        ValueError: If the pairing code format is invalid.
+    """
+    if not PAIRING_CODE_RE.match(value):
+        raise ValueError(f"Invalid pairing code: {value}. Must be exactly 8 characters, uppercase A-Z and digits 2-9")
+    return value
+
+
+def _validate_pairing_user_id(value: str) -> str:
+    """Validate and return the pairing user ID value.
+
+    Args:
+        value: The user ID string to validate.
+
+    Returns:
+        The validated user ID string.
+
+    Raises:
+        ValueError: If the user ID format is invalid.
+    """
+    if not PAIRING_USER_ID_RE.match(value):
+        raise ValueError(f"Invalid user ID: {value}. Must be 1-128 characters, alphanumeric with _:+@-.")
+    return value
+
+
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 
 ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
