@@ -1,6 +1,7 @@
 import pytest
 import asyncio
 import sys
+import json
 from pathlib import Path
 from unittest.mock import AsyncMock, patch, MagicMock
 
@@ -13,6 +14,8 @@ from server import (
     _validate_pairing_platform,
     _validate_pairing_code,
     _validate_pairing_user_id,
+    _append_pairing_audit,
+    pairing_ops_lock,
     HermesManager,
 )
 
@@ -431,3 +434,206 @@ class TestPairingSuccess:
             call_kwargs = mock_exec.call_args[1]
             assert 'env' in call_kwargs
             assert call_kwargs['env'] is not None
+
+
+class TestPairingAuditRedaction:
+    """Test that pairing codes are properly redacted in audit logs."""
+
+    def test_audit_redacts_full_code(self, tmp_path):
+        """Test that full pairing code is never logged."""
+        audit_file = tmp_path / ".hermes" / "pairing-audit.log"
+        
+        with patch.object(Path, 'home', return_value=tmp_path):
+            event = {
+                "operation": "approve",
+                "platform": "telegram",
+                "code": "ABCDEFGH",
+                "actor": "admin",
+                "ok": True,
+                "exit_code": 0,
+                "duration_ms": 150,
+            }
+            _append_pairing_audit(event)
+            
+            assert audit_file.exists()
+            content = audit_file.read_text()
+            entry = json.loads(content.strip())
+            
+            assert "code" not in entry
+            assert entry.get("code_last2") == "GH"
+            assert "ABCDEFGH" not in content
+
+    def test_audit_redacts_short_code(self, tmp_path):
+        """Test redaction handles short codes."""
+        audit_file = tmp_path / ".hermes" / "pairing-audit.log"
+        
+        with patch.object(Path, 'home', return_value=tmp_path):
+            event = {
+                "operation": "approve",
+                "platform": "telegram",
+                "code": "AB",
+                "actor": "admin",
+                "ok": True,
+                "exit_code": 0,
+            }
+            _append_pairing_audit(event)
+            
+            content = audit_file.read_text()
+            entry = json.loads(content.strip())
+            
+            assert "code" not in entry
+            assert entry.get("code_last2") == "AB"
+
+    def test_audit_handles_missing_code(self, tmp_path):
+        """Test that events without code field are logged correctly."""
+        audit_file = tmp_path / ".hermes" / "pairing-audit.log"
+        
+        with patch.object(Path, 'home', return_value=tmp_path):
+            event = {
+                "operation": "list",
+                "actor": "admin",
+                "ok": True,
+                "exit_code": 0,
+            }
+            _append_pairing_audit(event)
+            
+            content = audit_file.read_text()
+            entry = json.loads(content.strip())
+            
+            assert "code" not in entry
+            assert "code_last2" not in entry
+
+    def test_audit_includes_all_fields(self, tmp_path):
+        """Test that all required fields are logged."""
+        audit_file = tmp_path / ".hermes" / "pairing-audit.log"
+        
+        with patch.object(Path, 'home', return_value=tmp_path):
+            event = {
+                "operation": "approve",
+                "platform": "discord",
+                "code": "DISCORD1",
+                "actor": "user@example.com",
+                "ok": False,
+                "exit_code": 1,
+                "duration_ms": 250,
+                "stderr_summary": "connection refused",
+            }
+            _append_pairing_audit(event)
+            
+            content = audit_file.read_text()
+            entry = json.loads(content.strip())
+            
+            assert entry["operation"] == "approve"
+            assert entry["platform"] == "discord"
+            assert entry["actor"] == "user@example.com"
+            assert entry["ok"] is False
+            assert entry["exit_code"] == 1
+            assert entry["duration_ms"] == 250
+            assert entry["stderr_summary"] == "connection refused"
+            assert "timestamp" in entry
+
+
+class TestPairingOpsLock:
+    """Test that pairing_ops_lock is properly initialized."""
+
+    def test_lock_is_asyncio_lock(self):
+        """Test that pairing_ops_lock is an asyncio.Lock instance."""
+        assert isinstance(pairing_ops_lock, asyncio.Lock)
+
+    def test_lock_can_be_acquired(self):
+        """Test that the lock can be acquired and released."""
+        async def test_lock():
+            async with pairing_ops_lock:
+                return True
+            return False
+        
+        result = asyncio.get_event_loop().run_until_complete(test_lock())
+        assert result is True
+
+
+class TestAuditWriteFailureResilience:
+    """Test that audit write failures don't crash the API."""
+
+    def test_audit_handles_permission_error(self, tmp_path):
+        """Test that permission errors are handled gracefully."""
+        audit_dir = tmp_path / ".hermes"
+        audit_file = audit_dir / "pairing-audit.log"
+        
+        with patch.object(Path, 'home', return_value=tmp_path):
+            with patch('builtins.open', side_effect=PermissionError("No write access")):
+                event = {
+                    "operation": "approve",
+                    "platform": "telegram",
+                    "code": "ABCDEFGH",
+                    "actor": "admin",
+                    "ok": True,
+                }
+                _append_pairing_audit(event)
+                
+                assert not audit_file.exists()
+
+    def test_audit_handles_directory_creation_failure(self, tmp_path):
+        """Test that directory creation failures are handled gracefully."""
+        with patch.object(Path, 'home', return_value=tmp_path):
+            with patch.object(Path, 'mkdir', side_effect=OSError("Cannot create directory")):
+                event = {
+                    "operation": "list",
+                    "actor": "admin",
+                    "ok": True,
+                }
+                _append_pairing_audit(event)
+
+    def test_audit_handles_disk_full(self, tmp_path):
+        """Test that disk full errors are handled gracefully."""
+        with patch.object(Path, 'home', return_value=tmp_path):
+            with patch('builtins.open', side_effect=OSError("No space left on device")):
+                event = {
+                    "operation": "revoke",
+                    "platform": "slack",
+                    "user_id": "U12345",
+                    "actor": "admin",
+                    "ok": True,
+                }
+                _append_pairing_audit(event)
+
+    def test_audit_creates_directory_if_missing(self, tmp_path):
+        """Test that audit directory is created if it doesn't exist."""
+        audit_dir = tmp_path / ".hermes"
+        audit_file = audit_dir / "pairing-audit.log"
+        
+        assert not audit_dir.exists()
+        
+        with patch.object(Path, 'home', return_value=tmp_path):
+            event = {
+                "operation": "list",
+                "actor": "admin",
+                "ok": True,
+            }
+            _append_pairing_audit(event)
+            
+            assert audit_dir.exists()
+            assert audit_file.exists()
+
+    def test_audit_appends_multiple_entries(self, tmp_path):
+        """Test that multiple audit entries are appended correctly."""
+        audit_file = tmp_path / ".hermes" / "pairing-audit.log"
+        
+        with patch.object(Path, 'home', return_value=tmp_path):
+            events = [
+                {"operation": "list", "actor": "admin", "ok": True},
+                {"operation": "approve", "platform": "telegram", "code": "CODE1234", "actor": "admin", "ok": True},
+                {"operation": "revoke", "platform": "discord", "user_id": "U999", "actor": "admin", "ok": False},
+            ]
+            
+            for event in events:
+                _append_pairing_audit(event)
+            
+            content = audit_file.read_text()
+            lines = [line for line in content.strip().split('\n') if line]
+            
+            assert len(lines) == 3
+            
+            entries = [json.loads(line) for line in lines]
+            assert entries[0]["operation"] == "list"
+            assert entries[1]["operation"] == "approve"
+            assert entries[2]["operation"] == "revoke"

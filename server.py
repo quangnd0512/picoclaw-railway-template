@@ -1206,6 +1206,7 @@ managers = {
 active_backend = "picoclaw"
 switching_backend = False
 config_lock = asyncio.Lock()
+pairing_ops_lock = asyncio.Lock()
 
 
 def load_backend_meta() -> dict:
@@ -1229,6 +1230,44 @@ def save_backend_meta(backend: str):
 def get_active_manager() -> BaseGatewayManager:
     """Get the currently active gateway manager."""
     return managers.get(active_backend, gateway)
+
+
+def _append_pairing_audit(event: dict) -> None:
+    """Append a pairing operation event to the audit log.
+    
+    Writes JSONL to ~/.hermes/pairing-audit.log.
+    Handles write failures gracefully without crashing the API.
+    Redacts sensitive pairing codes before logging.
+    
+    Args:
+        event: Dict with fields: operation, platform, actor, ok, exit_code, 
+               duration_ms, stderr_summary, and optionally code (will be redacted)
+    """
+    try:
+        audit_dir = Path.home() / ".hermes"
+        audit_file = audit_dir / "pairing-audit.log"
+        
+        # Create directory if needed
+        audit_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Redact sensitive data
+        audit_entry = dict(event)
+        if "code" in audit_entry and audit_entry["code"]:
+            # Store only last 2 characters for debugging, never full code
+            full_code = str(audit_entry["code"])
+            audit_entry["code_last2"] = full_code[-2:] if len(full_code) >= 2 else "**"
+            del audit_entry["code"]
+        
+        # Ensure timestamp
+        if "timestamp" not in audit_entry:
+            audit_entry["timestamp"] = time.time()
+        
+        # Append as JSONL
+        with open(audit_file, "a") as f:
+            f.write(json.dumps(audit_entry) + "\n")
+    except Exception as e:
+        # Fail silently - audit logging should never break operations
+        print(f"Failed to write pairing audit log: {e}")
 
 
 async def homepage(request: Request):
