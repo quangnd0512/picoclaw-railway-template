@@ -1269,6 +1269,302 @@ def _append_pairing_audit(event: dict) -> None:
         # Fail silently - audit logging should never break operations
         print(f"Failed to write pairing audit log: {e}")
 
+async def api_hermes_pairing_list(request: Request):
+    """List pending Hermes pairing requests.
+    
+    GET /api/hermes/pairing/list
+    
+    Requires active_backend == "hermes".
+    """
+    # 1. Auth check
+    auth_err = require_auth(request)
+    if auth_err:
+        return auth_err
+    
+    # 2. Backend guard
+    if active_backend != "hermes":
+        return JSONResponse(
+            {"error": "Hermes backend not active"},
+            status_code=409
+        )
+    
+    # 3. Acquire lock and run operation
+    async with pairing_ops_lock:
+        result = await hermes_gateway.run_pairing_operation("list")
+    
+    # 4. Append audit
+    _append_pairing_audit({
+        "operation": "list",
+        "actor": request.user.display_name,
+        "ok": result.get("ok", False),
+        "exit_code": result.get("exit_code", -1),
+        "duration_ms": result.get("duration_ms", 0),
+        "stderr_summary": result.get("stderr", "")[:200],
+    })
+    
+    # 5. Return response based on status mapping
+    if not result.get("ok"):
+        exit_code = result.get("exit_code", -1)
+        if exit_code == -1 and "timed out" in result.get("stderr", "").lower():
+            return JSONResponse(
+                {"error": "Operation timed out", "details": result.get("stderr", "")},
+                status_code=504
+            )
+        return JSONResponse(
+            {"error": "Operation failed", "details": result.get("stderr", "")},
+            status_code=502
+        )
+    
+    return JSONResponse({
+        "ok": True,
+        "operation": "list",
+        "stdout": result.get("stdout", ""),
+        "duration_ms": result.get("duration_ms", 0),
+    })
+
+
+async def api_hermes_pairing_approve(request: Request):
+    """Approve a Hermes pairing request.
+    
+    POST /api/hermes/pairing/approve
+    Body: {platform: string, code: string}
+    
+    Requires active_backend == "hermes".
+    """
+    # 1. Auth check
+    auth_err = require_auth(request)
+    if auth_err:
+        return auth_err
+    
+    # 2. Backend guard
+    if active_backend != "hermes":
+        return JSONResponse(
+            {"error": "Hermes backend not active"},
+            status_code=409
+        )
+    
+    # 3. Parse and validate payload
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
+    
+    platform = body.get("platform")
+    code = body.get("code")
+    
+    if not platform or not code:
+        return JSONResponse(
+            {"error": "Missing required fields: platform and code are required"},
+            status_code=400
+        )
+    
+    # Validate using validators from Task 1
+    try:
+        validated_platform = _validate_pairing_platform(platform)
+    except ValueError as e:
+        return JSONResponse(
+            {"error": f"Invalid platform: {str(e)}"},
+            status_code=400
+        )
+    
+    try:
+        validated_code = _validate_pairing_code(code)
+    except ValueError as e:
+        return JSONResponse(
+            {"error": f"Invalid code: {str(e)}"},
+            status_code=400
+        )
+    
+    # 4. Acquire lock and run operation
+    async with pairing_ops_lock:
+        result = await hermes_gateway.run_pairing_operation(
+            "approve",
+            platform=validated_platform,
+            code=validated_code
+        )
+    
+    # 5. Append audit
+    _append_pairing_audit({
+        "operation": "approve",
+        "platform": validated_platform,
+        "actor": request.user.display_name,
+        "ok": result.get("ok", False),
+        "exit_code": result.get("exit_code", -1),
+        "duration_ms": result.get("duration_ms", 0),
+        "stderr_summary": result.get("stderr", "")[:200],
+        "code": validated_code,  # Will be redacted by audit function
+    })
+    
+    # 6. Return response based on status mapping
+    if not result.get("ok"):
+        exit_code = result.get("exit_code", -1)
+        if exit_code == -1 and "timed out" in result.get("stderr", "").lower():
+            return JSONResponse(
+                {"error": "Operation timed out", "details": result.get("stderr", "")},
+                status_code=504
+            )
+        return JSONResponse(
+            {"error": "Operation failed", "details": result.get("stderr", "")},
+            status_code=502
+        )
+    
+    return JSONResponse({
+        "ok": True,
+        "operation": "approve",
+        "platform": validated_platform,
+        "stdout": result.get("stdout", ""),
+        "duration_ms": result.get("duration_ms", 0),
+    })
+
+
+async def api_hermes_pairing_revoke(request: Request):
+    """Revoke a Hermes pairing for a specific user.
+    
+    POST /api/hermes/pairing/revoke
+    Body: {platform: string, user_id: string}
+    
+    Requires active_backend == "hermes".
+    """
+    # 1. Auth check
+    auth_err = require_auth(request)
+    if auth_err:
+        return auth_err
+    
+    # 2. Backend guard
+    if active_backend != "hermes":
+        return JSONResponse(
+            {"error": "Hermes backend not active"},
+            status_code=409
+        )
+    
+    # 3. Parse and validate payload
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
+    
+    platform = body.get("platform")
+    user_id = body.get("user_id")
+    
+    if not platform or not user_id:
+        return JSONResponse(
+            {"error": "Missing required fields: platform and user_id are required"},
+            status_code=400
+        )
+    
+    # Validate using validators from Task 1
+    try:
+        validated_platform = _validate_pairing_platform(platform)
+    except ValueError as e:
+        return JSONResponse(
+            {"error": f"Invalid platform: {str(e)}"},
+            status_code=400
+        )
+    
+    try:
+        validated_user_id = _validate_pairing_user_id(user_id)
+    except ValueError as e:
+        return JSONResponse(
+            {"error": f"Invalid user_id: {str(e)}"},
+            status_code=400
+        )
+    
+    # 4. Acquire lock and run operation
+    async with pairing_ops_lock:
+        result = await hermes_gateway.run_pairing_operation(
+            "revoke",
+            platform=validated_platform,
+            user_id=validated_user_id
+        )
+    
+    # 5. Append audit
+    _append_pairing_audit({
+        "operation": "revoke",
+        "platform": validated_platform,
+        "actor": request.user.display_name,
+        "ok": result.get("ok", False),
+        "exit_code": result.get("exit_code", -1),
+        "duration_ms": result.get("duration_ms", 0),
+        "stderr_summary": result.get("stderr", "")[:200],
+    })
+    
+    # 6. Return response based on status mapping
+    if not result.get("ok"):
+        exit_code = result.get("exit_code", -1)
+        if exit_code == -1 and "timed out" in result.get("stderr", "").lower():
+            return JSONResponse(
+                {"error": "Operation timed out", "details": result.get("stderr", "")},
+                status_code=504
+            )
+        return JSONResponse(
+            {"error": "Operation failed", "details": result.get("stderr", "")},
+            status_code=502
+        )
+    
+    return JSONResponse({
+        "ok": True,
+        "operation": "revoke",
+        "platform": validated_platform,
+        "user_id": validated_user_id,
+        "stdout": result.get("stdout", ""),
+        "duration_ms": result.get("duration_ms", 0),
+    })
+
+
+async def api_hermes_pairing_clear_pending(request: Request):
+    """Clear all pending Hermes pairing requests.
+    
+    POST /api/hermes/pairing/clear-pending
+    Body: none (global clear operation)
+    
+    Requires active_backend == "hermes".
+    """
+    # 1. Auth check
+    auth_err = require_auth(request)
+    if auth_err:
+        return auth_err
+    
+    # 2. Backend guard
+    if active_backend != "hermes":
+        return JSONResponse(
+            {"error": "Hermes backend not active"},
+            status_code=409
+        )
+    
+    # 3. Acquire lock and run operation (no payload validation needed)
+    async with pairing_ops_lock:
+        result = await hermes_gateway.run_pairing_operation("clear-pending")
+    
+    # 4. Append audit
+    _append_pairing_audit({
+        "operation": "clear-pending",
+        "actor": request.user.display_name,
+        "ok": result.get("ok", False),
+        "exit_code": result.get("exit_code", -1),
+        "duration_ms": result.get("duration_ms", 0),
+        "stderr_summary": result.get("stderr", "")[:200],
+    })
+    
+    # 5. Return response based on status mapping
+    if not result.get("ok"):
+        exit_code = result.get("exit_code", -1)
+        if exit_code == -1 and "timed out" in result.get("stderr", "").lower():
+            return JSONResponse(
+                {"error": "Operation timed out", "details": result.get("stderr", "")},
+                status_code=504
+            )
+        return JSONResponse(
+            {"error": "Operation failed", "details": result.get("stderr", "")},
+            status_code=502
+        )
+    
+    return JSONResponse({
+        "ok": True,
+        "operation": "clear-pending",
+        "stdout": result.get("stdout", ""),
+        "duration_ms": result.get("duration_ms", 0),
+    })
+
 
 async def homepage(request: Request):
     auth_err = require_auth(request)
@@ -1493,6 +1789,10 @@ routes = [
     Route("/api/gateway/restart", api_gateway_restart, methods=["POST"]),
     Route("/api/backend", api_backend_get, methods=["GET"]),
     Route("/api/backend", api_backend_post, methods=["POST"]),
+    Route("/api/hermes/pairing/list", api_hermes_pairing_list, methods=["GET"]),
+    Route("/api/hermes/pairing/approve", api_hermes_pairing_approve, methods=["POST"]),
+    Route("/api/hermes/pairing/revoke", api_hermes_pairing_revoke, methods=["POST"]),
+    Route("/api/hermes/pairing/clear-pending", api_hermes_pairing_clear_pending, methods=["POST"]),
 ]
 
 app = Starlette(

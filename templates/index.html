@@ -2088,6 +2088,15 @@
                 saving: false,
                 restartAfterSave: true,
                 toast: { show: false, message: '', type: 'success' },
+                pairing: {
+                  loading: false,
+                  lastResult: null,
+                  pendingCode: '',
+                  approvePlatform: 'telegram',
+                  revokePlatform: 'telegram',
+                  revokeUserId: '',
+                  clearPlatform: ''
+                },
 
                 providerList: [
                   { key: 'anthropic', label: 'Anthropic', hasBase: false },
@@ -2345,6 +2354,136 @@
                     });
                   }
                   return obj;
+                },
+
+                async loadPairingList() {
+                  if (this.backend !== 'hermes') {
+                    this.showToast('Pairing operations require Hermes backend', 'error');
+                    return;
+                  }
+                  this.pairing.loading = true;
+                  try {
+                    const res = await fetch('/api/hermes/pairing/list');
+                    if (res.ok) {
+                      const data = await res.json();
+                      this.pairing.lastResult = data;
+                    } else {
+                      try {
+                        const err = await res.json();
+                        this.showToast(err.error || 'Failed to load pairing list', 'error');
+                      } catch {
+                        this.showToast('Failed to load pairing list', 'error');
+                      }
+                    }
+                  } catch (e) {
+                    this.showToast('Error loading pairing list: ' + e.message, 'error');
+                  } finally {
+                    this.pairing.loading = false;
+                  }
+                },
+
+                async approvePairingCode() {
+                  if (this.backend !== 'hermes') {
+                    this.showToast('Pairing operations require Hermes backend', 'error');
+                    return;
+                  }
+                  if (!this.pairing.pendingCode || !this.pairing.pendingCode.trim()) {
+                    this.showToast('Please enter a pairing code', 'error');
+                    return;
+                  }
+                  this.pairing.loading = true;
+                  try {
+                    const res = await fetch('/api/hermes/pairing/approve', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        platform: this.pairing.approvePlatform,
+                        code: this.pairing.pendingCode.trim()
+                      })
+                    });
+                    if (res.ok) {
+                      this.showToast('Pairing code approved', 'success');
+                      this.pairing.pendingCode = '';
+                      await this.loadPairingList();
+                    } else {
+                      try {
+                        const err = await res.json();
+                        this.showToast(err.error || 'Failed to approve pairing code', 'error');
+                      } catch {
+                        this.showToast('Failed to approve pairing code', 'error');
+                      }
+                    }
+                  } catch (e) {
+                    this.showToast('Error approving pairing code: ' + e.message, 'error');
+                  } finally {
+                    this.pairing.loading = false;
+                  }
+                },
+
+                async revokePairingUser() {
+                  if (this.backend !== 'hermes') {
+                    this.showToast('Pairing operations require Hermes backend', 'error');
+                    return;
+                  }
+                  if (!this.pairing.revokeUserId || !this.pairing.revokeUserId.trim()) {
+                    this.showToast('Please enter a user ID', 'error');
+                    return;
+                  }
+                  this.pairing.loading = true;
+                  try {
+                    const res = await fetch('/api/hermes/pairing/revoke', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        platform: this.pairing.revokePlatform,
+                        user_id: this.pairing.revokeUserId.trim()
+                      })
+                    });
+                    if (res.ok) {
+                      this.showToast('User pairing revoked', 'success');
+                      this.pairing.revokeUserId = '';
+                      await this.loadPairingList();
+                    } else {
+                      try {
+                        const err = await res.json();
+                        this.showToast(err.error || 'Failed to revoke user pairing', 'error');
+                      } catch {
+                        this.showToast('Failed to revoke user pairing', 'error');
+                      }
+                    }
+                  } catch (e) {
+                    this.showToast('Error revoking user pairing: ' + e.message, 'error');
+                  } finally {
+                    this.pairing.loading = false;
+                  }
+                },
+
+                async clearPendingPairings() {
+                  if (this.backend !== 'hermes') {
+                    this.showToast('Pairing operations require Hermes backend', 'error');
+                    return;
+                  }
+                  this.pairing.loading = true;
+                  try {
+                    const res = await fetch('/api/hermes/pairing/clear-pending', {
+                      method: 'POST'
+                    });
+                    if (res.ok) {
+                      this.showToast('Pending pairings cleared', 'success');
+                      await this.loadPairingList();
+                    } else {
+                      try {
+                        const err = await res.json();
+                        this.showToast(err.error || 'Failed to clear pending pairings', 'error');
+                      } catch {
+                        this.showToast('Failed to clear pending pairings', 'error');
+                      }
+                    }
+                  } catch (e) {
+                    this.showToast('Error clearing pending pairings: ' + e.message, 'error');
+                  } finally {
+                    this.pairing.loading = false;
+                  }
                 }
               };
             }
