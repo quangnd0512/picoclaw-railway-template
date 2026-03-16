@@ -1056,6 +1056,137 @@ class HermesManager(BaseGatewayManager):
             return result
         return new_data
 
+    # Allowlisted pairing operations and their command mapping
+    PAIRING_COMMANDS: dict[str, tuple[str, ...]] = {
+        "list": ("hermes", "pairing", "list"),
+        "approve": ("hermes", "pairing", "approve", "{platform}", "{code}"),
+        "revoke": ("hermes", "pairing", "revoke", "{platform}", "{user_id}"),
+        "clear-pending": ("hermes", "pairing", "clear-pending"),
+    }
+
+    async def run_pairing_operation(
+        self,
+        operation: str,
+        *,
+        platform: str | None = None,
+        code: str | None = None,
+        user_id: str | None = None,
+        timeout_seconds: int = 20
+    ) -> dict:
+        if operation not in self.PAIRING_COMMANDS:
+            return {
+                "ok": False,
+                "operation": operation,
+                "exit_code": -1,
+                "stdout": "",
+                "stderr": f"Invalid operation: {operation}. Allowed: {list(self.PAIRING_COMMANDS.keys())}",
+                "duration_ms": 0,
+            }
+
+        cmd_template = self.PAIRING_COMMANDS[operation]
+        cmd_parts: list[str] = list(cmd_template)
+
+        if operation == "approve":
+            if not platform or not code:
+                return {
+                    "ok": False,
+                    "operation": operation,
+                    "exit_code": -1,
+                    "stdout": "",
+                    "stderr": "approve requires platform and code parameters",
+                    "duration_ms": 0,
+                }
+            try:
+                validated_platform = _validate_pairing_platform(platform)
+                validated_code = _validate_pairing_code(code)
+            except ValueError as e:
+                return {
+                    "ok": False,
+                    "operation": operation,
+                    "exit_code": -1,
+                    "stdout": "",
+                    "stderr": str(e),
+                    "duration_ms": 0,
+                }
+            cmd_parts[3] = validated_platform
+            cmd_parts[4] = validated_code
+
+        elif operation == "revoke":
+            if not platform or not user_id:
+                return {
+                    "ok": False,
+                    "operation": operation,
+                    "exit_code": -1,
+                    "stdout": "",
+                    "stderr": "revoke requires platform and user_id parameters",
+                    "duration_ms": 0,
+                }
+            try:
+                validated_platform = _validate_pairing_platform(platform)
+                validated_user_id = _validate_pairing_user_id(user_id)
+            except ValueError as e:
+                return {
+                    "ok": False,
+                    "operation": operation,
+                    "exit_code": -1,
+                    "stdout": "",
+                    "stderr": str(e),
+                    "duration_ms": 0,
+                }
+            cmd_parts[3] = validated_platform
+            cmd_parts[4] = validated_user_id
+
+        start_time = time.time()
+        try:
+            process = await asyncio.create_subprocess_exec(
+                *cmd_parts,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                env=self.get_env(),
+            )
+
+            try:
+                stdout_bytes, stderr_bytes = await asyncio.wait_for(
+                    process.communicate(),
+                    timeout=timeout_seconds
+                )
+                duration_ms = int((time.time() - start_time) * 1000)
+                return {
+                    "ok": process.returncode == 0,
+                    "operation": operation,
+                    "exit_code": process.returncode,
+                    "stdout": stdout_bytes.decode("utf-8", errors="replace"),
+                    "stderr": stderr_bytes.decode("utf-8", errors="replace"),
+                    "duration_ms": duration_ms,
+                }
+            except asyncio.TimeoutError:
+                process.terminate()
+                try:
+                    await asyncio.wait_for(process.wait(), timeout=5)
+                except asyncio.TimeoutError:
+                    process.kill()
+                    await process.wait()
+                duration_ms = int((time.time() - start_time) * 1000)
+                return {
+                    "ok": False,
+                    "operation": operation,
+                    "exit_code": -1,
+                    "stdout": "",
+                    "stderr": f"Command timed out after {timeout_seconds} seconds",
+                    "duration_ms": duration_ms,
+                }
+
+        except Exception as e:
+            duration_ms = int((time.time() - start_time) * 1000)
+            return {
+                "ok": False,
+                "operation": operation,
+                "exit_code": -1,
+                "stdout": "",
+                "stderr": str(e),
+                "duration_ms": duration_ms,
+            }
+
 
 # Initialize managers for both backends
 gateway = PicoClawManager()  # Keep for backward compatibility during transition
