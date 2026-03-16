@@ -677,7 +677,14 @@ class HermesManager(BaseGatewayManager):
 
         custom_providers = yaml_data.get("custom_providers", []) if isinstance(yaml_data, dict) else []
         if isinstance(custom_providers, list):
-            config["hermes"]["custom_providers"] = custom_providers
+            processed_providers = []
+            for provider in custom_providers:
+                if isinstance(provider, dict):
+                    processed = dict(provider)
+                    if isinstance(processed.get("models"), list):
+                        processed["models"] = ", ".join(processed["models"])
+                    processed_providers.append(processed)
+            config["hermes"]["custom_providers"] = processed_providers
 
         if "gateway" not in config["hermes"]:
             config["hermes"]["gateway"] = {}
@@ -794,7 +801,14 @@ class HermesManager(BaseGatewayManager):
 
         custom_providers = hermes_data.get("custom_providers") if isinstance(hermes_data, dict) else None
         if isinstance(custom_providers, list):
-            yaml_out["custom_providers"] = custom_providers
+            processed_providers = []
+            for provider in custom_providers:
+                if isinstance(provider, dict):
+                    processed = dict(provider)
+                    if isinstance(processed.get("models"), str):
+                        processed["models"] = [m.strip() for m in processed["models"].split(",") if m.strip()]
+                    processed_providers.append(processed)
+            yaml_out["custom_providers"] = processed_providers
 
         env_out = dict(existing_env)
 
