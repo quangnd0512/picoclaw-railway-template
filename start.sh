@@ -29,8 +29,41 @@ if [ ! -f /data/.picoclaw/config.json ]; then
     blogwatcher add "Medium Indie Hacker" https://medium.com/feed/tag/indie-hacker || true
 fi
 
-# Create Hermes directories
+# Ensure Hermes directory exists
 mkdir -p /data/.hermes
+
+# Hermes skill discovery path remediation
+# Keep /data/.picoclaw/workspace/skills as canonical source-of-truth
+# Create symlink /data/.hermes/skills -> /data/.picoclaw/workspace/skills
+HERMES_SKILLS_PATH="/data/.hermes/skills"
+PICOCLAW_SKILLS_PATH="/data/.picoclaw/workspace/skills"
+
+# Handle edge case: if /data/.hermes/skills exists as a real directory (not symlink)
+# Merge missing entries into canonical path, then archive the legacy directory
+if [ -d "$HERMES_SKILLS_PATH" ] && [ ! -L "$HERMES_SKILLS_PATH" ]; then
+    echo "Found legacy Hermes skills directory, migrating to canonical path..."
+    
+    # Copy any skills from legacy location that don't exist in canonical path (non-clobber)
+    cp -rn "$HERMES_SKILLS_PATH"/* "$PICOCLAW_SKILLS_PATH"/ 2>/dev/null || true
+    
+    # Archive legacy directory with timestamp
+    LEGACY_ARCHIVE="/data/.hermes/skills.backup.$(date +%Y%m%d%H%M%S)"
+    mv "$HERMES_SKILLS_PATH" "$LEGACY_ARCHIVE"
+    echo "Archived legacy skills to $LEGACY_ARCHIVE"
+fi
+
+# Create or refresh symlink idempotently
+if [ -L "$HERMES_SKILLS_PATH" ]; then
+    # Symlink exists - remove it to refresh
+    rm "$HERMES_SKILLS_PATH"
+elif [ -d "$HERMES_SKILLS_PATH" ]; then
+    # This shouldn't happen after the migration above, but handle defensively
+    rmdir "$HERMES_SKILLS_PATH"
+fi
+
+# Create symlink from Hermes discovery path to canonical picoclaw path
+ln -s "$PICOCLAW_SKILLS_PATH" "$HERMES_SKILLS_PATH"
+echo "Linked Hermes skills path to canonical location"
 
 # Create default Hermes config if not exists
 if [ ! -f /data/.hermes/config.yaml ]; then

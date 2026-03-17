@@ -129,3 +129,83 @@ When using the Hermes backend, you can manage pairings directly from the Status 
 - **Authentication required**: All pairing endpoints require valid Basic Auth credentials
 - **Backend guard**: Operations only work when Hermes is the active backend
 - **Input validation**: All inputs are validated against strict patterns before processing
+
+## Hermes Custom Skill Verification
+
+This section describes how to verify that custom skills are correctly installed and discoverable by the Hermes backend.
+
+### Prerequisites
+
+- **Docker**: Required for containerized testing
+- **Python 3.12+**: For running pytest
+- **pytest**: Test framework (`pip install pytest`)
+
+### One-Command Verification
+
+Run the full skill verification suite:
+
+```bash
+# Build and run all verification tests
+docker build -t picoclaw-railway-template . && \
+pytest tests/test_skill_runtime_matrix.py -v
+```
+
+For a quick check without full matrix:
+
+```bash
+# Run Hermes discovery baseline test
+pytest tests/test_hermes_skill_discovery.py -v
+```
+
+### Status Interpretations
+
+Each skill receives a terminal status:
+
+| Status | Meaning |
+|--------|---------|
+| `pass` | All verification dimensions passed. Skill is fully functional. |
+| `gated-env` | Skill structure is valid but requires API keys. Not a failure - just needs configuration. |
+| `fail` | Critical issue detected. Missing files, invalid YAML, or unmet dependencies. |
+
+### Verification Dimensions
+
+The test suite checks four dimensions per skill:
+
+1. **Packaging**: SKILL.md and _meta.json exist with valid YAML frontmatter
+2. **Dependencies**: Required binaries and environment variables are available
+3. **Hermes Discovery**: Skill exists in `/data/.hermes/skills` (Hermes canonical path)
+4. **Wrapper**: CLI wrapper (if applicable) is executable
+
+### Important: Wrapper Success ≠ Hermes Discovery
+
+**Warning**: A skill wrapper executing successfully does NOT guarantee Hermes discovery.
+
+- **Wrapper check**: Verifies `/usr/local/bin/<skill>` exists and runs
+- **Hermes discovery**: Verifies skill exists in `/data/.hermes/skills`
+
+These are independent dimensions. A skill can have a working wrapper but fail Hermes discovery if the skill directory is not properly synchronized to the Hermes path.
+
+### Evidence Files
+
+Test results are written to `.sisyphus/evidence/`:
+
+- `task-10-runtime-matrix.json` - Full verification report for all 14 skills
+- `task-5-hermes-baseline.txt` - Hermes discovery gap analysis
+- `task-6-wrapper-divergence.json` - Wrapper vs Hermes divergence report
+
+### Troubleshooting
+
+**Skills not discovered by Hermes:**
+- Check that `start.sh` copies skills to `/data/.hermes/skills`
+- Verify the Hermes backend is configured correctly
+- Run `ls -la /data/.hermes/skills/` inside the container
+
+**Wrapper not found:**
+- Verify Dockerfile creates the wrapper in `/usr/local/bin/`
+- Check wrapper has executable permissions (`chmod +x`)
+- Ensure wrapper script has correct shebang (`#!/bin/bash` or `#!/usr/bin/env python3`)
+
+**Gated by API keys:**
+- Set required environment variables in Railway
+- Common keys: `GEMINI_API_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`
+- Gated status is NOT a failure - skills are structurally valid

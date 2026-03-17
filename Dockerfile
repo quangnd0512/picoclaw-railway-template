@@ -35,8 +35,11 @@ RUN uv venv /opt/hermes/venv && \
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl ca-certificates git nodejs npm gh jq bc && \
+    apt-get install -y --no-install-recommends curl ca-certificates git nodejs npm gh jq bc unzip && \
     rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL https://bun.sh/install | bash && \
+    ln -s /root/.bun/bin/bun /usr/local/bin/bun
 
 COPY --from=picoclaw-builder /src/build/picoclaw /usr/local/bin/picoclaw
 # COPY --from=picoclaw-builder /go/bin/gog /usr/local/bin/gog
@@ -49,7 +52,7 @@ COPY requirements.txt /app/requirements.txt
 RUN uv pip install --system --no-cache -r /app/requirements.txt
 COPY skills/news-aggregator-skill/requirements.txt /tmp/news-requirements.txt
 RUN uv pip install --system --no-cache -r /tmp/news-requirements.txt
-RUN uv pip install --system --no-cache yfinance pandas
+RUN uv pip install --system --no-cache yfinance pandas duckduckgo-search
 RUN npm install -g @steipete/summarize
 
 # Add wrapper for stock-analysis

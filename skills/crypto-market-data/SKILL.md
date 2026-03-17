@@ -1,5 +1,5 @@
 ---
-name: Crypto & Stock Market Data (Node.js)
+name: crypto-market-data
 description: No API KEY needed for free tier. Professional-grade cryptocurrency and stock market data integration for real-time prices, company profiles, and global analytics. Powered by Node.js with zero external dependencies.
 ---
 
