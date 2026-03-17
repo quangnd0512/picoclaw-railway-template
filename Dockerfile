@@ -117,7 +117,7 @@ RUN chmod +x /app/start.sh
 ENV HOME=/data
 ENV PICOCLAW_AGENTS_DEFAULTS_WORKSPACE=/data/.picoclaw/workspace
 ENV FINANCE_NEWS_VENV_BOOTSTRAPPED=1
-ENV TZ="Asia/Saigon"
+# ENV TZ="Asia/Saigon"
 ENV PATH="/opt/hermes/venv/bin:${PATH}"
 ENV PYTHONPATH="/opt/hermes/venv/lib/python3.12/site-packages:${PYTHONPATH}"
 # ENV GOG_KEYRING_BACKEND=file
