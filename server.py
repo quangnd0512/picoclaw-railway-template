@@ -22,9 +22,9 @@ from starlette.authentication import (
 from starlette.middleware import Middleware
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.requests import Request
-from starlette.responses import JSONResponse, PlainTextResponse
+from starlette.responses import JSONResponse, PlainTextResponse, FileResponse
 from starlette.routing import Route
-from starlette.templating import Jinja2Templates
+from starlette.staticfiles import StaticFiles
 
 dotenv = importlib.import_module("dotenv")
 
@@ -112,8 +112,6 @@ def _validate_pairing_user_id(value: str) -> str:
         raise ValueError(f"Invalid user ID: {value}. Must be 1-128 characters, alphanumeric with _:+@-.")
     return value
 
-
-templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 
 ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
@@ -1570,7 +1568,7 @@ async def homepage(request: Request):
     auth_err = require_auth(request)
     if auth_err:
         return auth_err
-    return templates.TemplateResponse(request, "index.html")
+    return FileResponse("frontend/dist/index.html")
 
 
 async def health(request: Request):
@@ -1801,6 +1799,8 @@ app = Starlette(
     on_startup=[auto_start_gateway],
     on_shutdown=[shutdown_handler],
 )
+
+app.mount("/assets", StaticFiles(directory="frontend/dist/assets"), name="assets")
 
 
 if __name__ == "__main__":

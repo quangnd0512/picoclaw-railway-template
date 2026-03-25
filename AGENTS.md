@@ -6,7 +6,7 @@ Welcome! This `AGENTS.md` file provides essential context, commands, and code st
 
 **Primary Goal:** Provide a dead-simple, highly reliable deploy template for the `picoclaw` gateway.
 - **Backend:** Python 3.12, Starlette (bare async ASGI framework), Uvicorn, Asyncio.
-- **Frontend:** HTML, Alpine.js (via CDN), TailwindCSS (via CDN).
+- **Frontend:** Vite+React+TypeScript app in `frontend/` directory, served as built static files by the Python backend.
 - **Deployment:** Docker, Railway (`railway.toml`).
 - **Core Mechanism:** A Python web server runs alongside the `picoclaw gateway` binary as a subprocess, managing its lifecycle (start/stop/restart) and intercepting `stdout`/`stderr` for live logging via a web UI.
 
@@ -84,13 +84,13 @@ ruff format .
 - **Type Hinting:** Use standard Python type hinting (e.g., `def get_status() -> dict:`) to improve code clarity and maintainability.
 - **Logging Management:** Subprocess logs are captured and stored in a limited-size `collections.deque(maxlen=500)`. This structure is intentional to prevent memory leaks over long uptimes. Do not replace it with an unbounded list.
 
-### Frontend (`templates/index.html`)
-- **No-Build Architecture:** The frontend strictly relies on CDN-hosted TailwindCSS and Alpine.js. Do not introduce Node.js, `package.json`, Webpack, Vite, or npm packages. Keep it simple and dependency-free.
-- **Reactivity & State:** Use Alpine.js directives (`x-data`, `x-model`, `x-show`, `x-for`, `@click`) for state management and UI interactions. The primary state is managed by the `app()` function at the bottom of the file.
+### React+Vite Frontend (`frontend/`)
+- **Build Architecture:** The Python backend (`server.py`, `start.sh`, `requirements.txt`) has no Node.js dependencies. The `frontend/` directory is a separate Vite+React+TypeScript application with its own `package.json`. Frontend builds are performed via `npm run build` during Docker image construction. The built static files are served by the Python backend from `frontend/dist/`. **Do not add npm packages to the Python backend layer. Do not add Python packages to `frontend/`.**
+- **State Management:** Use React hooks (`useState`, `useContext`, `useReducer`) and TanStack Query for data fetching. **Do not add:** shadcn/ui, React Router, Zustand, Redux, or other complex state management libraries.
 - **Styling:** 
   - Use Tailwind utility classes. 
   - **Dark Mode Requirement:** All new UI components must include equivalent `dark:` classes for dark mode support (e.g., `bg-white dark:bg-gray-900`, `text-gray-900 dark:text-gray-100`, `border-gray-200 dark:border-gray-800`).
-- **Data Binding:** When adding new configuration fields to the UI, ensure they accurately bind to the `config` object (e.g., `x-model="config.providers.newprovider.api_key"`) and trigger a save via `saveConfig()`.
+- **Component Structure:** Keep components simple and focused. Do not over-architect — follow React best practices but avoid unnecessary abstraction layers or complex patterns.
 
 ### Git & Collaboration
 - Do not over-engineer. This is a template designed for quick, reliable 1-click deployments.
@@ -100,14 +100,15 @@ ruff format .
 
 ## 4. Codebase Structure & File Guide
 - `server.py`: The core backend server and gateway manager. All routes and API endpoints live here.
-- `templates/index.html`: The monolithic frontend. Includes Tailwind CDN, Alpine.js logic (`app()`), and HTML structure.
+- `frontend/`: Vite+React+TypeScript application with its own `package.json`, build config, and components.
+- `frontend/dist/`: Built static files (HTML, CSS, JS bundles) served by the Python backend at `/`.
 - `start.sh`: The container entrypoint. Bootstraps the workspace and starts the Python server.
 - `railway.toml`: Deployment configuration for Railway specifically.
 - `requirements.txt`: Python dependencies (Starlette, Uvicorn, Jinja2, python-multipart).
-- `Dockerfile`: Multi-stage build that compiles PicoClaw from Go source and sets up the Python environment.
+- `Dockerfile`: Multi-stage build that compiles PicoClaw from Go source, builds the React frontend, and sets up the Python environment.
 
 ## 5. Agent Instructions (Tone & Behavior)
-- **Simplicity First:** The biggest virtue of this repository is that it has *no build steps*. Do not introduce a `package.json`, React, Vue, Webpack, or Vite. Stick to Alpine and Tailwind via CDN.
+- **Simplicity First:** The biggest virtue of this repository is straightforward, focused code without unnecessary complexity. For the Python backend, maintain the zero-build simplicity. For the React+Vite frontend, avoid adding component libraries (shadcn/ui), routing libraries (React Router), or complex state management (Zustand, Redux). Keep the codebase maintainable and easy to understand.
 - **Zero Fluff:** Provide only the code needed to implement a feature. Do not add superfluous abstractions, design patterns, or layers unless necessary for fixing a bug or fulfilling a request.
 - **Persistence:** Remember that the configuration is stored in `~/.picoclaw/config.json` inside the container (mapped to `/data` in Railway). Modifications to settings must read/write to this location.
 - **Error Recovery:** If modifying the `GatewayManager` subprocess logic, ensure that you handle `asyncio.CancelledError` gracefully and never leave zombie `picoclaw gateway` processes behind.

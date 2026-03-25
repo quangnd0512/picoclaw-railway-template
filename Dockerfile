@@ -109,7 +109,8 @@ fi' > /usr/local/bin/news-aggregator-skill && chmod +x /usr/local/bin/news-aggre
 RUN mkdir -p /data/.picoclaw
 
 COPY server.py /app/server.py
-COPY templates/ /app/templates/
+COPY frontend/ /app/frontend/
+RUN cd /app/frontend && npm install && npm run build && rm -rf node_modules
 COPY skills/ /app/skills/
 COPY start.sh /app/start.sh
 RUN chmod +x /app/start.sh
