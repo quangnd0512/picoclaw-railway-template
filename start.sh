@@ -89,4 +89,4 @@ if [ ! -f /data/.gateway-meta.json ]; then
     echo '{"backend": "picoclaw"}' > /data/.gateway-meta.json
 fi
 
-exec python /app/server.py
+exec /usr/local/bin/python3 /app/server.py
