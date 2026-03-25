@@ -1,0 +1,552 @@
+        <script>
+            function app() {
+              return {
+                tab: 'config',
+                backend: 'picoclaw',
+                availableBackends: ['picoclaw', 'hermes'],
+                switchingBackend: false,
+                config: defaultConfig(),
+                status: {},
+                logs: [],
+                saving: false,
+                restartAfterSave: true,
+                toast: { show: false, message: '', type: 'success' },
+                pairing: {
+                  loading: false,
+                  lastResult: null,
+                  pendingCode: '',
+                  approvePlatform: 'telegram',
+                  revokePlatform: 'telegram',
+                  revokeUserId: '',
+                  clearPlatform: ''
+                },
+
+                providerList: [
+                  { key: 'anthropic', label: 'Anthropic', hasBase: false },
+                  { key: 'openai', label: 'OpenAI', hasBase: true, basePlaceholder: 'https://api.openai.com/v1' },
+                  { key: 'openrouter', label: 'OpenRouter', hasBase: true, basePlaceholder: 'https://openrouter.ai/api/v1' },
+                  { key: 'deepseek', label: 'DeepSeek', hasBase: false },
+                  { key: 'groq', label: 'Groq', hasBase: false },
+                  { key: 'gemini', label: 'Gemini', hasBase: false },
+                  { key: 'zhipu', label: 'Zhipu', hasBase: true },
+                  { key: 'moonshot', label: 'Moonshot', hasBase: false },
+                  { key: 'nvidia', label: 'NVIDIA', hasBase: true, basePlaceholder: 'Optional' },
+                  { key: 'vllm', label: 'vLLM', hasBase: true, basePlaceholder: 'http://localhost:8000/v1' },
+                ],
+
+                getProvider(key, field) {
+                  return this.config.providers?.[key]?.[field] || '';
+                },
+                setProvider(key, field, value) {
+                  if (!this.config.providers[key]) this.config.providers[key] = {};
+                  this.config.providers[key][field] = value;
+                },
+
+                addMcpServer() {
+                  const name = window.prompt('Enter new MCP server name:');
+                  if (!name || !name.trim()) return;
+                  const key = name.trim();
+                  if (this.config.tools.mcp.servers[key]) {
+                    this.showToast('Server already exists', 'error');
+                    return;
+                  }
+                  this.config.tools.mcp.servers[key] = {
+                    enabled: false,
+                    command: '',
+                    args: [],
+                    env: {}
+                  };
+                },
+                removeMcpServer(name) {
+                  if (window.confirm(`Remove MCP server "${name}"?`)) {
+                    delete this.config.tools.mcp.servers[name];
+                  }
+                },
+                getMcpServerType(server) {
+                  return (server.type === 'http' || server.type === 'sse') ? 'http' : 'stdio';
+                },
+                setMcpServerType(name, type) {
+                  const server = this.config.tools.mcp.servers[name];
+                  if (type === 'http') {
+                    delete server.command;
+                    delete server.args;
+                    delete server.env;
+                    delete server.env_file;
+                    server.type = 'http';
+                    server.url = '';
+                    server.headers = {};
+                  } else {
+                    delete server.type;
+                    delete server.url;
+                    delete server.headers;
+                    server.command = '';
+                    server.args = [];
+                    server.env = {};
+                  }
+                },
+                addMcpEnvRow(name) {
+                  const server = this.config.tools.mcp.servers[name];
+                  if (!server.env) server.env = {};
+                  server.env[''] = '';
+                },
+                removeMcpEnvRow(name, key) {
+                  const server = this.config.tools.mcp.servers[name];
+                  if (server.env && server.env[key] !== undefined) {
+                    delete server.env[key];
+                  }
+                },
+                addMcpHeaderRow(name) {
+                  const server = this.config.tools.mcp.servers[name];
+                  if (!server.headers) server.headers = {};
+                  server.headers[''] = '';
+                },
+                removeMcpHeaderRow(name, key) {
+                  const server = this.config.tools.mcp.servers[name];
+                  if (server.headers && server.headers[key] !== undefined) {
+                    delete server.headers[key];
+                  }
+                },
+                getExecPatterns(field) {
+                  return (this.config.tools.exec?.[field] || []).join('\n');
+                },
+                setExecPatterns(field, text) {
+                  if (!this.config.tools.exec) this.config.tools.exec = {};
+                  this.config.tools.exec[field] = text.split('\n').map(s => s.trim()).filter(Boolean);
+                },
+                getMcpArgs(name) {
+                  return (this.config.tools.mcp.servers[name]?.args || []).join('\n');
+                },
+                setMcpArgs(name, text) {
+                  if (this.config.tools.mcp.servers[name]) {
+                    this.config.tools.mcp.servers[name].args = text.split('\n').map(s => s.trim()).filter(Boolean);
+                  }
+                },
+
+                async init() {
+                  try {
+                    const res = await fetch('/api/backend');
+                    if (res.ok) {
+                      const data = await res.json();
+                      this.backend = data.backend;
+                      this.availableBackends = data.available;
+                    }
+                  } catch (e) {}
+
+                  await this.loadConfig();
+                  await this.loadStatus();
+                  await this.loadLogs();
+                  setInterval(() => this.loadStatus(), 5000);
+                  setInterval(() => this.loadLogs(), 3000);
+                },
+
+                async switchBackend(newBackend) {
+                  if (this.switchingBackend) return;
+                  if (this.backend === newBackend) return;
+                  
+                  if (this.status.gateway?.state === 'running') {
+                    if (!confirm('Gateway is running. Stop it and switch?')) return;
+                  }
+                  
+                  this.switchingBackend = true;
+                  try {
+                    const res = await fetch('/api/backend', {
+                      method: 'POST',
+                      headers: {'Content-Type': 'application/json'},
+                      body: JSON.stringify({backend: newBackend})
+                    });
+                    if (res.ok) {
+                      this.backend = newBackend;
+                      await this.loadConfig();
+                      this.showToast(`Switched to ${newBackend} backend`, 'success');
+                    } else {
+                      this.showToast('Failed to switch backend', 'error');
+                    }
+                  } catch (e) {
+                    this.showToast('Error switching backend: ' + e.message, 'error');
+                  } finally {
+                    this.switchingBackend = false;
+                  }
+                },
+
+                async loadConfig() {
+                  try {
+                    const res = await fetch('/api/config');
+                    if (res.ok) {
+                      const data = await res.json();
+                      this.config = mergeDeep(defaultConfig(), data);
+                    }
+                  } catch (e) {}
+                },
+
+                async saveConfig() {
+                  this.saving = true;
+                  try {
+                    const payload = JSON.parse(JSON.stringify(this.config));
+                    payload._restartGateway = this.restartAfterSave;
+                    const res = await fetch('/api/config', {
+                      method: 'PUT',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(payload),
+                    });
+                    if (res.ok) {
+                      this.showToast('Configuration saved', 'success');
+                      await this.loadConfig();
+                    } else {
+                      try {
+                        const err = await res.json();
+                        this.showToast(err.error || 'Save failed (' + res.status + ')', 'error');
+                      } catch {
+                        const text = await res.text();
+                        this.showToast(text || 'Save failed (' + res.status + ')', 'error');
+                      }
+                    }
+                  } catch (e) {
+                    this.showToast('Save failed: ' + e.message, 'error');
+                  }
+                  this.saving = false;
+                },
+
+                async loadStatus() {
+                  try {
+                    const res = await fetch('/api/status');
+                    if (res.ok) this.status = await res.json();
+                  } catch (e) {}
+                },
+
+                async loadLogs() {
+                  try {
+                    const res = await fetch('/api/logs');
+                    if (res.ok) {
+                      const data = await res.json();
+                      const wasAtBottom = this.$refs.logViewer &&
+                        (this.$refs.logViewer.scrollTop + this.$refs.logViewer.clientHeight >= this.$refs.logViewer.scrollHeight - 50);
+                      this.logs = data.lines;
+                      if (wasAtBottom && this.$refs.logViewer) {
+                        this.$nextTick(() => {
+                          this.$refs.logViewer.scrollTop = this.$refs.logViewer.scrollHeight;
+                        });
+                      }
+                    }
+                  } catch (e) {}
+                },
+
+                async startGateway() {
+                  await fetch('/api/gateway/start', { method: 'POST' });
+                  this.showToast('Gateway starting', 'success');
+                  setTimeout(() => this.loadStatus(), 1000);
+                },
+
+                async stopGateway() {
+                  await fetch('/api/gateway/stop', { method: 'POST' });
+                  this.showToast('Gateway stopping', 'success');
+                  setTimeout(() => this.loadStatus(), 1000);
+                },
+
+                async restartGateway() {
+                  await fetch('/api/gateway/restart', { method: 'POST' });
+                  this.showToast('Gateway restarting', 'success');
+                  setTimeout(() => this.loadStatus(), 2000);
+                },
+
+                formatUptime(seconds) {
+                  if (seconds == null) return '';
+                  const h = Math.floor(seconds / 3600);
+                  const m = Math.floor((seconds % 3600) / 60);
+                  const s = seconds % 60;
+                  if (h > 0) return h + 'h ' + m + 'm ' + s + 's';
+                  if (m > 0) return m + 'm ' + s + 's';
+                  return s + 's';
+                },
+
+                showToast(message, type) {
+                  type = type || 'success';
+                  this.toast = { show: true, message: message, type: type };
+                  setTimeout(() => { this.toast.show = false; }, 3000);
+                },
+
+                objectToArray(obj) {
+                  if (!obj) return [];
+                  return Object.entries(obj).map(([key, value]) => ({ key, value }));
+                },
+
+                arrayToObject(arr) {
+                  const obj = {};
+                  if (arr) {
+                    arr.forEach(item => {
+                      if (item.key) obj[item.key] = item.value;
+                    });
+                  }
+                  return obj;
+                },
+
+                async loadPairingList() {
+                  if (this.backend !== 'hermes') {
+                    this.showToast('Pairing operations require Hermes backend', 'error');
+                    return;
+                  }
+                  this.pairing.loading = true;
+                  try {
+                    const res = await fetch('/api/hermes/pairing/list');
+                    if (res.ok) {
+                      const data = await res.json();
+                      this.pairing.lastResult = data;
+                    } else {
+                      try {
+                        const err = await res.json();
+                        this.showToast(err.error || 'Failed to load pairing list', 'error');
+                      } catch {
+                        this.showToast('Failed to load pairing list', 'error');
+                      }
+                    }
+                  } catch (e) {
+                    this.showToast('Error loading pairing list: ' + e.message, 'error');
+                  } finally {
+                    this.pairing.loading = false;
+                  }
+                },
+
+                async approvePairingCode() {
+                  if (this.backend !== 'hermes') {
+                    this.showToast('Pairing operations require Hermes backend', 'error');
+                    return;
+                  }
+                  if (!this.pairing.pendingCode || !this.pairing.pendingCode.trim()) {
+                    this.showToast('Please enter a pairing code', 'error');
+                    return;
+                  }
+                  this.pairing.loading = true;
+                  try {
+                    const res = await fetch('/api/hermes/pairing/approve', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        platform: this.pairing.approvePlatform,
+                        code: this.pairing.pendingCode.trim()
+                      })
+                    });
+                    if (res.ok) {
+                      this.showToast('Pairing code approved', 'success');
+                      this.pairing.pendingCode = '';
+                      await this.loadPairingList();
+                    } else {
+                      try {
+                        const err = await res.json();
+                        this.showToast(err.error || 'Failed to approve pairing code', 'error');
+                      } catch {
+                        this.showToast('Failed to approve pairing code', 'error');
+                      }
+                    }
+                  } catch (e) {
+                    this.showToast('Error approving pairing code: ' + e.message, 'error');
+                  } finally {
+                    this.pairing.loading = false;
+                  }
+                },
+
+                async revokePairingUser() {
+                  if (this.backend !== 'hermes') {
+                    this.showToast('Pairing operations require Hermes backend', 'error');
+                    return;
+                  }
+                  if (!this.pairing.revokeUserId || !this.pairing.revokeUserId.trim()) {
+                    this.showToast('Please enter a user ID', 'error');
+                    return;
+                  }
+                  this.pairing.loading = true;
+                  try {
+                    const res = await fetch('/api/hermes/pairing/revoke', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        platform: this.pairing.revokePlatform,
+                        user_id: this.pairing.revokeUserId.trim()
+                      })
+                    });
+                    if (res.ok) {
+                      this.showToast('User pairing revoked', 'success');
+                      this.pairing.revokeUserId = '';
+                      await this.loadPairingList();
+                    } else {
+                      try {
+                        const err = await res.json();
+                        this.showToast(err.error || 'Failed to revoke user pairing', 'error');
+                      } catch {
+                        this.showToast('Failed to revoke user pairing', 'error');
+                      }
+                    }
+                  } catch (e) {
+                    this.showToast('Error revoking user pairing: ' + e.message, 'error');
+                  } finally {
+                    this.pairing.loading = false;
+                  }
+                },
+
+                async clearPendingPairings() {
+                  if (this.backend !== 'hermes') {
+                    this.showToast('Pairing operations require Hermes backend', 'error');
+                    return;
+                  }
+                  this.pairing.loading = true;
+                  try {
+                    const res = await fetch('/api/hermes/pairing/clear-pending', {
+                      method: 'POST'
+                    });
+                    if (res.ok) {
+                      this.showToast('Pending pairings cleared', 'success');
+                      await this.loadPairingList();
+                    } else {
+                      try {
+                        const err = await res.json();
+                        this.showToast(err.error || 'Failed to clear pending pairings', 'error');
+                      } catch {
+                        this.showToast('Failed to clear pending pairings', 'error');
+                      }
+                    }
+                  } catch (e) {
+                    this.showToast('Error clearing pending pairings: ' + e.message, 'error');
+                  } finally {
+                    this.pairing.loading = false;
+                  }
+                }
+              };
+            }
+
+            function defaultConfig() {
+              return {
+                agents: { defaults: { workspace: '~/.picoclaw/workspace', restrict_to_workspace: true, allow_read_outside_workspace: false, provider: '', model: 'glm-4.7', max_tokens: 8192, temperature: 0.7, max_tool_iterations: 20 } },
+                channels: {
+                  telegram: { enabled: false, token: '', proxy: '', allow_from: [] },
+                  discord: { enabled: false, token: '', allow_from: [] },
+                  slack: { enabled: false, bot_token: '', app_token: '', allow_from: [] },
+                  whatsapp: { enabled: false, bridge_url: 'ws://localhost:3001', allow_from: [] },
+                  feishu: { enabled: false, app_id: '', app_secret: '', encrypt_key: '', verification_token: '', allow_from: [] },
+                  dingtalk: { enabled: false, client_id: '', client_secret: '', allow_from: [] },
+                  qq: { enabled: false, app_id: '', app_secret: '', allow_from: [] },
+                  line: { enabled: false, channel_secret: '', channel_access_token: '', webhook_host: '0.0.0.0', webhook_port: 18791, webhook_path: '/webhook/line', allow_from: [] },
+                  maixcam: { enabled: false, host: '0.0.0.0', port: 18790, allow_from: [] },
+                },
+                hermes: {
+                  agent: { max_turns: 90, system_prompt: '', reasoning_effort: 'medium', personalities: '' },
+                  compression: { enabled: true, threshold: 0.50, summary_model: '', summary_provider: '' },
+                  display: { compact: false, personality: 'kawaii', resume_display: 'full', bell_on_complete: false, show_reasoning: false, skin: '' },
+                  mcp_servers: [],
+                  provider_routing: { sort: 'price', only: '', ignore: '', order: '', require_parameters: false, data_collection: 'deny' },
+                  fallback_model: { provider: '', model: '' },
+                  auxiliary: {
+                    vision: { provider: '', model: '', base_url: '', api_key: '' },
+                    web_extract: { provider: '', model: '', base_url: '', api_key: '' }
+                  },
+                  channels: {
+                    telegram: { enabled: false, bot_token: '', token: '', home_channel: '', home_channel_name: '', allowed_users: '', allow_from: [], allow_all_users: false },
+                    discord: { enabled: false, bot_token: '', token: '', allowed_users: '', allow_from: [], allow_bots: false, require_mention: false, free_response_channels: '', auto_thread: false },
+                    slack: { enabled: false, bot_token: '', app_token: '', home_channel: '', home_channel_name: '', allowed_users: '', allow_all_users: false },
+                    whatsapp: { enabled: false, mode: 'local', allowed_users: '', allow_all_users: false },
+                    signal: { enabled: false, http_url: '', account: '', ignore_stories: true, home_channel: '', home_channel_name: '', group_allowed_users: '', allowed_users: '', allow_all_users: false },
+                    email: { enabled: false, address: '', password: '', imap_host: '', smtp_host: '', imap_port: 993, smtp_port: 465, poll_interval: 60, home_address: '', home_address_name: '', allowed_users: '', allow_all_users: false },
+                    homeassistant: { enabled: false, token: '', url: '' }
+                  },
+                  terminal: {
+                    backend: 'native',
+                    cwd: '',
+                    timeout: 300,
+                    docker_image: '',
+                    container_cpu: '',
+                    container_memory: '',
+                    container_disk: '',
+                    container_persistent: false,
+                    ssh_host: '',
+                    ssh_port: 22,
+                    ssh_user: '',
+                    ssh_key_path: ''
+                  },
+                  security: {
+                    redact_secrets: true,
+                    tirith_enabled: false,
+                    tirith_path: '',
+                    tirith_timeout: 30,
+                    tirith_fail_open: false
+                  }
+                },
+                providers: {
+                  anthropic: { api_key: '' },
+                  openai: { api_key: '', api_base: '', base_url: '' },
+                  openrouter: { api_key: '' },
+                  deepseek: { api_key: '' },
+                  groq: { api_key: '' },
+                  gemini: { api_key: '' },
+                  zhipu: { api_key: '', api_base: '' },
+                  zai: { api_key: '' },
+                  vllm: { api_key: '', api_base: '' },
+                  nvidia: { api_key: '', api_base: '' },
+                  moonshot: { api_key: '' },
+                  minimax: { api_key: '' },
+                  custom: { api_key: '', base_url: '', model: '' },
+                },
+                gateway: { host: '0.0.0.0', port: 18790 },
+                tools: {
+                  web: {
+                    brave: { enabled: false, api_key: '', max_results: 5 },
+                    duckduckgo: { enabled: true, max_results: 5 },
+                    perplexity: { enabled: false, api_key: '', max_results: 5 },
+                    tavily: { enabled: false, api_key: '', base_url: '', max_results: 5 },
+                    proxy: '',
+                    fetch_limit_bytes: 10485760
+                  },
+                  mcp: {
+                    enabled: false,
+                    servers: {
+                      context7: {
+                        enabled: false,
+                        type: "http",
+                        url: "https://mcp.context7.com/mcp"
+                      },
+                      filesystem: {
+                        enabled: false,
+                        command: "npx",
+                        args: ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]
+                      },
+                      github: {
+                        enabled: false,
+                        command: "npx",
+                        args: ["-y", "@modelcontextprotocol/server-github"],
+                        env: { "GITHUB_PERSONAL_ACCESS_TOKEN": "" }
+                    }
+                     }
+                },
+                cron: {
+                    exec_timeout_minutes: 5
+                },
+                exec: {
+                    enable_deny_patterns: true,
+                    custom_deny_patterns: [],
+                    custom_allow_patterns: []
+                },
+                skills: {
+                    registries: {
+                        clawhub: {
+                            enabled: true,
+                            base_url: "https://clawhub.ai",
+                            search_path: "/api/v1/search",
+                            skills_path: "/api/v1/skills",
+                            download_path: "/api/v1/download"
+                        }
+                    }
+                },
+                },
+                heartbeat: { enabled: true, interval: 30 },
+                devices: { enabled: false, monitor_usb: false }
+              };
+            }
+
+            function mergeDeep(target, source) {
+              const output = Object.assign({}, target);
+              for (const key of Object.keys(source)) {
+                if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+                  output[key] = mergeDeep(target[key] || {}, source[key]);
+                } else {
+                  output[key] = source[key];
+                }
+              }
+              return output;
+            }
+        </script>

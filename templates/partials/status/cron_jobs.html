@@ -1,0 +1,22 @@
+                    <section x-show="(status.cron?.count || 0) > 0">
+                        <h2 class="text-lg font-semibold mb-3">
+                            Cron Jobs
+                            <span
+                                class="text-sm text-gray-500"
+                                x-text="'(' + (status.cron?.count || 0) + ')'"
+                            ></span>
+                        </h2>
+                        <div
+                            class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
+                        >
+                            <template
+                                x-for="(job, i) in (status.cron?.jobs || [])"
+                                :key="i"
+                            >
+                                <div
+                                    class="text-sm py-1 text-gray-500 dark:text-gray-400"
+                                    x-text="JSON.stringify(job)"
+                                ></div>
+                            </template>
+                        </div>
+                    </section>

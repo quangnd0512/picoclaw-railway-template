@@ -1,0 +1,26 @@
+                    <section>
+                        <div class="flex items-center justify-between mb-3">
+                            <h2 class="text-lg font-semibold">Recent Logs</h2>
+                            <span
+                                class="text-xs text-gray-500"
+                                x-text="logs.length + ' lines'"
+                            ></span>
+                        </div>
+                        <div
+                            class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4 log-viewer h-96 overflow-y-auto"
+                            x-ref="logViewer"
+                        >
+                            <template x-for="(line, i) in logs" :key="i">
+                                <div
+                                    class="text-gray-600 dark:text-gray-400 whitespace-pre-wrap break-all"
+                                    x-text="line"
+                                ></div>
+                            </template>
+                            <div
+                                x-show="logs.length === 0"
+                                class="text-gray-400 dark:text-gray-600 text-sm"
+                            >
+                                No logs yet
+                            </div>
+                        </div>
+                    </section>

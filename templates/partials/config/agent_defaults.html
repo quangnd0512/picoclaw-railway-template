@@ -1,0 +1,74 @@
+                    <section>
+                        <h2 class="text-lg font-semibold mb-3">
+                            Agent Defaults
+                        </h2>
+                        <div
+                            class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
+                        >
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label
+                                        class="block text-xs text-gray-500 mb-1"
+                                        >Model</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        x-model="config.agents.defaults.model"
+                                    />
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs text-gray-500 mb-1"
+                                        >Max Tokens</label
+                                    >
+                                    <input
+                                        type="number"
+                                        class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        x-model.number="config.agents.defaults.max_tokens"
+                                    />
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs text-gray-500 mb-1"
+                                        >Temperature</label
+                                    >
+                                    <input
+                                        type="number"
+                                        step="0.1"
+                                        min="0"
+                                        max="2"
+                                        class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        x-model.number="config.agents.defaults.temperature"
+                                    />
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs text-gray-500 mb-1"
+                                        >Max Tool Iterations</label
+                                    >
+                                    <input
+                                        type="number"
+                                        class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        x-model.number="config.agents.defaults.max_tool_iterations"
+                                    />
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
+                                        x-model="config.agents.defaults.restrict_to_workspace"
+                                    />
+                                    <label class="text-sm text-gray-700 dark:text-gray-300">Restrict to Workspace</label>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
+                                        x-model="config.agents.defaults.allow_read_outside_workspace"
+                                    />
+                                    <label class="text-sm text-gray-700 dark:text-gray-300">Allow Read Outside Workspace</label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>

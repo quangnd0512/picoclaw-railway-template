@@ -1,0 +1,664 @@
+                    <section x-show="backend === 'picoclaw'">
+                        <h2 class="text-lg font-semibold mb-3">Channels</h2>
+                        <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                            <div class="space-y-4">
+                                <!-- Telegram -->
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h3 class="font-medium">Telegram</h3>
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.channels.telegram.enabled" />
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                        </label>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.channels.telegram.enabled">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Bot Token</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.channels.telegram.token" placeholder="Token from @BotFather" />
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Proxy</label>
+                                            <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.channels.telegram.proxy" placeholder="http://proxy:8080" />
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label class="block text-xs text-gray-500 mb-1">Allow From</label>
+                                            <div class="flex flex-wrap gap-2">
+                                                <template x-for="(user, index) in config.channels.telegram.allow_from" :key="index">
+                                                    <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">
+                                                        <span x-text="user"></span>
+                                                        <button type="button" @click="config.channels.telegram.allow_from.splice(index, 1)" class="text-gray-400 hover:text-red-500">×</button>
+                                                    </div>
+                                                </template>
+                                                <input type="text" class="flex-1 min-w-[120px] bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded px-2 py-1 text-sm" placeholder="Add user ID and press Enter" @keydown.enter="if ($event.target.value) { config.channels.telegram.allow_from.push($event.target.value); $event.target.value = ''; }" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Discord -->
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h3 class="font-medium">Discord</h3>
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.channels.discord.enabled" />
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                        </label>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.channels.discord.enabled">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Bot Token</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.channels.discord.token" placeholder="Token from Developer Portal" />
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label class="block text-xs text-gray-500 mb-1">Allow From</label>
+                                            <div class="flex flex-wrap gap-2">
+                                                <template x-for="(user, index) in config.channels.discord.allow_from" :key="index">
+                                                    <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">
+                                                        <span x-text="user"></span>
+                                                        <button type="button" @click="config.channels.discord.allow_from.splice(index, 1)" class="text-gray-400 hover:text-red-500">×</button>
+                                                    </div>
+                                                </template>
+                                                <input type="text" class="flex-1 min-w-[120px] bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded px-2 py-1 text-sm" placeholder="Add user ID and press Enter" @keydown.enter="if ($event.target.value) { config.channels.discord.allow_from.push($event.target.value); $event.target.value = ''; }" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Slack -->
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h3 class="font-medium">Slack</h3>
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.channels.slack.enabled" />
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                        </label>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.channels.slack.enabled">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Bot Token</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.channels.slack.bot_token" placeholder="xoxb-..." />
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">App Token</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.channels.slack.app_token" placeholder="xapp-..." />
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label class="block text-xs text-gray-500 mb-1">Allow From</label>
+                                            <div class="flex flex-wrap gap-2">
+                                                <template x-for="(user, index) in config.channels.slack.allow_from" :key="index">
+                                                    <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">
+                                                        <span x-text="user"></span>
+                                                        <button type="button" @click="config.channels.slack.allow_from.splice(index, 1)" class="text-gray-400 hover:text-red-500">×</button>
+                                                    </div>
+                                                </template>
+                                                <input type="text" class="flex-1 min-w-[120px] bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded px-2 py-1 text-sm" placeholder="Add user ID and press Enter" @keydown.enter="if ($event.target.value) { config.channels.slack.allow_from.push($event.target.value); $event.target.value = ''; }" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- WhatsApp -->
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h3 class="font-medium">WhatsApp</h3>
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.channels.whatsapp.enabled" />
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                        </label>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.channels.whatsapp.enabled">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Bridge URL</label>
+                                            <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.channels.whatsapp.bridge_url" placeholder="ws://localhost:3001" />
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label class="block text-xs text-gray-500 mb-1">Allow From</label>
+                                            <div class="flex flex-wrap gap-2">
+                                                <template x-for="(user, index) in config.channels.whatsapp.allow_from" :key="index">
+                                                    <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">
+                                                        <span x-text="user"></span>
+                                                        <button type="button" @click="config.channels.whatsapp.allow_from.splice(index, 1)" class="text-gray-400 hover:text-red-500">×</button>
+                                                    </div>
+                                                </template>
+                                                <input type="text" class="flex-1 min-w-[120px] bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded px-2 py-1 text-sm" placeholder="Add phone number and press Enter" @keydown.enter="if ($event.target.value) { config.channels.whatsapp.allow_from.push($event.target.value); $event.target.value = ''; }" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2 class="text-lg font-semibold mb-3">Channels</h2>
+                        <div x-show="backend === 'picoclaw'" class="space-y-4">
+                            <div
+                                class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
+                            >
+                                <div
+                                    class="flex items-center justify-between mb-3"
+                                >
+                                    <h3 class="font-medium">Telegram</h3>
+                                    <label
+                                        class="flex items-center gap-2 cursor-pointer"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
+                                            x-model="config.channels.telegram.enabled"
+                                        />
+                                        <span
+                                            class="text-xs text-gray-500 dark:text-gray-400"
+                                            >Enabled</span
+                                        >
+                                    </label>
+                                </div>
+                                <div
+                                    class="grid grid-cols-1 md:grid-cols-2 gap-3"
+                                    x-show="config.channels.telegram.enabled"
+                                >
+                                    <div>
+                                        <label
+                                            class="block text-xs text-gray-500 mb-1"
+                                            >Bot Token</label
+                                        >
+                                        <input
+                                            type="password"
+                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            x-model="config.channels.telegram.token"
+                                            placeholder="Token from @BotFather"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs text-gray-500 mb-1"
+                                            >Allowed Users
+                                            (comma-separated)</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            :value="(config.channels.telegram.allow_from || []).join(', ')"
+                                            @input="config.channels.telegram.allow_from = $event.target.value.split(',').map(s => s.trim()).filter(Boolean)"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div
+                                class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
+                            >
+                                <div
+                                    class="flex items-center justify-between mb-3"
+                                >
+                                    <h3 class="font-medium">Discord</h3>
+                                    <label
+                                        class="flex items-center gap-2 cursor-pointer"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
+                                            x-model="config.channels.discord.enabled"
+                                        />
+                                        <span
+                                            class="text-xs text-gray-500 dark:text-gray-400"
+                                            >Enabled</span
+                                        >
+                                    </label>
+                                </div>
+                                <div
+                                    class="grid grid-cols-1 md:grid-cols-2 gap-3"
+                                    x-show="config.channels.discord.enabled"
+                                >
+                                    <div>
+                                        <label
+                                            class="block text-xs text-gray-500 mb-1"
+                                            >Bot Token</label
+                                        >
+                                        <input
+                                            type="password"
+                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            x-model="config.channels.discord.token"
+                                            placeholder="Token from Developer Portal"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs text-gray-500 mb-1"
+                                            >Allowed Users
+                                            (comma-separated)</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            :value="(config.channels.discord.allow_from || []).join(', ')"
+                                            @input="config.channels.discord.allow_from = $event.target.value.split(',').map(s => s.trim()).filter(Boolean)"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div
+                                class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
+                            >
+                                <div
+                                    class="flex items-center justify-between mb-3"
+                                >
+                                    <h3 class="font-medium">Feishu</h3>
+                                    <label
+                                        class="flex items-center gap-2 cursor-pointer"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
+                                            x-model="config.channels.feishu.enabled"
+                                        />
+                                        <span
+                                            class="text-xs text-gray-500 dark:text-gray-400"
+                                            >Enabled</span
+                                        >
+                                    </label>
+                                </div>
+                                <div
+                                    class="grid grid-cols-1 md:grid-cols-2 gap-3"
+                                    x-show="config.channels.feishu.enabled"
+                                >
+                                    <div>
+                                        <label
+                                            class="block text-xs text-gray-500 mb-1"
+                                            >App ID</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            x-model="config.channels.feishu.app_id"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs text-gray-500 mb-1"
+                                            >App Secret</label
+                                        >
+                                        <input
+                                            type="password"
+                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            x-model="config.channels.feishu.app_secret"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs text-gray-500 mb-1"
+                                            >Encrypt Key</label
+                                        >
+                                        <input
+                                            type="password"
+                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            x-model="config.channels.feishu.encrypt_key"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs text-gray-500 mb-1"
+                                            >Verification Token</label
+                                        >
+                                        <input
+                                            type="password"
+                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            x-model="config.channels.feishu.verification_token"
+                                        />
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label
+                                            class="block text-xs text-gray-500 mb-1"
+                                            >Allowed Users
+                                            (comma-separated)</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            :value="(config.channels.feishu.allow_from || []).join(', ')"
+                                            @input="config.channels.feishu.allow_from = $event.target.value.split(',').map(s => s.trim()).filter(Boolean)"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div
+                                class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
+                            >
+                                <div
+                                    class="flex items-center justify-between mb-3"
+                                >
+                                    <h3 class="font-medium">DingTalk</h3>
+                                    <label
+                                        class="flex items-center gap-2 cursor-pointer"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
+                                            x-model="config.channels.dingtalk.enabled"
+                                        />
+                                        <span
+                                            class="text-xs text-gray-500 dark:text-gray-400"
+                                            >Enabled</span
+                                        >
+                                    </label>
+                                </div>
+                                <div
+                                    class="grid grid-cols-1 md:grid-cols-2 gap-3"
+                                    x-show="config.channels.dingtalk.enabled"
+                                >
+                                    <div>
+                                        <label
+                                            class="block text-xs text-gray-500 mb-1"
+                                            >Client ID</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            x-model="config.channels.dingtalk.client_id"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs text-gray-500 mb-1"
+                                            >Client Secret</label
+                                        >
+                                        <input
+                                            type="password"
+                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            x-model="config.channels.dingtalk.client_secret"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div
+                                class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
+                            >
+                                <div
+                                    class="flex items-center justify-between mb-3"
+                                >
+                                    <h3 class="font-medium">LINE</h3>
+                                    <label
+                                        class="flex items-center gap-2 cursor-pointer"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
+                                            x-model="config.channels.line.enabled"
+                                        />
+                                        <span
+                                            class="text-xs text-gray-500 dark:text-gray-400"
+                                            >Enabled</span
+                                        >
+                                    </label>
+                                </div>
+                                <div
+                                    class="grid grid-cols-1 md:grid-cols-2 gap-3"
+                                    x-show="config.channels.line.enabled"
+                                >
+                                    <div>
+                                        <label
+                                            class="block text-xs text-gray-500 mb-1"
+                                            >Channel Secret</label
+                                        >
+                                        <input
+                                            type="password"
+                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            x-model="config.channels.line.channel_secret"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs text-gray-500 mb-1"
+                                            >Channel Access Token</label
+                                        >
+                                        <input
+                                            type="password"
+                                            class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            x-model="config.channels.line.channel_access_token"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div x-show="backend === 'hermes'" class="space-y-4" x-cloak>
+                            <!-- Telegram -->
+                            <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-medium">Telegram</h3>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.telegram.enabled" />
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                    </label>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.hermes.channels.telegram.enabled">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Bot Token</label>
+                                        <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.telegram.bot_token" placeholder="Token from @BotFather" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Allowed Users (comma-separated)</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.telegram.allowed_users" placeholder="123456789,987654321" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Discord -->
+                            <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-medium">Discord</h3>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.discord.enabled" />
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                    </label>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.hermes.channels.discord.enabled">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Bot Token</label>
+                                        <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.discord.bot_token" placeholder="Token from Developer Portal" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Allowed Users (comma-separated)</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.discord.allowed_users" placeholder="284102345871466496" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Slack -->
+                            <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-medium">Slack</h3>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.slack.enabled" />
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                    </label>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.hermes.channels.slack.enabled">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Bot Token</label>
+                                        <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.slack.bot_token" placeholder="xoxb-..." />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">App Token</label>
+                                        <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.slack.app_token" placeholder="xapp-..." />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Home Channel</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.slack.home_channel" placeholder="C12345678" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Home Channel Name</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.slack.home_channel_name" placeholder="general" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Allowed Users (comma-separated)</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.slack.allowed_users" placeholder="U12345678,U87654321" />
+                                    </div>
+                                    <div class="flex items-center mt-6">
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.slack.allow_all_users" />
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Allow All Users</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- WhatsApp -->
+                            <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-medium">WhatsApp</h3>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.whatsapp.enabled" />
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                    </label>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.hermes.channels.whatsapp.enabled">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Mode</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.whatsapp.mode" placeholder="local" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Allowed Users (comma-separated)</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.whatsapp.allowed_users" placeholder="1234567890,0987654321" />
+                                    </div>
+                                    <div class="flex items-center mt-6">
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.whatsapp.allow_all_users" />
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Allow All Users</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Signal -->
+                            <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-medium">Signal</h3>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.signal.enabled" />
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                    </label>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.hermes.channels.signal.enabled">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">HTTP URL</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.signal.http_url" placeholder="http://localhost:8080" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Account</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.signal.account" placeholder="+1234567890" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Home Channel</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.signal.home_channel" placeholder="group_id" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Home Channel Name</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.signal.home_channel_name" placeholder="general" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Group Allowed Users (comma-separated)</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.signal.group_allowed_users" placeholder="group_id1,group_id2" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Allowed Users (comma-separated)</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.signal.allowed_users" placeholder="+1234567890,+0987654321" />
+                                    </div>
+                                    <div class="flex items-center mt-6">
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.signal.ignore_stories" />
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Ignore Stories</span>
+                                        </label>
+                                    </div>
+                                    <div class="flex items-center mt-6">
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.signal.allow_all_users" />
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Allow All Users</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-medium">Email</h3>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.email.enabled" />
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                    </label>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.hermes.channels.email.enabled">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Address</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.email.address" placeholder="bot@example.com" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Password</label>
+                                        <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.email.password" placeholder="password" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">IMAP Host</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.email.imap_host" placeholder="imap.example.com" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">SMTP Host</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.email.smtp_host" placeholder="smtp.example.com" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">IMAP Port</label>
+                                        <input type="number" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model.number="config.hermes.channels.email.imap_port" placeholder="993" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">SMTP Port</label>
+                                        <input type="number" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model.number="config.hermes.channels.email.smtp_port" placeholder="465" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Poll Interval (seconds)</label>
+                                        <input type="number" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model.number="config.hermes.channels.email.poll_interval" placeholder="60" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Home Address</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.email.home_address" placeholder="admin@example.com" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Home Address Name</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.email.home_address_name" placeholder="Admin" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Allowed Users (comma-separated)</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.email.allowed_users" placeholder="user1@example.com,user2@example.com" />
+                                    </div>
+                                    <div class="flex items-center mt-6">
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.email.allow_all_users" />
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Allow All Users</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Home Assistant -->
+                            <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-medium">Home Assistant</h3>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" x-model="config.hermes.channels.homeassistant.enabled" />
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
+                                    </label>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-show="config.hermes.channels.homeassistant.enabled">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">URL</label>
+                                        <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.homeassistant.url" placeholder="http://homeassistant.local:8123" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Token</label>
+                                        <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.hermes.channels.homeassistant.token" placeholder="Long-Lived Access Token" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>

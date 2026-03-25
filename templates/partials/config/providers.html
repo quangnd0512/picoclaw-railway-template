@@ -1,0 +1,113 @@
+                    <section>
+                        <h2 class="text-lg font-semibold mb-3">Providers</h2>
+                        <div x-show="backend === 'picoclaw'">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <template x-for="p in providerList" :key="p.key">
+                                    <div
+                                        class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
+                                    >
+                                        <h3
+                                            class="font-medium mb-3 capitalize"
+                                            x-text="p.label"
+                                        ></h3>
+                                        <div class="space-y-3">
+                                            <div>
+                                                <label
+                                                    class="block text-xs text-gray-500 mb-1"
+                                                    >API Key</label
+                                                >
+                                                <input
+                                                    type="password"
+                                                    class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                    :value="getProvider(p.key, 'api_key')"
+                                                    @input="setProvider(p.key, 'api_key', $event.target.value)"
+                                                    placeholder="Enter API key"
+                                                />
+                                            </div>
+                                            <div x-show="p.hasBase">
+                                                <label
+                                                    class="block text-xs text-gray-500 mb-1"
+                                                    >Base URL</label
+                                                >
+                                                <input
+                                                    type="text"
+                                                    class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                    :value="getProvider(p.key, 'api_base')"
+                                                    @input="setProvider(p.key, 'api_base', $event.target.value)"
+                                                    :placeholder="p.basePlaceholder || 'Optional'"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                        <div x-show="backend === 'hermes'">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- OpenRouter -->
+                                <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                    <h3 class="font-medium mb-3">OpenRouter</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">API Key</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.providers.openrouter.api_key" placeholder="Enter API key" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Anthropic -->
+                                <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                    <h3 class="font-medium mb-3">Anthropic</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">API Key</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.providers.anthropic.api_key" placeholder="Enter API key" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- OpenAI/Codex -->
+                                <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                    <h3 class="font-medium mb-3">OpenAI / Codex</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">API Key</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.providers.openai.api_key" placeholder="Enter API key" />
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Base URL</label>
+                                            <input type="text" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.providers.openai.api_base" placeholder="Optional" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- z.ai/GLM -->
+                                <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                    <h3 class="font-medium mb-3">z.ai / GLM</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">API Key</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.providers.zhipu.api_key" placeholder="Enter API key" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Kimi/Moonshot -->
+                                <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                    <h3 class="font-medium mb-3">Kimi / Moonshot</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">API Key</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.providers.moonshot.api_key" placeholder="Enter API key" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- MiniMax -->
+                                <div class="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+                                    <h3 class="font-medium mb-3">MiniMax</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">API Key</label>
+                                            <input type="password" class="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" x-model="config.providers.minimax.api_key" placeholder="Enter API key" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>

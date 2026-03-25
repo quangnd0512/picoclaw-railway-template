@@ -1,0 +1,24 @@
+                    <div
+                        class="flex items-center justify-between bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4"
+                    >
+                        <label class="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                class="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
+                                x-model="restartAfterSave"
+                            />
+                            <span
+                                class="text-sm text-gray-500 dark:text-gray-400"
+                                >Restart gateway after save</span
+                            >
+                        </label>
+                        <button
+                            type="button"
+                            @click="saveConfig()"
+                            :disabled="saving"
+                            class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-50 rounded-lg text-sm font-medium transition"
+                        >
+                            <span x-show="!saving">Save Configuration</span>
+                            <span x-show="saving">Saving...</span>
+                        </button>
+                    </div>
