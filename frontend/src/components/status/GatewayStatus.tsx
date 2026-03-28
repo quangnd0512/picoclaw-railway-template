@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+// import { useState, useEffect } from 'react';
 import { useStatusQuery } from '../../hooks/useStatus';
-import { useBackendQuery, useSwitchBackend } from '../../hooks/useBackend';
+// import { useBackendQuery, useSwitchBackend } from '../../hooks/useBackend';
 import { useStartGateway, useStopGateway, useRestartGateway } from '../../hooks/useGateway';
 import { Button } from '../ui/Button';
-import { Select } from '../ui/Select';
+// import { Select } from '../ui/Select';
 import type { GatewayStatus as BaseGatewayStatus } from '../../types/status';
 
 type ExtendedGatewayStatus = BaseGatewayStatus & {
@@ -23,39 +23,39 @@ export function formatUptime(seconds?: number | null): string {
 
 export function GatewayStatus() {
   const { data: statusData } = useStatusQuery();
-  const { data: backendData } = useBackendQuery();
+  // const { data: backendData } = useBackendQuery();
 
   const startGateway = useStartGateway();
   const stopGateway = useStopGateway();
   const restartGateway = useRestartGateway();
-  const switchBackend = useSwitchBackend();
+  // const switchBackend = useSwitchBackend();
 
   const gateway = statusData?.gateway as ExtendedGatewayStatus | undefined;
-  const backend = backendData?.backend;
+  // const backend = backendData?.backend;
 
-  const [localBackend, setLocalBackend] = useState<string>('');
+  // const [localBackend, setLocalBackend] = useState<string>('');
 
-  useEffect(() => {
-    if (backend) {
-      setLocalBackend(backend);
-    }
-  }, [backend]);
+  // useEffect(() => {
+  //   if (backend) {
+  //     setLocalBackend(backend);
+  //   }
+  // }, [backend]);
 
-  const handleBackendChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newBackend = e.target.value as 'picoclaw' | 'hermes';
-    if (newBackend === backend) return;
+  // const handleBackendChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  //   const newBackend = e.target.value as 'picoclaw' | 'hermes';
+  //   if (newBackend === backend) return;
 
-    if (gateway?.state === 'running') {
-      const confirmed = window.confirm('Switch backend will stop the gateway. Continue?');
-      if (!confirmed) {
-        setLocalBackend(backend || '');
-        return;
-      }
-    }
+  //   if (gateway?.state === 'running') {
+  //     const confirmed = window.confirm('Switch backend will stop the gateway. Continue?');
+  //     if (!confirmed) {
+  //       setLocalBackend(backend || '');
+  //       return;
+  //     }
+  //   }
 
-    setLocalBackend(newBackend);
-    switchBackend.mutate(newBackend);
-  };
+  //   setLocalBackend(newBackend);
+  //   switchBackend.mutate(newBackend);
+  // };
 
   const getStateColor = (state?: string) => {
     switch (state) {
@@ -69,11 +69,11 @@ export function GatewayStatus() {
     }
   };
 
-  const availableBackends = (backendData as { available?: string[] })?.available || ['picoclaw', 'hermes'];
+  // const availableBackends = (backendData as { available?: string[] })?.available || ['picoclaw', 'hermes'];
 
   return (
     <section>
-      <div className="flex items-center justify-between mb-3">
+      {/*<div className="flex items-center justify-between mb-3">
         <h2 className="text-lg font-semibold">Gateway</h2>
         <div className="flex items-center gap-2">
           <Select
@@ -89,7 +89,7 @@ export function GatewayStatus() {
             ))}
           </Select>
         </div>
-      </div>
+      </div>*/}
 
       <div className="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
         <div className="flex items-center justify-between mb-4">
