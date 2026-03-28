@@ -49,13 +49,15 @@ function App() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showRestartConfirm, setShowRestartConfirm] = useState(false);
 
-    if (configData) {
-        const configString = stableStringify(configData);
-        if (configString !== lastLoadedConfigString) {
-            setLastLoadedConfigString(configString);
-            setLocalConfig(configData);
+    useEffect(() => {
+        if (configData) {
+            const configString = stableStringify(configData);
+            if (configString !== lastLoadedConfigString) {
+                setLastLoadedConfigString(configString);
+                setLocalConfig(configData);
+            }
         }
-    }
+    }, [configData, lastLoadedConfigString]);
 
     const { isDirty, changeCount, dirtySections } = useUnsavedChanges(
         localConfig,
