@@ -12,11 +12,14 @@ RUN make build
 # RUN go install github.com/steipete/gogcli/cmd/gog@latest
 RUN go install github.com/Hyaxia/blogwatcher/cmd/blogwatcher@latest
 
-FROM python:3.12-bookworm AS hermes-builder
+FROM python:3.12-slim-bookworm AS hermes-builder
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends git ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends \
+        git \
+        ca-certificates \
+        build-essential \
+        && rm -rf /var/lib/apt/lists/*
 
 # Install uv for fast Python package installation
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
@@ -25,7 +28,7 @@ WORKDIR /hermes-src
 
 # Clone Hermes Agent and initialize submodules
 RUN git clone https://github.com/NousResearch/hermes-agent.git . && \
-    git submodule update --init --recursive
+    git submodule update --init --recursive --depth 1
 
 # Create venv and install Hermes with all dependencies
 RUN uv venv /opt/hermes/venv && \
@@ -60,11 +63,19 @@ COPY --from=hermes-builder /opt/hermes/venv /opt/hermes/venv
 COPY --from=hermes-builder /hermes-src /hermes-src
 
 COPY requirements.txt /app/requirements.txt
-RUN uv pip install --system --no-cache -r /app/requirements.txt
 COPY skills/news-aggregator-skill/requirements.txt /tmp/news-requirements.txt
-RUN uv pip install --system --no-cache -r /tmp/news-requirements.txt
-RUN uv pip install --system --no-cache yfinance pandas duckduckgo-search
-RUN bun install -g @steipete/summarize
+
+RUN uv pip install --system --no-cache \
+    -r /app/requirements.txt \
+    -r /tmp/news-requirements.txt \
+    yfinance \
+    pandas \
+    duckduckgo-search \
+    && rm -rf /tmp/* \
+    && rm -rf /root/.cache/*
+
+RUN bun install -g @steipete/summarize && \
+    rm -rf /root/.bun/install/cache
 
 # Add wrapper for stock-analysis
 RUN echo '#!/bin/sh\n\
@@ -130,6 +141,14 @@ RUN ln -s /opt/hermes/venv/bin/hermes /usr/local/bin/hermes
 ENV HOME=/data
 ENV PICOCLAW_AGENTS_DEFAULTS_WORKSPACE=/data/.picoclaw/workspace
 ENV FINANCE_NEWS_VENV_BOOTSTRAPPED=1
+
+# Prevent Python from writing pyc files
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Add health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
 
 WORKDIR /app
 

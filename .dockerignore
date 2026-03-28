@@ -1,11 +1,44 @@
-.tmpdata/
-__pycache__/
-*.pyc
-.env
-.tmpdata*
-.sisyphus
-.venv
-.zed
-node_modules
-frontend/dist/
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+!README.md
+
+# Node.js / Frontend
+node_modules/
 frontend/node_modules/
+frontend/dist/
+npm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
+
+# Local Development
+.tmpdata/
+.env
+*.log
+
+# Docker
+.dockerignore
+docker-compose*.yml
+
+# CI/CD
+.github/
+
+# Testing
+tests/
+coverage/
+
+# Skills artifacts
+skills/**/node_modules/
+skills/**/__pycache__/
