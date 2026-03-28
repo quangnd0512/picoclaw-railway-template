@@ -244,7 +244,7 @@ function App() {
     };
 
     return (
-        <div className="bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 min-h-screen flex relative">
+        <div className="bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 h-screen flex overflow-hidden relative">
             {showLoadingOverlay && (
                 <div className="fixed inset-0 flex items-center justify-center bg-gray-50/50 dark:bg-gray-950/50 z-[60]">
                     <div className="text-center">
@@ -265,7 +265,7 @@ function App() {
                 dirtySections={dirtySections}
             />
 
-            <main className="flex-1 overflow-auto">
+            <main className="flex-1 overflow-y-auto">
                 <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 pb-32">
                     {renderTabContent()}
                 </div>

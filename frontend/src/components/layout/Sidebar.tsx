@@ -40,7 +40,7 @@ export function Sidebar({ activeTab, onTabChange, backend, dirtySections }: Side
   ];
 
   return (
-    <div className="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 p-4 flex flex-col h-screen overflow-y-auto">
+    <div className="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 p-4 flex flex-col h-screen overflow-hidden">
       <div className="mb-6 pb-4 border-b border-gray-200 dark:border-gray-800">
         <div className="flex items-center gap-3">
           <span className="text-2xl" role="img" aria-label="logo">🦐</span>
