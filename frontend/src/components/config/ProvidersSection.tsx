@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import type { AppConfig, ProviderConfig } from '../../types/config';
+import { CopyButton } from '../ui/CopyButton';
+import { FormField } from '../ui/FormField';
 import { Input } from '../ui/Input';
+import { PasswordInput } from '../ui/PasswordInput';
 
 interface ProvidersSectionProps {
   config: AppConfig;
@@ -90,11 +93,12 @@ const ProviderCard = ({
   const hasKey = !!data['api_key'];
 
   return (
-    <div className="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4 transition-colors">
-      <button 
+    <div className="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4 motion-safe:transition-colors motion-safe:duration-150">
+      <button
         type="button"
         className="w-full flex justify-between items-center text-left"
         onClick={() => setExpanded(!expanded)}
+        aria-expanded={expanded}
       >
         <div className="flex items-center space-x-3">
           <h3 className="font-medium capitalize">{meta.label}</h3>
@@ -117,25 +121,47 @@ const ProviderCard = ({
         </span>
       </button>
       
-      {expanded && (
-        <div className="space-y-3 mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
-          {meta.fields.map(field => {
-            const inputId = `provider-${meta.key}-${field.key}`;
-            return (
-              <div key={field.key}>
-                <label htmlFor={inputId} className="block text-xs text-gray-500 mb-1">{field.label}</label>
-                <Input
-                  id={inputId}
-                  type={field.type}
-                  value={data[field.key] || ''}
-                  onChange={(e) => onChange(`providers.${meta.key}.${field.key}`, e.target.value)}
-                  placeholder={field.placeholder}
-                />
-              </div>
-            );
-          })}
+      <div
+        className={`grid mt-4 border-t border-gray-100 dark:border-gray-800 transition-[grid-template-rows] motion-safe:duration-200 ${
+          expanded ? 'grid-rows-[1fr] pt-3' : 'grid-rows-[0fr] pt-0'
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="space-y-3">
+            {meta.fields.map(field => {
+              const inputId = `provider-${meta.key}-${field.key}`;
+              const value = data[field.key] || '';
+
+              if (field.type === 'password') {
+                return (
+                  <FormField key={field.key} id={inputId} label={field.label}>
+                    <div className="flex items-center gap-2">
+                      <PasswordInput
+                        value={value}
+                        onChange={(e) => onChange(`providers.${meta.key}.${field.key}`, e.target.value)}
+                        placeholder={field.placeholder}
+                        className="flex-1"
+                      />
+                      <CopyButton text={value} />
+                    </div>
+                  </FormField>
+                );
+              }
+
+              return (
+                <FormField key={field.key} id={inputId} label={field.label}>
+                  <Input
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange(`providers.${meta.key}.${field.key}`, e.target.value)}
+                    placeholder={field.placeholder}
+                  />
+                </FormField>
+              );
+            })}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

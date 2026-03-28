@@ -1,5 +1,10 @@
 import type { AppConfig } from '../../types/config';
 import { Input } from '../ui/Input';
+import { Toggle } from '../ui/Toggle';
+import { PasswordInput } from '../ui/PasswordInput';
+import { CopyButton } from '../ui/CopyButton';
+import { FormField } from '../ui/FormField';
+import { FormSection } from '../ui/FormSection';
 
 interface Props {
   config: AppConfig;
@@ -9,137 +14,141 @@ interface Props {
 
 export function WebSearch({ config, onChange }: Props) {
   return (
-    <section className="mb-8">
-      <h2 className="text-lg font-semibold mb-3">Web Search</h2>
-      
-      <div className="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4 mb-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">Brave Search API Key</label>
-            <Input
-              type="password"
-              value={config.tools.web.brave.api_key || ''}
-              onChange={(e) => onChange('tools.web.brave.api_key', e.target.value)}
-              placeholder="Enter Brave Search API key"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              className="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
-              checked={config.tools.web.duckduckgo.enabled}
-              onChange={(e) => onChange('tools.web.duckduckgo.enabled', e.target.checked)}
-            />
-            <label className="text-sm text-gray-500 dark:text-gray-400">DuckDuckGo Search</label>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div className="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-medium">Perplexity Search</h3>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                className="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
-                checked={config.tools.web.perplexity.enabled}
-                onChange={(e) => onChange('tools.web.perplexity.enabled', e.target.checked)}
+    <section className="space-y-4">
+      <FormSection title="Web Search Providers">
+        <div className="space-y-4">
+          <FormField label="Brave Search API Key" id="brave-api-key">
+            <div className="relative">
+              <PasswordInput
+                value={config.tools.web.brave.api_key || ''}
+                onChange={(e) => onChange('tools.web.brave.api_key', e.target.value)}
+                placeholder="Enter Brave Search API key"
               />
-              <span className="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
-            </label>
-          </div>
+              {config.tools.web.brave.api_key && (
+                <div className="absolute right-10 top-1/2 -translate-y-1/2">
+                  <CopyButton text={config.tools.web.brave.api_key} />
+                </div>
+              )}
+            </div>
+          </FormField>
+
+          <FormField label="DuckDuckGo Search" id="duckduckgo-enabled">
+            <Toggle
+              id="duckduckgo-enabled"
+              checked={config.tools.web.duckduckgo.enabled}
+              onChange={(checked) => onChange('tools.web.duckduckgo.enabled', checked)}
+            />
+          </FormField>
+        </div>
+      </FormSection>
+
+      <FormSection title="Perplexity Search">
+        <div className="space-y-4">
+          <FormField label="Enabled" id="perplexity-enabled">
+            <Toggle
+              id="perplexity-enabled"
+              checked={config.tools.web.perplexity.enabled}
+              onChange={(checked) => onChange('tools.web.perplexity.enabled', checked)}
+            />
+          </FormField>
+
           {config.tools.web.perplexity.enabled && (
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">API Key</label>
-                <Input
-                  type="password"
-                  value={config.tools.web.perplexity.api_key || ''}
-                  onChange={(e) => onChange('tools.web.perplexity.api_key', e.target.value)}
-                  placeholder="Enter API key"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Max Results</label>
+            <>
+              <FormField label="API Key" id="perplexity-api-key">
+                <div className="relative">
+                  <PasswordInput
+                    value={config.tools.web.perplexity.api_key || ''}
+                    onChange={(e) => onChange('tools.web.perplexity.api_key', e.target.value)}
+                    placeholder="Enter API key"
+                  />
+                  {config.tools.web.perplexity.api_key && (
+                    <div className="absolute right-10 top-1/2 -translate-y-1/2">
+                      <CopyButton text={config.tools.web.perplexity.api_key} />
+                    </div>
+                  )}
+                </div>
+              </FormField>
+
+              <FormField label="Max Results" id="perplexity-max-results">
                 <Input
                   type="number"
                   value={config.tools.web.perplexity.max_results}
                   onChange={(e) => onChange('tools.web.perplexity.max_results', Number(e.target.value))}
                 />
-              </div>
-            </div>
+              </FormField>
+            </>
           )}
         </div>
+      </FormSection>
 
-        <div className="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-medium">Tavily Search</h3>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                className="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
-                checked={config.tools.web.tavily.enabled}
-                onChange={(e) => onChange('tools.web.tavily.enabled', e.target.checked)}
-              />
-              <span className="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
-            </label>
-          </div>
+      <FormSection title="Tavily Search">
+        <div className="space-y-4">
+          <FormField label="Enabled" id="tavily-enabled">
+            <Toggle
+              id="tavily-enabled"
+              checked={config.tools.web.tavily.enabled}
+              onChange={(checked) => onChange('tools.web.tavily.enabled', checked)}
+            />
+          </FormField>
+
           {config.tools.web.tavily.enabled && (
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">API Key</label>
-                <Input
-                  type="password"
-                  value={config.tools.web.tavily.api_key || ''}
-                  onChange={(e) => onChange('tools.web.tavily.api_key', e.target.value)}
-                  placeholder="Enter API key"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Base URL</label>
+            <>
+              <FormField label="API Key" id="tavily-api-key">
+                <div className="relative">
+                  <PasswordInput
+                    value={config.tools.web.tavily.api_key || ''}
+                    onChange={(e) => onChange('tools.web.tavily.api_key', e.target.value)}
+                    placeholder="Enter API key"
+                  />
+                  {config.tools.web.tavily.api_key && (
+                    <div className="absolute right-10 top-1/2 -translate-y-1/2">
+                      <CopyButton text={config.tools.web.tavily.api_key} />
+                    </div>
+                  )}
+                </div>
+              </FormField>
+
+              <FormField label="Base URL" id="tavily-base-url">
                 <Input
                   type="text"
                   value={config.tools.web.tavily.base_url || ''}
                   onChange={(e) => onChange('tools.web.tavily.base_url', e.target.value)}
                   placeholder="Optional"
                 />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Max Results</label>
+              </FormField>
+
+              <FormField label="Max Results" id="tavily-max-results">
                 <Input
                   type="number"
                   value={config.tools.web.tavily.max_results}
                   onChange={(e) => onChange('tools.web.tavily.max_results', Number(e.target.value))}
                 />
-              </div>
-            </div>
+              </FormField>
+            </>
           )}
         </div>
-      </div>
+      </FormSection>
 
-      <h3 className="text-md font-semibold mb-3">Web Settings</h3>
-      <div className="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
+      <FormSection title="Web Settings">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">Web Proxy</label>
+          <FormField label="Web Proxy" id="web-proxy">
             <Input
               type="text"
               value={config.tools.web.proxy || ''}
               onChange={(e) => onChange('tools.web.proxy', e.target.value)}
               placeholder="socks5://127.0.0.1:1080"
             />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">Fetch Limit (bytes)</label>
+          </FormField>
+
+          <FormField label="Fetch Limit (bytes)" id="fetch-limit-bytes">
             <Input
               type="number"
               value={config.tools.web.fetch_limit_bytes}
               onChange={(e) => onChange('tools.web.fetch_limit_bytes', Number(e.target.value))}
             />
-          </div>
+          </FormField>
         </div>
-      </div>
+      </FormSection>
     </section>
   );
 }

@@ -2,6 +2,9 @@ import { useState } from 'react';
 import type { McpServer, McpServersConfig, McpServerType } from '../../types/config';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
+import { Toggle } from '../ui/Toggle';
+import { PasswordInput } from '../ui/PasswordInput';
+import { FormField } from '../ui/FormField';
 
 export interface PicoClawMcpProps {
   enabled: boolean;
@@ -77,16 +80,15 @@ export function PicoClawMcp({ enabled, onEnabledChange, servers, onServersChange
         </div>
         <div className="space-y-2">
           {entries.map(([k, v], index) => (
-            <div key={`env-${index}`} className="flex gap-2">
+            <div key={k || `new-env-${index}`} className="flex gap-2">
               <Input 
                 className="w-1/3" 
                 placeholder="Key" 
                 value={k} 
                 onChange={e => updateEntry(index, e.target.value, v)} 
               />
-              <Input 
+              <PasswordInput 
                 className="flex-1" 
-                type="password" 
                 placeholder="Value" 
                 value={v} 
                 onChange={e => updateEntry(index, k, e.target.value)} 
@@ -138,16 +140,15 @@ export function PicoClawMcp({ enabled, onEnabledChange, servers, onServersChange
         </div>
         <div className="space-y-2">
           {entries.map(([k, v], index) => (
-            <div key={`header-${index}`} className="flex gap-2">
+            <div key={k || `new-header-${index}`} className="flex gap-2">
               <Input 
                 className="w-1/3" 
                 placeholder="Key" 
                 value={k} 
                 onChange={e => updateEntry(index, e.target.value, v)} 
               />
-              <Input 
+              <PasswordInput 
                 className="flex-1" 
-                type="password" 
                 placeholder="Value" 
                 value={v} 
                 onChange={e => updateEntry(index, k, e.target.value)} 
@@ -173,15 +174,12 @@ export function PicoClawMcp({ enabled, onEnabledChange, servers, onServersChange
     <section>
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-lg font-semibold">MCP Servers</h2>
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input 
-            type="checkbox" 
-            className="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" 
-            checked={enabled}
-            onChange={(e) => onEnabledChange(e.target.checked)} 
-          />
-          <span className="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
-        </label>
+        <Toggle 
+          id="mcp-enabled"
+          label="Enabled" 
+          checked={enabled}
+          onChange={onEnabledChange}
+        />
       </div>
 
       {enabled && (
@@ -204,16 +202,19 @@ export function PicoClawMcp({ enabled, onEnabledChange, servers, onServersChange
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <label className="flex items-center gap-2 cursor-pointer" onClick={e => e.stopPropagation()} onKeyDown={e => { if (e.key === 'Enter') e.stopPropagation(); }}>
-                      <input 
-                        type="checkbox" 
-                        className="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600" 
+                    <button 
+                      type="button"
+                      onClick={e => e.stopPropagation()} 
+                      onKeyDown={e => { if (e.key === 'Enter') e.stopPropagation(); }}
+                      style={{ display: 'contents' }}
+                    >
+                      <Toggle 
+                        id={`server-${name}-enabled`}
                         checked={server.enabled ?? false}
-                        onChange={(e) => updateServer(name, { enabled: e.target.checked })} 
+                        onChange={(checked) => updateServer(name, { enabled: checked })}
                       />
-                      <span className="text-xs text-gray-500 dark:text-gray-400">Enabled</span>
-                    </label>
-                    <svg className={`w-5 h-5 text-gray-400 transition-transform ${expanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    </button>
+                    <svg className={`w-5 h-5 text-gray-400 motion-safe:transition-transform motion-safe:duration-200 ${expanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <title>Toggle details</title>
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                     </svg>
@@ -224,43 +225,39 @@ export function PicoClawMcp({ enabled, onEnabledChange, servers, onServersChange
                   <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800 space-y-4">
                     {!isHttp ? (
                       <div className="space-y-4">
-                        <div>
-                          <span className="block text-xs text-gray-500 mb-1">Command</span>
-                          <Input 
-                            value={server.command || ''} 
-                            onChange={e => updateServer(name, { command: e.target.value })} 
-                          />
-                        </div>
-                        <div>
-                          <span className="block text-xs text-gray-500 mb-1">Args (one per line)</span>
-                          <textarea 
-                            className="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" 
-                            rows={3} 
-                            value={(server.args || []).join('\n')} 
-                            onChange={e => updateServer(name, { args: e.target.value.split('\n').filter(Boolean) })}
-                          />
-                        </div>
+                         <FormField label="Command">
+                           <Input 
+                             value={server.command || ''} 
+                             onChange={e => updateServer(name, { command: e.target.value })} 
+                           />
+                         </FormField>
+                         <FormField label="Args (one per line)">
+                           <textarea 
+                             className="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" 
+                             rows={3} 
+                             value={(server.args || []).join('\n')} 
+                             onChange={e => updateServer(name, { args: e.target.value.split('\n').filter(Boolean) })}
+                           />
+                         </FormField>
                         <EnvEditor env={server.env} onChange={(newEnv) => updateServer(name, { env: newEnv })} />
                       </div>
-                    ) : (
-                      <div className="space-y-4">
-                        <div>
-                          <span className="block text-xs text-gray-500 mb-1">Type</span>
-                          <Select 
-                            value={server.type || 'http'} 
-                            onChange={e => updateServer(name, { type: e.target.value as McpServerType })}
-                          >
-                            <option value="http">HTTP</option>
-                            <option value="sse">SSE</option>
-                          </Select>
-                        </div>
-                        <div>
-                          <span className="block text-xs text-gray-500 mb-1">URL</span>
-                          <Input 
-                            value={server.url || ''} 
-                            onChange={e => updateServer(name, { url: e.target.value })} 
-                          />
-                        </div>
+                      ) : (
+                       <div className="space-y-4">
+                         <FormField label="Type">
+                           <Select 
+                             value={server.type || 'http'} 
+                             onChange={e => updateServer(name, { type: e.target.value as McpServerType })}
+                           >
+                             <option value="http">HTTP</option>
+                             <option value="sse">SSE</option>
+                           </Select>
+                         </FormField>
+                         <FormField label="URL">
+                           <Input 
+                             value={server.url || ''} 
+                             onChange={e => updateServer(name, { url: e.target.value })} 
+                           />
+                         </FormField>
                         <HeadersEditor 
                           headers={(server as unknown as { headers?: Record<string, string> }).headers} 
                           onChange={headers => updateServer(name, { headers } as unknown as Partial<McpServer>)} 

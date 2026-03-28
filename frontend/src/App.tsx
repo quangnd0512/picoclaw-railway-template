@@ -21,6 +21,7 @@ import { StatusTabWrapper } from "./components/tabs/StatusTabWrapper";
 import { FloatingApplyButton } from "./components/FloatingApplyButton";
 import { FloatingBackendSwitch } from "./components/FloatingBackendSwitch";
 import { ReviewChangesModal } from "./components/ReviewChangesModal";
+import { Toast } from "./components/ui/Toast";
 
 export type TabType =
     | "providers"
@@ -48,6 +49,7 @@ function App() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showRestartConfirm, setShowRestartConfirm] = useState(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
 
     useEffect(() => {
         if (configData) {
@@ -133,6 +135,10 @@ function App() {
             {
                 onSuccess: () => {
                     setShowRestartConfirm(false);
+                    setSaveError(null);
+                },
+                onError: (error) => {
+                    setSaveError(error instanceof Error ? error.message : 'Failed to save configuration');
                 },
             },
         );
@@ -141,88 +147,100 @@ function App() {
     const renderTabContent = () => {
         if (!localConfig || !backend) return null;
 
-        switch (activeTab) {
-            case "providers":
-                return (
-                    <ProvidersTab
-                        config={localConfig}
-                        backend={backend as any}
-                        onChange={handleConfigChangePath}
-                    />
-                );
-            case "channels":
-                return (
-                    <ChannelsTab
-                        config={localConfig}
-                        backend={backend as any}
-                        onChange={handleConfigChangeFull}
-                    />
-                );
-            case "agent":
-                return (
-                    <AgentDefaultsTab
-                        config={localConfig}
-                        backend={backend as any}
-                        onChange={handleConfigChangePath}
-                    />
-                );
-            case "websearch":
-                return (
-                    <WebSearchTab
-                        config={localConfig}
-                        backend={backend as any}
-                        onChange={handleConfigChangePath}
-                    />
-                );
-            case "mcp":
-                return (
-                    <McpTab
-                        config={localConfig}
-                        backend={backend as any}
-                        onChange={handleConfigChangePath}
-                    />
-                );
-            case "exec":
-                return (
-                    <ExecToolTab
-                        config={localConfig}
-                        backend={backend as any}
-                        onChange={handleConfigChangePath}
-                    />
-                );
-            case "cron":
-                return (
-                    <CronTab
-                        config={localConfig}
-                        backend={backend as any}
-                        onChange={handleConfigChangePath}
-                    />
-                );
-            case "skills":
-                return (
-                    <SkillsTab
-                        config={localConfig}
-                        backend={backend as any}
-                        onChange={handleConfigChangePath}
-                    />
-                );
-            case "system":
-                return (
-                    <SystemSettingsTab
-                        config={localConfig}
-                        backend={backend as any}
-                        onChange={handleConfigChangePath}
-                    />
-                );
-            case "status":
-                return <StatusTabWrapper />;
-            default:
-                return (
-                    <div className="text-gray-500 dark:text-gray-400">
-                        Select a tab from the sidebar
-                    </div>
-                );
-        }
+        const content = (() => {
+            switch (activeTab) {
+                case "providers":
+                    return (
+                        <ProvidersTab
+                            config={localConfig}
+                            backend={backend as any}
+                            onChange={handleConfigChangePath}
+                        />
+                    );
+                case "channels":
+                    return (
+                        <ChannelsTab
+                            config={localConfig}
+                            backend={backend as any}
+                            onChange={handleConfigChangeFull}
+                        />
+                    );
+                case "agent":
+                    return (
+                        <AgentDefaultsTab
+                            config={localConfig}
+                            backend={backend as any}
+                            onChange={handleConfigChangePath}
+                        />
+                    );
+                case "websearch":
+                    return (
+                        <WebSearchTab
+                            config={localConfig}
+                            backend={backend as any}
+                            onChange={handleConfigChangePath}
+                        />
+                    );
+                case "mcp":
+                    return (
+                        <McpTab
+                            config={localConfig}
+                            backend={backend as any}
+                            onChange={handleConfigChangePath}
+                        />
+                    );
+                case "exec":
+                    return (
+                        <ExecToolTab
+                            config={localConfig}
+                            backend={backend as any}
+                            onChange={handleConfigChangePath}
+                        />
+                    );
+                case "cron":
+                    return (
+                        <CronTab
+                            config={localConfig}
+                            backend={backend as any}
+                            onChange={handleConfigChangePath}
+                        />
+                    );
+                case "skills":
+                    return (
+                        <SkillsTab
+                            config={localConfig}
+                            backend={backend as any}
+                            onChange={handleConfigChangePath}
+                        />
+                    );
+                case "system":
+                    return (
+                        <SystemSettingsTab
+                            config={localConfig}
+                            backend={backend as any}
+                            onChange={handleConfigChangePath}
+                        />
+                    );
+                case "status":
+                    return <StatusTabWrapper />;
+                default:
+                    return (
+                        <div className="text-gray-500 dark:text-gray-400">
+                            Select a tab from the sidebar
+                        </div>
+                    );
+            }
+        })();
+
+        return (
+            <div
+                role="tabpanel"
+                id={`tabpanel-${activeTab}`}
+                aria-labelledby={`tab-${activeTab}`}
+            >
+                {content}
+            </div>
+        );
     };
 
     return (
@@ -305,6 +323,13 @@ function App() {
                     </div>
                 </div>
             )}
+
+            <Toast
+                message={saveError || ''}
+                type="error"
+                isVisible={!!saveError}
+                onDismiss={() => setSaveError(null)}
+            />
         </div>
     );
 }

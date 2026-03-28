@@ -50,7 +50,8 @@ export function Sidebar({ activeTab, onTabChange, backend, dirtySections }: Side
         </div>
       </div>
 
-      <nav className="flex-1 flex flex-col gap-1">
+      {/* eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role */}
+      <nav className="flex-1 flex flex-col gap-1" role="tablist" aria-label="Configuration tabs">
         {tabs.map((tab) => {
           if (tab.hideOnHermes && backend === 'hermes') {
             return null;
@@ -62,9 +63,13 @@ export function Sidebar({ activeTab, onTabChange, backend, dirtySections }: Side
           return (
             <button
               key={tab.id}
+              id={`tab-${tab.id}`}
+              role="tab"
               type="button"
+              aria-selected={isActive}
+              aria-controls={`tabpanel-${tab.id}`}
               onClick={() => onTabChange(tab.id)}
-              className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors text-left w-full ${
+              className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm motion-safe:transition-colors motion-safe:duration-150 text-left w-full ${
                 isActive
                   ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-medium'
                   : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50'

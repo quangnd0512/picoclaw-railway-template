@@ -21,20 +21,63 @@ const SECTION_NAMES: Record<string, string> = {
 
 export function ReviewChangesModal({ isOpen, onClose, dirtySections, onApply }: ReviewChangesModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
         onClose();
+        return;
+      }
+
+      // Focus trap for Tab key
+      if (e.key === 'Tab' && isOpen && modalRef.current) {
+        const focusableElements = Array.from(
+          modalRef.current.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          )
+        ) as HTMLElement[];
+
+        if (focusableElements.length === 0) return;
+
+        const firstFocusable = focusableElements[0];
+        const lastFocusable = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstFocusable) {
+            e.preventDefault();
+            lastFocusable.focus();
+          }
+        } else {
+          if (document.activeElement === lastFocusable) {
+            e.preventDefault();
+            firstFocusable.focus();
+          }
+        }
       }
     };
 
     if (isOpen) {
+      // Store current focus
+      previousFocusRef.current = document.activeElement as HTMLElement;
+      
+      // Focus first focusable element
+      const focusableElements = modalRef.current?.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusableElements && focusableElements.length > 0) {
+        (focusableElements[0] as HTMLElement).focus();
+      }
+
       document.addEventListener('keydown', handleKeyDown);
     }
     
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
+      
+      if (!isOpen && previousFocusRef.current) {
+        previousFocusRef.current.focus();
+      }
     };
   }, [isOpen, onClose]);
 
@@ -56,7 +99,7 @@ export function ReviewChangesModal({ isOpen, onClose, dirtySections, onApply }: 
         <button 
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 motion-safe:transition-colors motion-safe:duration-150"
           aria-label="Close modal"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

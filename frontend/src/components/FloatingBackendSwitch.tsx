@@ -45,14 +45,14 @@ export function FloatingBackendSwitch({
             : 'bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600'
           }
           text-white font-medium px-4 py-2.5 rounded-full shadow-lg
-          transition-all duration-200
+          transition-opacity transition-transform motion-safe:duration-200
           disabled:opacity-50 disabled:cursor-wait
         `}
       >
         <span className="text-lg" aria-hidden="true">{isHermes ? '🔮' : '🦐'}</span>
         <span>{isHermes ? 'Hermes' : 'PicoClaw'}</span>
         <svg
-          className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 transition-transform motion-safe:duration-200 ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -67,7 +67,7 @@ export function FloatingBackendSwitch({
           <button
             type="button"
             onClick={() => handleSelect('picoclaw')}
-            className={`w-full flex items-center gap-3 px-4 py-3 text-sm text-left transition-colors ${
+            className={`w-full flex items-center gap-3 px-4 py-3 text-sm text-left transition-colors motion-safe:duration-150 ${
               backend === 'picoclaw'
                 ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
                 : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50'
@@ -84,7 +84,7 @@ export function FloatingBackendSwitch({
           <button
             type="button"
             onClick={() => handleSelect('hermes')}
-            className={`w-full flex items-center gap-3 px-4 py-3 text-sm text-left transition-colors ${
+            className={`w-full flex items-center gap-3 px-4 py-3 text-sm text-left transition-colors motion-safe:duration-150 ${
               backend === 'hermes'
                 ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
                 : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50'

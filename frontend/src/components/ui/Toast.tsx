@@ -21,7 +21,9 @@ export function Toast({ message, type = 'success', isVisible, onDismiss }: Toast
 
   return (
     <div
-      className={`fixed bottom-6 right-6 px-4 py-3 rounded-xl text-sm font-medium text-white shadow-lg transition-opacity duration-300 ${
+      role={type === 'error' ? 'alert' : 'status'}
+      aria-live={type === 'error' ? 'assertive' : 'polite'}
+      className={`fixed bottom-6 right-6 px-4 py-3 rounded-xl text-sm font-medium text-white shadow-lg animate-slide-down motion-safe:duration-200 ${
         type === 'error' ? 'bg-red-600' : 'bg-emerald-600'
       }`}
     >
