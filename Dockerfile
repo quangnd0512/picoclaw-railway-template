@@ -30,10 +30,11 @@ WORKDIR /hermes-src
 RUN git clone https://github.com/NousResearch/hermes-agent.git . && \
     git submodule update --init --recursive --depth 1
 
-# Create venv and install Hermes with all dependencies
+# Create venv and install Hermes with minimal dependencies (non-editable install)
+# Non-editable allows removing /hermes-src after install to save ~200MB
 RUN uv venv /opt/hermes/venv && \
     . /opt/hermes/venv/bin/activate && \
-    uv pip install --no-cache -e ".[all]"
+    uv pip install --no-cache ".[messaging,cron,mcp,pty]"
 
 FROM node:24-alpine AS frontend-builder
 
@@ -60,7 +61,6 @@ COPY --from=picoclaw-builder /src/build/picoclaw /usr/local/bin/picoclaw
 COPY --from=picoclaw-builder /go/bin/blogwatcher /usr/local/bin/blogwatcher
 
 COPY --from=hermes-builder /opt/hermes/venv /opt/hermes/venv
-COPY --from=hermes-builder /hermes-src /hermes-src
 
 COPY requirements.txt /app/requirements.txt
 COPY skills/news-aggregator-skill/requirements.txt /tmp/news-requirements.txt
