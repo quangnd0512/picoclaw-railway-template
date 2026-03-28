@@ -17,7 +17,7 @@ const TAB_TO_CONFIG_SECTIONS: Record<TabType, string[]> = {
   exec: ['tools'],
   cron: ['tools'],
   skills: ['tools'],
-  system: ['gateway', 'heartbeat', 'devices'],
+  system: ['gateway', 'heartbeat', 'devices', 'hermes'],
   status: [],
 };
 
