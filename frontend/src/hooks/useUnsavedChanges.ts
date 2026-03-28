@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import type { AppConfig } from '../types/config';
+import { stableStringify } from '../utils/stableStringify';
 
 export interface UseUnsavedChangesResult {
   isDirty: boolean;
@@ -36,7 +37,7 @@ export function useUnsavedChanges(
       const localValue = localConfig[section as keyof AppConfig];
       const serverValue = serverConfig[section as keyof AppConfig];
 
-      if (JSON.stringify(localValue) !== JSON.stringify(serverValue)) {
+      if (stableStringify(localValue) !== stableStringify(serverValue)) {
         dirtySections.push(section);
       }
     }

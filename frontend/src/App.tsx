@@ -3,6 +3,7 @@ import { useConfigQuery, useSaveConfig } from './hooks/useConfig';
 import { useBackendQuery } from './hooks/useBackend';
 import { useUnsavedChanges } from './hooks/useUnsavedChanges';
 import type { AppConfig } from './types/config';
+import { stableStringify } from './utils/stableStringify';
 import { Sidebar } from './components/layout/Sidebar';
 import { Button } from './components/ui/Button';
 
@@ -35,10 +36,10 @@ function App() {
   const [showRestartConfirm, setShowRestartConfirm] = useState(false);
 
   if (configData) {
-    const configString = JSON.stringify(configData);
+    const configString = stableStringify(configData);
     if (configString !== lastLoadedConfigString) {
       setLastLoadedConfigString(configString);
-      setLocalConfig(JSON.parse(configString));
+      setLocalConfig(configData);
     }
   }
 
