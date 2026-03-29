@@ -28,17 +28,28 @@ export function useUnsavedChanges(
       'agents',
       'hermes',
       'gateway',
-      'tools',
       'heartbeat',
       'devices',
     ] as const;
 
+    // Compare top-level sections
     for (const section of sections) {
       const localValue = localConfig[section as keyof AppConfig];
       const serverValue = serverConfig[section as keyof AppConfig];
 
       if (stableStringify(localValue) !== stableStringify(serverValue)) {
         dirtySections.push(section);
+      }
+    }
+
+    // Compare tools subsections independently (web, mcp, exec, cron, skills)
+    const toolSubsections = ['web', 'mcp', 'exec', 'cron', 'skills'] as const;
+    for (const subsection of toolSubsections) {
+      const localValue = localConfig.tools[subsection as keyof typeof localConfig.tools];
+      const serverValue = serverConfig.tools[subsection as keyof typeof serverConfig.tools];
+
+      if (stableStringify(localValue) !== stableStringify(serverValue)) {
+        dirtySections.push(`tools.${subsection}`);
       }
     }
 
