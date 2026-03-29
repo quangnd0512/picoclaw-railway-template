@@ -77,13 +77,49 @@ const SmileIcon = () => (
 );
 
 export function AgentDefaults({ config, backend, onChange }: Props) {
+  const agentDefaults = config.agents?.defaults ?? {
+    workspace: '~/.picoclaw/workspace',
+    restrict_to_workspace: true,
+    allow_read_outside_workspace: false,
+    provider: '',
+    model: 'glm-4.7',
+    max_tokens: 8192,
+    temperature: 0.7,
+    max_tool_iterations: 20,
+  };
+
   if (backend === 'hermes') {
+    const hermesAgent = config.hermes?.agent ?? { max_turns: 90, system_prompt: '', reasoning_effort: 'medium', personalities: '' };
     return (
       <section className="mb-8">
         <h2 className="text-lg font-semibold mb-3">Agent Configuration</h2>
         <div className="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                label="Provider"
+                id="hermes-provider"
+                helpText="LLM provider name (e.g., openai, anthropic)"
+              >
+                <Input
+                  type="text"
+                  icon={<ServerIcon />}
+                  value={agentDefaults.provider || ''}
+                  onChange={(e) => onChange('agents.defaults.provider', e.target.value)}
+                />
+              </FormField>
+              <FormField
+                label="Model"
+                id="hermes-model"
+                helpText="Model identifier (e.g., gpt-4, claude-opus)"
+              >
+                <Input
+                  type="text"
+                  icon={<SparkleIcon />}
+                  value={agentDefaults.model || ''}
+                  onChange={(e) => onChange('agents.defaults.model', e.target.value)}
+                />
+              </FormField>
               <FormField
                 label="Max Turns"
                 id="hermes-max-turns"
@@ -92,7 +128,7 @@ export function AgentDefaults({ config, backend, onChange }: Props) {
                 <Input
                   type="number"
                   icon={<RepeatIcon />}
-                  value={config.hermes.agent.max_turns}
+                  value={hermesAgent.max_turns}
                   onChange={(e) => onChange('hermes.agent.max_turns', Number(e.target.value))}
                   placeholder="90"
                 />
@@ -104,7 +140,7 @@ export function AgentDefaults({ config, backend, onChange }: Props) {
               >
                 <Select
                   icon={<BrainIcon />}
-                  value={config.hermes.agent.reasoning_effort}
+                  value={hermesAgent.reasoning_effort}
                   onChange={(e) => onChange('hermes.agent.reasoning_effort', e.target.value)}
                 >
                   <option value="low">Low</option>
@@ -122,7 +158,7 @@ export function AgentDefaults({ config, backend, onChange }: Props) {
                 id="hermes-system-prompt"
                 className="w-full bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono"
                 rows={4}
-                value={config.hermes.agent.system_prompt || ''}
+                value={hermesAgent.system_prompt || ''}
                 onChange={(e) => onChange('hermes.agent.system_prompt', e.target.value)}
                 placeholder="Custom system prompt..."
               />
@@ -135,7 +171,7 @@ export function AgentDefaults({ config, backend, onChange }: Props) {
               <Input
                 type="text"
                 icon={<SmileIcon />}
-                value={config.hermes.agent.personalities || ''}
+                value={hermesAgent.personalities || ''}
                 onChange={(e) => onChange('hermes.agent.personalities', e.target.value)}
                 placeholder="e.g. helpful, concise"
               />
@@ -159,7 +195,7 @@ export function AgentDefaults({ config, backend, onChange }: Props) {
             <Input
               type="text"
               icon={<ServerIcon />}
-              value={config.agents.defaults.provider || ''}
+              value={agentDefaults.provider || ''}
               onChange={(e) => onChange('agents.defaults.provider', e.target.value)}
             />
           </FormField>
@@ -171,7 +207,7 @@ export function AgentDefaults({ config, backend, onChange }: Props) {
             <Input
               type="text"
               icon={<SparkleIcon />}
-              value={config.agents.defaults.model || ''}
+              value={agentDefaults.model || ''}
               onChange={(e) => onChange('agents.defaults.model', e.target.value)}
             />
           </FormField>
@@ -183,7 +219,7 @@ export function AgentDefaults({ config, backend, onChange }: Props) {
             <Input
               type="text"
               icon={<FolderIcon />}
-              value={config.agents.defaults.workspace || ''}
+              value={agentDefaults.workspace || ''}
               onChange={(e) => onChange('agents.defaults.workspace', e.target.value)}
             />
           </FormField>
@@ -195,7 +231,7 @@ export function AgentDefaults({ config, backend, onChange }: Props) {
             <Input
               type="number"
               icon={<ZapIcon />}
-              value={config.agents.defaults.max_tokens}
+              value={agentDefaults.max_tokens}
               onChange={(e) => onChange('agents.defaults.max_tokens', Number(e.target.value))}
             />
           </FormField>
@@ -210,7 +246,7 @@ export function AgentDefaults({ config, backend, onChange }: Props) {
               min="0"
               max="2"
               icon={<ThermometerIcon />}
-              value={config.agents.defaults.temperature}
+              value={agentDefaults.temperature}
               onChange={(e) => onChange('agents.defaults.temperature', Number(e.target.value))}
             />
           </FormField>
@@ -222,7 +258,7 @@ export function AgentDefaults({ config, backend, onChange }: Props) {
             <Input
               type="number"
               icon={<CogIcon />}
-              value={config.agents.defaults.max_tool_iterations}
+              value={agentDefaults.max_tool_iterations}
               onChange={(e) => onChange('agents.defaults.max_tool_iterations', Number(e.target.value))}
             />
           </FormField>
@@ -231,7 +267,7 @@ export function AgentDefaults({ config, backend, onChange }: Props) {
               id="restrict-workspace"
               type="checkbox"
               className="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
-              checked={config.agents.defaults.restrict_to_workspace}
+              checked={agentDefaults.restrict_to_workspace}
               onChange={(e) => onChange('agents.defaults.restrict_to_workspace', e.target.checked)}
             />
             <label htmlFor="restrict-workspace" className="text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2 cursor-pointer" title="Prevent agent from accessing files outside workspace">
@@ -244,7 +280,7 @@ export function AgentDefaults({ config, backend, onChange }: Props) {
               id="allow-read-outside"
               type="checkbox"
               className="rounded bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
-              checked={config.agents.defaults.allow_read_outside_workspace}
+              checked={agentDefaults.allow_read_outside_workspace}
               onChange={(e) => onChange('agents.defaults.allow_read_outside_workspace', e.target.checked)}
             />
             <label htmlFor="allow-read-outside" className="text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2 cursor-pointer" title="Allow read-only access to files outside workspace">

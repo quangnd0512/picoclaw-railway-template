@@ -12,10 +12,14 @@ export function useSwitchBackend() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (backend: 'picoclaw' | 'hermes') => setBackend(backend),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['config'] })
-      queryClient.invalidateQueries({ queryKey: ['backend'] })
+    mutationFn: async (backend: 'picoclaw' | 'hermes') => {
+      await setBackend(backend)
+      return backend
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['config'] })
+      await queryClient.invalidateQueries({ queryKey: ['backend'] })
+      await queryClient.refetchQueries({ queryKey: ['config'], exact: true })
     },
   })
 }
