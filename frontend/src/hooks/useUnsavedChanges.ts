@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import type { AppConfig } from '../types/config';
 import { stableStringify } from '../utils/stableStringify';
 
@@ -10,10 +10,20 @@ export interface UseUnsavedChangesResult {
 
 export function useUnsavedChanges(
   localConfig: AppConfig | null,
-  serverConfig: AppConfig | null
+  serverConfig: AppConfig | null,
+  debounceMs: number = 300
 ): UseUnsavedChangesResult {
+  const [debouncedConfig, setDebouncedConfig] = useState(localConfig);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedConfig(localConfig);
+    }, debounceMs);
+    return () => clearTimeout(timer);
+  }, [localConfig, debounceMs]);
+
   return useMemo(() => {
-    if (!localConfig || !serverConfig) {
+    if (!debouncedConfig || !serverConfig) {
       return {
         isDirty: false,
         dirtySections: [],
@@ -32,9 +42,8 @@ export function useUnsavedChanges(
       'devices',
     ] as const;
 
-    // Compare top-level sections
     for (const section of sections) {
-      const localValue = localConfig[section as keyof AppConfig];
+      const localValue = debouncedConfig[section as keyof AppConfig];
       const serverValue = serverConfig[section as keyof AppConfig];
 
       if (stableStringify(localValue) !== stableStringify(serverValue)) {
@@ -42,10 +51,9 @@ export function useUnsavedChanges(
       }
     }
 
-    // Compare tools subsections independently (web, mcp, exec, cron, skills)
     const toolSubsections = ['web', 'mcp', 'exec', 'cron', 'skills'] as const;
     for (const subsection of toolSubsections) {
-      const localValue = localConfig.tools[subsection as keyof typeof localConfig.tools];
+      const localValue = debouncedConfig.tools[subsection as keyof typeof debouncedConfig.tools];
       const serverValue = serverConfig.tools[subsection as keyof typeof serverConfig.tools];
 
       if (stableStringify(localValue) !== stableStringify(serverValue)) {
@@ -58,5 +66,5 @@ export function useUnsavedChanges(
       dirtySections,
       changeCount: dirtySections.length,
     };
-  }, [localConfig, serverConfig]);
+  }, [debouncedConfig, serverConfig]);
 }
