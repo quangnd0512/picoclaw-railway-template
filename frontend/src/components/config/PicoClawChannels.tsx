@@ -43,6 +43,48 @@ export function PicoClawChannels({ channels, onChange }: PicoClawChannelsProps) 
   return (
     <div className="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
       <div className="space-y-4">
+        {/* Telegram */}
+        <FormSection title="Telegram">
+          <div className="space-y-4">
+            <Toggle
+              id="telegram-enabled"
+              label="Enabled"
+              checked={channels.telegram.enabled}
+              onChange={(checked) => updateChannel('telegram', { enabled: checked })}
+            />
+            <div className={`grid transition-[grid-template-rows] motion-safe:duration-200 ${
+              channels.telegram.enabled ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+            }`}>
+              <div className="overflow-hidden">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <SecretField
+                    label="Bot Token"
+                    value={channels.telegram.token}
+                    onChange={(value) => updateChannel('telegram', { token: value })}
+                  />
+                  <FormField label="Proxy">
+                    <Input
+                      type="text"
+                      value={channels.telegram.proxy}
+                      onChange={(e) => updateChannel('telegram', { proxy: e.target.value })}
+                      placeholder="socks5://127.0.0.1:1080"
+                    />
+                  </FormField>
+                  <div className="md:col-span-2">
+                    <FormField label="Allow From">
+                      <ChipInput
+                        value={channels.telegram.allow_from || []}
+                        onChange={(allow_from) => updateChannel('telegram', { allow_from })}
+                        placeholder="Add user ID and press Enter"
+                      />
+                    </FormField>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </FormSection>
+
         {/* Feishu */}
         <FormSection title="Feishu">
           <div className="space-y-4">
