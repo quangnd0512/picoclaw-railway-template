@@ -14,7 +14,7 @@ run:
 		-p $(PORT):8080 \
 		-e PORT=8080 \
 		-e ADMIN_PASSWORD=$(ADMIN_PASSWORD) \
-		-v $(CURDIR)/.tmpdata:/data \
+		-v clawbot-data:/data \
 		$(IMAGE_NAME)
 	@echo "Container started. Access at http://localhost:$(PORT)"
 
@@ -23,3 +23,6 @@ stop:
 
 clean:
 	docker rmi $(IMAGE_NAME)
+
+clean-data:
+	docker volume rm clawbot-data
