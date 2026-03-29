@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useConfigQuery, useSaveConfig } from "./hooks/useConfig";
-import { useBackendQuery } from "./hooks/useBackend";
+import { useBackendQuery, useSwitchBackend } from "./hooks/useBackend";
 import { useUnsavedChanges } from "./hooks/useUnsavedChanges";
 import type { AppConfig } from "./types/config";
 import { stableStringify } from "./utils/stableStringify";
@@ -41,6 +41,7 @@ function App() {
     const { data: backendData, isLoading: isLoadingBackend } =
         useBackendQuery();
     const { mutate: saveConfig, isPending: isSaving } = useSaveConfig();
+    const switchBackendMutation = useSwitchBackend();
 
     const [localConfig, setLocalConfig] = useState<AppConfig | null>(null);
     const [lastLoadedConfigString, setLastLoadedConfigString] = useState<
@@ -50,6 +51,7 @@ function App() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showRestartConfirm, setShowRestartConfirm] = useState(false);
     const [saveError, setSaveError] = useState<string | null>(null);
+    const [pendingBackendSwitch, setPendingBackendSwitch] = useState<'picoclaw' | 'hermes' | null>(null);
 
     useEffect(() => {
         if (configData) {
@@ -136,12 +138,29 @@ function App() {
                 onSuccess: () => {
                     setShowRestartConfirm(false);
                     setSaveError(null);
+                    if (pendingBackendSwitch) {
+                        switchBackendMutation.mutate(pendingBackendSwitch);
+                        setPendingBackendSwitch(null);
+                    }
                 },
                 onError: (error) => {
                     setSaveError(error instanceof Error ? error.message : 'Failed to save configuration');
                 },
             },
         );
+    };
+
+    const handleApplyAndSwitch = (newBackend: 'picoclaw' | 'hermes') => {
+        setPendingBackendSwitch(newBackend);
+        setIsModalOpen(true);
+    };
+
+    const handleDiscardAndSwitch = (newBackend: 'picoclaw' | 'hermes') => {
+        if (configData) {
+            setLocalConfig(configData);
+            setLastLoadedConfigString(stableStringify(configData));
+        }
+        switchBackendMutation.mutate(newBackend);
     };
 
     const renderTabContent = () => {
@@ -277,7 +296,13 @@ function App() {
                 onClick={handleApplyClick}
             />
 
-            <FloatingBackendSwitch backend={backend} />
+            <FloatingBackendSwitch
+                backend={backend}
+                isDirty={isDirty}
+                dirtySections={dirtySections}
+                onApplyAndSwitch={handleApplyAndSwitch}
+                onDiscardAndSwitch={handleDiscardAndSwitch}
+            />
 
             <ReviewChangesModal
                 isOpen={isModalOpen}
