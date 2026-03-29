@@ -37,12 +37,12 @@ export function defaultConfig(): AppConfig {
         web_extract: { provider: '', model: '', base_url: '', api_key: '' },
       },
       channels: {
-        telegram: { enabled: false, bot_token: '', token: '', home_channel: '', home_channel_name: '', allowed_users: '', allow_from: [], allow_all_users: false },
-        discord: { enabled: false, bot_token: '', token: '', allowed_users: '', allow_from: [], allow_bots: false, require_mention: false, free_response_channels: '', auto_thread: false },
-        slack: { enabled: false, bot_token: '', app_token: '', home_channel: '', home_channel_name: '', allowed_users: '', allow_all_users: false },
-        whatsapp: { enabled: false, mode: 'local', allowed_users: '', allow_all_users: false },
-        signal: { enabled: false, http_url: '', account: '', ignore_stories: true, home_channel: '', home_channel_name: '', group_allowed_users: '', allowed_users: '', allow_all_users: false },
-        email: { enabled: false, address: '', password: '', imap_host: '', smtp_host: '', imap_port: 993, smtp_port: 465, poll_interval: 60, home_address: '', home_address_name: '', allowed_users: '', allow_all_users: false },
+        telegram: { enabled: false, bot_token: '', token: '', home_channel: '', home_channel_name: '', allowed_users: [], allow_from: [], allow_all_users: false },
+        discord: { enabled: false, bot_token: '', token: '', allowed_users: [], allow_from: [], allow_bots: false, require_mention: false, free_response_channels: '', auto_thread: false },
+        slack: { enabled: false, bot_token: '', app_token: '', home_channel: '', home_channel_name: '', allowed_users: [], allow_all_users: false },
+        whatsapp: { enabled: false, mode: 'local', allowed_users: [], allow_all_users: false },
+        signal: { enabled: false, http_url: '', account: '', ignore_stories: true, home_channel: '', home_channel_name: '', group_allowed_users: [], allowed_users: [], allow_all_users: false },
+        email: { enabled: false, address: '', password: '', imap_host: '', smtp_host: '', imap_port: 993, smtp_port: 465, poll_interval: 60, home_address: '', home_address_name: '', allowed_users: [], allow_all_users: false },
         homeassistant: { enabled: false, token: '', url: '' },
       },
       terminal: {

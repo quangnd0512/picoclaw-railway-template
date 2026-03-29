@@ -122,7 +122,7 @@ export interface HermesTelegramChannel {
   token: string;
   home_channel: string;
   home_channel_name: string;
-  allowed_users: string;
+  allowed_users: string[];
   allow_from: string[];
   allow_all_users: boolean;
 }
@@ -131,7 +131,7 @@ export interface HermesDiscordChannel {
   enabled: boolean;
   bot_token: string;
   token: string;
-  allowed_users: string;
+  allowed_users: string[];
   allow_from: string[];
   allow_bots: boolean;
   require_mention: boolean;
@@ -145,14 +145,14 @@ export interface HermesSlackChannel {
   app_token: string;
   home_channel: string;
   home_channel_name: string;
-  allowed_users: string;
+  allowed_users: string[];
   allow_all_users: boolean;
 }
 
 export interface HermesWhatsAppChannel {
   enabled: boolean;
   mode: string;
-  allowed_users: string;
+  allowed_users: string[];
   allow_all_users: boolean;
 }
 
@@ -163,8 +163,8 @@ export interface HermesSignalChannel {
   ignore_stories: boolean;
   home_channel: string;
   home_channel_name: string;
-  group_allowed_users: string;
-  allowed_users: string;
+  group_allowed_users: string[];
+  allowed_users: string[];
   allow_all_users: boolean;
 }
 
@@ -179,7 +179,7 @@ export interface HermesEmailChannel {
   poll_interval: number;
   home_address: string;
   home_address_name: string;
-  allowed_users: string;
+  allowed_users: string[];
   allow_all_users: boolean;
 }
 

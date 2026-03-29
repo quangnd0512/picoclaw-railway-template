@@ -23,9 +23,6 @@ export function HermesChannels({ channels, onChange }: HermesChannelsProps) {
     });
   };
 
-  const stringToArray = (str?: string) => (str ? str.split(',').map(s => s.trim()).filter(Boolean) : []);
-  const arrayToString = (arr: string[]) => arr.join(',');
-
   return (
     <div className="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
       <div className="space-y-4">
@@ -73,8 +70,8 @@ export function HermesChannels({ channels, onChange }: HermesChannelsProps) {
                 <div className="md:col-span-2">
                   <FormField label="Allowed Users" id="hermes-discord-allowed-users">
                     <ChipInput
-                      value={stringToArray(channels.discord.allowed_users)}
-                      onChange={(arr) => updateChannel('discord', { allowed_users: arrayToString(arr) })}
+                      value={channels.discord.allowed_users || []}
+                      onChange={(allowed_users) => updateChannel('discord', { allowed_users })}
                       placeholder="Add User ID and press Enter"
                     />
                   </FormField>
@@ -191,8 +188,8 @@ export function HermesChannels({ channels, onChange }: HermesChannelsProps) {
                 <div className="md:col-span-2">
                   <FormField label="Allowed Users" id="hermes-telegram-allowed-users">
                     <ChipInput
-                      value={stringToArray(channels.telegram.allowed_users)}
-                      onChange={(arr) => updateChannel('telegram', { allowed_users: arrayToString(arr) })}
+                      value={channels.telegram.allowed_users || []}
+                      onChange={(allowed_users) => updateChannel('telegram', { allowed_users })}
                       placeholder="Add User ID and press Enter"
                     />
                   </FormField>
@@ -283,8 +280,8 @@ export function HermesChannels({ channels, onChange }: HermesChannelsProps) {
                 <div className="md:col-span-2">
                   <FormField label="Allowed Users" id="hermes-slack-allowed-users">
                     <ChipInput
-                      value={stringToArray(channels.slack.allowed_users)}
-                      onChange={(arr) => updateChannel('slack', { allowed_users: arrayToString(arr) })}
+                      value={channels.slack.allowed_users || []}
+                      onChange={(allowed_users) => updateChannel('slack', { allowed_users })}
                       placeholder="Add User ID and press Enter"
                     />
                   </FormField>
@@ -328,8 +325,8 @@ export function HermesChannels({ channels, onChange }: HermesChannelsProps) {
                 <div className="md:col-span-2">
                   <FormField label="Allowed Users" id="hermes-whatsapp-allowed-users">
                     <ChipInput
-                      value={stringToArray(channels.whatsapp.allowed_users)}
-                      onChange={(arr) => updateChannel('whatsapp', { allowed_users: arrayToString(arr) })}
+                      value={channels.whatsapp.allowed_users || []}
+                      onChange={(allowed_users) => updateChannel('whatsapp', { allowed_users })}
                       placeholder="Add Number and press Enter"
                     />
                   </FormField>
@@ -396,8 +393,8 @@ export function HermesChannels({ channels, onChange }: HermesChannelsProps) {
                 <div className="md:col-span-2">
                   <FormField label="Group Allowed Users" id="hermes-signal-group-allowed-users">
                     <ChipInput
-                      value={stringToArray(channels.signal.group_allowed_users)}
-                      onChange={(arr) => updateChannel('signal', { group_allowed_users: arrayToString(arr) })}
+                      value={channels.signal.group_allowed_users || []}
+                      onChange={(group_allowed_users) => updateChannel('signal', { group_allowed_users })}
                       placeholder="Add Group ID and press Enter"
                     />
                   </FormField>
@@ -406,8 +403,8 @@ export function HermesChannels({ channels, onChange }: HermesChannelsProps) {
                 <div className="md:col-span-2">
                   <FormField label="Allowed Users" id="hermes-signal-allowed-users">
                     <ChipInput
-                      value={stringToArray(channels.signal.allowed_users)}
-                      onChange={(arr) => updateChannel('signal', { allowed_users: arrayToString(arr) })}
+                      value={channels.signal.allowed_users || []}
+                      onChange={(allowed_users) => updateChannel('signal', { allowed_users })}
                       placeholder="Add Number and press Enter"
                     />
                   </FormField>
@@ -526,8 +523,8 @@ export function HermesChannels({ channels, onChange }: HermesChannelsProps) {
                 <div className="md:col-span-2">
                   <FormField label="Allowed Users" id="hermes-email-allowed-users">
                     <ChipInput
-                      value={stringToArray(channels.email.allowed_users)}
-                      onChange={(arr) => updateChannel('email', { allowed_users: arrayToString(arr) })}
+                      value={channels.email.allowed_users || []}
+                      onChange={(allowed_users) => updateChannel('email', { allowed_users })}
                       placeholder="Add Email and press Enter"
                     />
                   </FormField>
