@@ -17,6 +17,7 @@ import { CronTab } from "./components/tabs/CronTab";
 import { SkillsTab } from "./components/tabs/SkillsTab";
 import { SystemSettingsTab } from "./components/tabs/SystemSettingsTab";
 import { StatusTabWrapper } from "./components/tabs/StatusTabWrapper";
+import { AuditTab } from "./components/tabs/AuditTab";
 
 import { FloatingApplyButton } from "./components/FloatingApplyButton";
 import { FloatingBackendSwitch } from "./components/FloatingBackendSwitch";
@@ -33,6 +34,7 @@ export type TabType =
     | "cron"
     | "skills"
     | "system"
+    | "audit"
     | "status";
 
 function App() {
@@ -242,6 +244,8 @@ function App() {
                     );
                 case "status":
                     return <StatusTabWrapper />;
+                case "audit":
+                    return <AuditTab />;
                 default:
                     return (
                         <div className="text-gray-500 dark:text-gray-400">

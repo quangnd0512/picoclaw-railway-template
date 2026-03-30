@@ -1,28 +1,11 @@
-import { useStatusQuery } from '../../hooks/useStatus';
-import type { StatusResponse } from '../../types/status';
+import { useAuditQuery } from '../../hooks/useAudit';
 
-export interface CronJob {
-  name: string;
-  schedule: string;
-  last_run: string;
-  next_run: string;
-  status: string;
-}
+export function AuditCronJobs() {
+  const { data } = useAuditQuery();
 
-interface StatusResponseWithCron extends StatusResponse {
-  cron_jobs?: CronJob[];
-}
+  const jobs = data?.cron?.jobs ?? [];
 
-function hasCronJobs(data: StatusResponse): data is StatusResponseWithCron {
-  return 'cron_jobs' in data;
-}
-
-export function CronJobs() {
-  const { data } = useStatusQuery();
-
-  const cronJobs = data && hasCronJobs(data) ? data.cron_jobs : [];
-
-  if (!cronJobs || cronJobs.length === 0) {
+  if (jobs.length === 0) {
     return null;
   }
 
@@ -30,12 +13,12 @@ export function CronJobs() {
     <section>
       <h2 className="text-lg font-semibold mb-3">
         Cron Jobs
-        <span className="text-sm text-gray-500 ml-1">({cronJobs.length})</span>
+        <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">({jobs.length})</span>
       </h2>
       <div className="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-xl p-4">
-        {cronJobs.map((job) => (
+        {jobs.map((job, i) => (
           <div
-            key={job.name}
+            key={job.name ?? i}
             className="text-sm py-2 text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800 last:border-0 last:pb-0 first:pt-0"
           >
             <div className="flex justify-between items-center mb-1">

@@ -1,7 +1,6 @@
 import { GatewayStatus } from './status/GatewayStatus'
 import { ProvidersStatus } from './status/ProvidersStatus'
 import { ChannelsStatus } from './status/ChannelsStatus'
-import { CronJobs } from './status/CronJobs'
 import { PairingOps } from './status/PairingOps'
 import { LogViewer } from './status/LogViewer'
 import { useBackendQuery } from '../hooks/useBackend'
@@ -15,7 +14,6 @@ export function StatusTab() {
       <GatewayStatus />
       <ProvidersStatus />
       <ChannelsStatus />
-      <CronJobs />
       {backend === 'hermes' && <PairingOps />}
       <LogViewer />
     </div>

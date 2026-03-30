@@ -1612,20 +1612,36 @@ async def api_config_put(request: Request):
 
 
 async def api_status(request: Request):
+     auth_err = require_auth(request)
+     if auth_err:
+         return auth_err
+
+     manager = get_active_manager()
+     config = manager.read_config()
+
+     providers = {}
+     for name, prov in config.get("providers", {}).items():
+         providers[name] = {"configured": bool(prov.get("api_key"))}
+
+     channels = {}
+     for name, chan in config.get("channels", {}).items():
+         channels[name] = {"enabled": chan.get("enabled", False)}
+
+     return JSONResponse({
+         "backend": active_backend,
+         "gateway": manager.get_status(),
+         "providers": providers,
+         "channels": channels,
+     })
+
+
+async def api_audit(request: Request):
     auth_err = require_auth(request)
     if auth_err:
         return auth_err
 
     manager = get_active_manager()
     config = manager.read_config()
-
-    providers = {}
-    for name, prov in config.get("providers", {}).items():
-        providers[name] = {"configured": bool(prov.get("api_key"))}
-
-    channels = {}
-    for name, chan in config.get("channels", {}).items():
-        channels[name] = {"enabled": chan.get("enabled", False)}
 
     cron_dir = manager.get_config_path().parent / "cron"
     cron_jobs = []
@@ -1636,12 +1652,79 @@ async def api_status(request: Request):
             except Exception:
                 pass
 
+    picoclaw_home = Path(os.environ.get("PICOCLAW_HOME", Path.home() / ".picoclaw"))
+    sessions = []
+    sessions_dir = picoclaw_home / "sessions"
+    if sessions_dir.exists():
+        try:
+            session_files = sorted(
+                sessions_dir.glob("*.jsonl"),
+                key=lambda f: f.stat().st_mtime,
+                reverse=True,
+            )[:50]
+        except Exception:
+            session_files = []
+        for f in session_files:
+            try:
+                sessions.append({
+                    "id": f.stem,
+                    "date": f.stat().st_mtime,
+                    "message_count": len([l for l in f.read_text().splitlines() if l.strip()]),
+                })
+            except Exception:
+                pass
+
+    skills = []
+    skills_dir = picoclaw_home / "workspace" / "skills"
+    if skills_dir.exists():
+        for d in skills_dir.iterdir():
+            if not d.is_dir():
+                continue
+            meta = {}
+            try:
+                meta = json.loads((d / "_meta.json").read_text())
+            except Exception:
+                pass
+            skills.append({
+                "name": meta.get("name", d.name),
+                "description": meta.get("description", ""),
+                "version": meta.get("version", ""),
+            })
+
+    if active_backend == "picoclaw":
+        mcp_servers = []
+        for name, srv in config.get("tools", {}).get("mcp", {}).get("servers", {}).items():
+            mcp_servers.append({
+                "name": name,
+                "type": srv.get("type", "command"),
+                "command_or_url": srv.get("command") or srv.get("url", ""),
+            })
+    else:
+        mcp_servers = []
+        for srv in config.get("hermes", {}).get("mcp_servers", []):
+            mcp_servers.append({
+                "name": srv.get("name", ""),
+                "type": srv.get("type", "command"),
+                "command_or_url": srv.get("command", ""),
+            })
+
+    if active_backend == "picoclaw":
+        tools = {}
+        for tool_name in ["web", "exec", "cron", "mcp", "skills"]:
+            tool_cfg = config.get("tools", {}).get(tool_name, {})
+            if not isinstance(tool_cfg, dict):
+                tool_cfg = {}
+            tools[tool_name] = {"enabled": tool_cfg.get("enabled", True)}
+    else:
+        tools = {}
+
     return JSONResponse({
         "backend": active_backend,
-        "gateway": manager.get_status(),
-        "providers": providers,
-        "channels": channels,
         "cron": {"count": len(cron_jobs), "jobs": cron_jobs},
+        "sessions": sessions,
+        "skills": skills,
+        "mcp_servers": mcp_servers,
+        "tools": tools,
     })
 
 
@@ -1781,6 +1864,7 @@ routes = [
     Route("/api/config", api_config_get, methods=["GET"]),
     Route("/api/config", api_config_put, methods=["PUT"]),
     Route("/api/status", api_status),
+    Route("/api/audit", api_audit),
     Route("/api/logs", api_logs),
     Route("/api/gateway/start", api_gateway_start, methods=["POST"]),
     Route("/api/gateway/stop", api_gateway_stop, methods=["POST"]),

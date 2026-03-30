@@ -18,6 +18,7 @@ const TAB_TO_CONFIG_SECTIONS: Record<TabType, string[]> = {
   skills: ['tools.skills'],
   system: ['gateway', 'heartbeat', 'devices', 'hermes'],
   status: [],
+  audit: [],
 };
 
 export function Sidebar({ activeTab, onTabChange, backend, dirtySections }: SidebarProps) {
@@ -28,6 +29,7 @@ export function Sidebar({ activeTab, onTabChange, backend, dirtySections }: Side
 
   const tabs: { id: TabType; label: string; icon: string; hideOnHermes?: boolean }[] = [
     { id: 'status', label: 'Status', icon: '📊' },
+    { id: 'audit', label: 'Audit', icon: '🔍' },
     { id: 'providers', label: 'Providers', icon: '🔑' },
     { id: 'channels', label: 'Channels', icon: '📡' },
     { id: 'agent', label: 'Agent Defaults', icon: '🤖' },

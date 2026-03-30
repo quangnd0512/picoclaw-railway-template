@@ -2,6 +2,7 @@ import type { AppConfig } from '../types/config';
 import { defaultConfig } from '../utils/defaultConfig';
 import { mergeDeep } from '../utils/mergeDeep';
 import type { StatusResponse } from '../types/status';
+import type { AuditResponse } from '../types/audit';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -89,6 +90,12 @@ export async function getLogs(): Promise<string[]> {
 
   const data = (await res.json()) as LogsResponse;
   return data.lines;
+}
+
+export async function getAudit(): Promise<AuditResponse> {
+  const res = await fetch('/api/audit', { credentials: 'include' });
+  if (!res.ok) throw new Error(`Failed to fetch audit: ${res.status}`);
+  return res.json();
 }
 
 // ============================================================================

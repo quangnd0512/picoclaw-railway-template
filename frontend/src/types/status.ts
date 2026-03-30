@@ -22,25 +22,10 @@ export interface GatewayStatus {
   logs: string[];
 }
 
-export interface MCPServerStatus {
-  name: string;
-  enabled: boolean;
-  status: 'healthy' | 'unhealthy' | 'unknown';
-  error?: string;
-}
-
-export interface ToolStatus {
-  enabled: boolean;
-  configured: boolean;
-  error?: string;
-}
-
 export interface StatusResponse {
   gateway: GatewayStatus;
   channels: Record<string, ChannelStatus>;
   providers: Record<string, ProviderStatus>;
-  tools: Record<string, ToolStatus>;
-  mcp_servers: MCPServerStatus[];
   uptime_seconds: number;
   backend: 'picoclaw' | 'hermes' | 'unknown';
 }
