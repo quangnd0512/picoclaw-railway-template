@@ -36,7 +36,7 @@ export function HealthMatrix() {
 
   if (items.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4">
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm p-5">
         <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
           Provider &amp; Channel Health
         </h3>
@@ -48,10 +48,23 @@ export function HealthMatrix() {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4">
+    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm p-5">
       <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
         Provider &amp; Channel Health
       </h3>
+      <p className="text-xs text-gray-600 dark:text-gray-400 mb-4">
+        <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+          {items.filter(i => i.enabled && i.configured).length} healthy
+        </span>
+        {' '} · {' '}
+        <span className="text-red-600 dark:text-red-400 font-medium">
+          {items.filter(i => i.error).length} error
+        </span>
+        {' '} · {' '}
+        <span className="text-gray-500">
+          {items.length} total
+        </span>
+      </p>
       <ul className="grid grid-cols-2 sm:grid-cols-3 gap-2">
         {items.map((item) => (
           <li

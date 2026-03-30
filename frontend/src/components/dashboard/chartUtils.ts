@@ -29,3 +29,21 @@ export function useChartTheme() {
     bgColor: dark ? CHART_COLORS.bg.dark : CHART_COLORS.bg.light,
   }
 }
+
+export const CHART_COLOR_SEQUENCE = [
+  '#3b82f6', // blue
+  '#10b981', // emerald
+  '#f59e0b', // amber
+  '#8b5cf6', // violet
+  '#ec4899', // rose
+  '#06b6d4', // cyan
+  '#f97316', // orange
+]
+
+export const HEATMAP_COLORS = ['#f3f4f6', '#bfdbfe', '#60a5fa', '#2563eb', '#1d4ed8']
+
+export function colorScale(value: number, max: number, steps: number): string {
+  const intensity = Math.min(1, Math.max(0, value / max))
+  const index = Math.floor(intensity * (steps - 1))
+  return HEATMAP_COLORS[Math.min(index, HEATMAP_COLORS.length - 1)]
+}
