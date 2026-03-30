@@ -39,9 +39,9 @@ export function AuditTab() {
       <section className="bg-gradient-to-r from-blue-50 via-white to-sky-50 dark:from-blue-950/40 dark:via-gray-900 dark:to-sky-950/40 border border-blue-100 dark:border-gray-800 rounded-2xl p-5 sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-blue-600 dark:text-blue-300">System Audit</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-blue-600 dark:text-blue-300">Diagnostics</p>
             <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-gray-100 mt-1">
-              Runtime Insights
+              Diagnostics Insights
             </h1>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
               Snapshot of cron jobs, tools, skills, MCP servers, and sessions for the current backend.

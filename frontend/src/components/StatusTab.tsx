@@ -42,9 +42,9 @@ export function StatusTab() {
       <section className="bg-gradient-to-r from-emerald-50 via-white to-cyan-50 dark:from-emerald-950/30 dark:via-gray-900 dark:to-cyan-950/30 border border-emerald-100 dark:border-gray-800 rounded-2xl p-5 sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-300">System Status</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-300">Runtime</p>
             <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-gray-100 mt-1">
-              Live Health Overview
+              Runtime Health Overview
             </h1>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
               Monitor gateway state, provider and channel readiness, pairing operations, and live logs.

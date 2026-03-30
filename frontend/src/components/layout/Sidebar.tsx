@@ -28,8 +28,8 @@ export function Sidebar({ activeTab, onTabChange, backend, dirtySections }: Side
   };
 
   const tabs: { id: TabType; label: string; icon: string; hideOnHermes?: boolean }[] = [
-    { id: 'status', label: 'Status', icon: '📊' },
-    { id: 'audit', label: 'Audit', icon: '🔍' },
+    { id: 'status', label: 'Runtime', icon: '📊' },
+    { id: 'audit', label: 'Diagnostics', icon: '🔍' },
     { id: 'providers', label: 'Providers', icon: '🔑' },
     { id: 'channels', label: 'Channels', icon: '📡' },
     { id: 'agent', label: 'Agent Defaults', icon: '🤖' },
