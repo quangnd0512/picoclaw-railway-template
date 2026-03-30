@@ -7,6 +7,7 @@ import { stableStringify } from "./utils/stableStringify";
 import { Sidebar } from "./components/layout/Sidebar";
 import { Button } from "./components/ui/Button";
 
+import { DashboardTab } from "./components/tabs/DashboardTab";
 import { ProvidersTab } from "./components/tabs/ProvidersTab";
 import { ChannelsTab } from "./components/tabs/ChannelsTab";
 import { AgentDefaultsTab } from "./components/tabs/AgentDefaultsTab";
@@ -25,6 +26,7 @@ import { ReviewChangesModal } from "./components/ReviewChangesModal";
 import { Toast } from "./components/ui/Toast";
 
 export type TabType =
+    | "dashboard"
     | "providers"
     | "channels"
     | "agent"
@@ -38,7 +40,7 @@ export type TabType =
     | "status";
 
 function App() {
-    const [activeTab, setActiveTab] = useState<TabType>("status");
+    const [activeTab, setActiveTab] = useState<TabType>("dashboard");
     const { data: configData, isLoading: isLoadingConfig } = useConfigQuery();
     const { data: backendData, isLoading: isLoadingBackend } =
         useBackendQuery();
@@ -170,6 +172,8 @@ function App() {
 
         const content = (() => {
             switch (activeTab) {
+                case "dashboard":
+                    return <DashboardTab />;
                 case "providers":
                     return (
                         <ProvidersTab

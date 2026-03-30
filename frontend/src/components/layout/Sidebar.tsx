@@ -8,6 +8,7 @@ interface SidebarProps {
 }
 
 const TAB_TO_CONFIG_SECTIONS: Record<TabType, string[]> = {
+  dashboard: [],
   providers: ['providers'],
   channels: ['channels'],
   agent: ['agents'],
@@ -28,6 +29,7 @@ export function Sidebar({ activeTab, onTabChange, backend, dirtySections }: Side
   };
 
   const tabs: { id: TabType; label: string; icon: string; hideOnHermes?: boolean }[] = [
+    { id: 'dashboard', label: 'Dashboard', icon: '📈' },
     { id: 'status', label: 'Runtime', icon: '📊' },
     { id: 'audit', label: 'Diagnostics', icon: '🔍' },
     { id: 'providers', label: 'Providers', icon: '🔑' },
