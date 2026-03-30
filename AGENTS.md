@@ -13,20 +13,24 @@ Welcome! This `AGENTS.md` file provides essential context, commands, and code st
 ## 2. Environment Setup, Build, and Testing Commands
 
 ### Running Locally (Docker)
-To accurately replicate the Railway production environment, use Docker:
+To accurately replicate the Railway production environment, use Docker with the Makefile:
 ```bash
 # 1. Build the image
-docker build -t picoclaw-railway-template .
+make build
 
-# 2. Run the container
-# Mount a local .tmpdata directory to persist state
-docker run --rm -p 8080:8080 \
-  -e PORT=8080 \
-  -e ADMIN_PASSWORD=test \
-  -v $(pwd)/.tmpdata:/data \
-  picoclaw-railway-template
+# 2. Run the container (use ADMIN_PASSWORD=<secret> to set a custom password, default: "test")
+make run
+
+# Stop the container
+make stop
+
+# Clean up image
+make clean
+
+# Clean up persistent data volume
+make clean-data
 ```
-*Access the web UI at `http://localhost:8080` with username `admin` and password `test`.*
+*Access the web UI at `http://localhost:8080` with username `admin` and password `test` (or your custom `ADMIN_PASSWORD`).*
 
 ### Python Environment Management
 The Dockerfile uses `uv` for ultra-fast package installation. Locally, standard `pip` or `uv` is fine:
