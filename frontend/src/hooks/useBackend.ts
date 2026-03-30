@@ -19,6 +19,7 @@ export function useSwitchBackend() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['config'] })
       await queryClient.invalidateQueries({ queryKey: ['backend'] })
+      await queryClient.invalidateQueries({ queryKey: ['status'] })
       await queryClient.invalidateQueries({ queryKey: ['audit'] })
       await queryClient.refetchQueries({ queryKey: ['config'], exact: true })
     },
