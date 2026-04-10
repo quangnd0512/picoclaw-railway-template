@@ -22,7 +22,7 @@ from starlette.authentication import (
 from starlette.middleware import Middleware
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.requests import Request
-from starlette.responses import JSONResponse, PlainTextResponse, FileResponse
+from starlette.responses import FileResponse, JSONResponse, PlainTextResponse
 from starlette.routing import Route
 from starlette.staticfiles import StaticFiles
 
@@ -57,7 +57,15 @@ HERMES_SECRET_FIELDS = {
 }
 
 # Hermes pairing operation constants
-HERMES_PAIRING_PLATFORMS = ("telegram", "discord", "slack", "whatsapp", "signal", "email", "homeassistant")
+HERMES_PAIRING_PLATFORMS = (
+    "telegram",
+    "discord",
+    "slack",
+    "whatsapp",
+    "signal",
+    "email",
+    "homeassistant",
+)
 PAIRING_CODE_RE = re.compile(r"^[A-Z2-9]{8}$")
 PAIRING_USER_ID_RE = re.compile(r"^[A-Za-z0-9_:+@.-]{1,128}$")
 
@@ -75,7 +83,9 @@ def _validate_pairing_platform(value: str) -> str:
         ValueError: If the platform is not valid.
     """
     if value not in HERMES_PAIRING_PLATFORMS:
-        raise ValueError(f"Invalid platform: {value}. Must be one of {HERMES_PAIRING_PLATFORMS}")
+        raise ValueError(
+            f"Invalid platform: {value}. Must be one of {HERMES_PAIRING_PLATFORMS}"
+        )
     return value
 
 
@@ -92,7 +102,9 @@ def _validate_pairing_code(value: str) -> str:
         ValueError: If the pairing code format is invalid.
     """
     if not PAIRING_CODE_RE.match(value):
-        raise ValueError(f"Invalid pairing code: {value}. Must be exactly 8 characters, uppercase A-Z and digits 2-9")
+        raise ValueError(
+            f"Invalid pairing code: {value}. Must be exactly 8 characters, uppercase A-Z and digits 2-9"
+        )
     return value
 
 
@@ -109,7 +121,9 @@ def _validate_pairing_user_id(value: str) -> str:
         ValueError: If the user ID format is invalid.
     """
     if not PAIRING_USER_ID_RE.match(value):
-        raise ValueError(f"Invalid user ID: {value}. Must be 1-128 characters, alphanumeric with _:+@-.")
+        raise ValueError(
+            f"Invalid user ID: {value}. Must be 1-128 characters, alphanumeric with _:+@-."
+        )
     return value
 
 
@@ -169,13 +183,47 @@ def default_config():
         "channels": {
             "telegram": {"enabled": False, "token": "", "proxy": "", "allow_from": []},
             "discord": {"enabled": False, "token": "", "allow_from": []},
-            "slack": {"enabled": False, "bot_token": "", "app_token": "", "allow_from": []},
-            "whatsapp": {"enabled": False, "bridge_url": "ws://localhost:3001", "allow_from": []},
-            "feishu": {"enabled": False, "app_id": "", "app_secret": "", "encrypt_key": "", "verification_token": "", "allow_from": []},
-            "dingtalk": {"enabled": False, "client_id": "", "client_secret": "", "allow_from": []},
+            "slack": {
+                "enabled": False,
+                "bot_token": "",
+                "app_token": "",
+                "allow_from": [],
+            },
+            "whatsapp": {
+                "enabled": False,
+                "bridge_url": "ws://localhost:3001",
+                "allow_from": [],
+            },
+            "feishu": {
+                "enabled": False,
+                "app_id": "",
+                "app_secret": "",
+                "encrypt_key": "",
+                "verification_token": "",
+                "allow_from": [],
+            },
+            "dingtalk": {
+                "enabled": False,
+                "client_id": "",
+                "client_secret": "",
+                "allow_from": [],
+            },
             "qq": {"enabled": False, "app_id": "", "app_secret": "", "allow_from": []},
-            "line": {"enabled": False, "channel_secret": "", "channel_access_token": "", "webhook_host": "0.0.0.0", "webhook_port": 18791, "webhook_path": "/webhook/line", "allow_from": []},
-            "maixcam": {"enabled": False, "host": "0.0.0.0", "port": 18790, "allow_from": []},
+            "line": {
+                "enabled": False,
+                "channel_secret": "",
+                "channel_access_token": "",
+                "webhook_host": "0.0.0.0",
+                "webhook_port": 18791,
+                "webhook_path": "/webhook/line",
+                "allow_from": [],
+            },
+            "maixcam": {
+                "enabled": False,
+                "host": "0.0.0.0",
+                "port": 18790,
+                "allow_from": [],
+            },
         },
         "providers": {
             "anthropic": {"api_key": ""},
@@ -195,38 +243,45 @@ def default_config():
                 "brave": {"enabled": False, "api_key": "", "max_results": 5},
                 "duckduckgo": {"enabled": True, "max_results": 5},
                 "perplexity": {"enabled": False, "api_key": "", "max_results": 5},
-                "tavily": {"enabled": False, "api_key": "", "base_url": "", "max_results": 5},
+                "tavily": {
+                    "enabled": False,
+                    "api_key": "",
+                    "base_url": "",
+                    "max_results": 5,
+                },
                 "proxy": "",
-                "fetch_limit_bytes": 10485760
+                "fetch_limit_bytes": 10485760,
             },
             "mcp": {
                 "enabled": False,
                 "servers": {
-                "context7": {
-                    "enabled": False,
-                    "type": "http",
-                    "url": "https://mcp.context7.com/mcp"
+                    "context7": {
+                        "enabled": False,
+                        "type": "http",
+                        "url": "https://mcp.context7.com/mcp",
+                    },
+                    "filesystem": {
+                        "enabled": False,
+                        "command": "npx",
+                        "args": [
+                            "-y",
+                            "@modelcontextprotocol/server-filesystem",
+                            "/tmp",
+                        ],
+                    },
+                    "github": {
+                        "enabled": False,
+                        "command": "npx",
+                        "args": ["-y", "@modelcontextprotocol/server-github"],
+                        "env": {"GITHUB_PERSONAL_ACCESS_TOKEN": ""},
+                    },
                 },
-                "filesystem": {
-                    "enabled": False,
-                    "command": "npx",
-                    "args": ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]
-                },
-                "github": {
-                    "enabled": False,
-                    "command": "npx",
-                    "args": ["-y", "@modelcontextprotocol/server-github"],
-                    "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "" }
-                }
-                }
             },
-            "cron": {
-                "exec_timeout_minutes": 5
-            },
+            "cron": {"exec_timeout_minutes": 5},
             "exec": {
                 "enable_deny_patterns": True,
                 "custom_deny_patterns": [],
-                "custom_allow_patterns": []
+                "custom_allow_patterns": [],
             },
             "skills": {
                 "registries": {
@@ -235,10 +290,10 @@ def default_config():
                         "base_url": "https://clawhub.ai",
                         "search_path": "/api/v1/search",
                         "skills_path": "/api/v1/skills",
-                        "download_path": "/api/v1/download"
+                        "download_path": "/api/v1/download",
                     }
                 }
-            }
+            },
         },
         "heartbeat": {"enabled": True, "interval": 30},
         "devices": {"enabled": False, "monitor_usb": False},
@@ -301,7 +356,9 @@ class BaseGatewayManager(ABC):
             self.start_time = time.time()
             task = asyncio.create_task(self._read_output())
             self._read_tasks.append(task)
-            task.add_done_callback(lambda t: self._read_tasks.remove(t) if t in self._read_tasks else None)
+            task.add_done_callback(
+                lambda t: self._read_tasks.remove(t) if t in self._read_tasks else None
+            )
         except Exception as e:
             self.state = "error"
             self.logs.append(f"Failed to start gateway: {e}")
@@ -340,7 +397,11 @@ class BaseGatewayManager(ABC):
                 self.logs.append(cleaned)
         except asyncio.CancelledError:
             return
-        if self.process and self.process.returncode is not None and self.state == "running":
+        if (
+            self.process
+            and self.process.returncode is not None
+            and self.state == "running"
+        ):
             self.state = "error"
             self.logs.append(f"Gateway exited with code {self.process.returncode}")
             if not self._manual_stop_requested:
@@ -372,18 +433,37 @@ class BaseGatewayManager(ABC):
 
 class PicoClawManager(BaseGatewayManager):
     SECRET_FIELDS = {
-        "api_key", "token", "app_secret", "encrypt_key",
-        "verification_token", "bot_token", "app_token",
-        "channel_secret", "channel_access_token", "client_secret",
-        "SLACK_BOT_TOKEN", "SLACK_APP_TOKEN", "EMAIL_PASSWORD", "HASS_TOKEN",
-        "GLM_API_KEY", "ZAI_API_KEY", "Z_AI_API_KEY", "KIMI_API_KEY",
-        "MINIMAX_API_KEY", "MINIMAX_CN_API_KEY", "ANTHROPIC_API_KEY", "ANTHROPIC_TOKEN",
-        "AUXILIARY_VISION_API_KEY", "AUXILIARY_WEB_EXTRACT_API_KEY",
+        "api_key",
+        "token",
+        "app_secret",
+        "encrypt_key",
+        "verification_token",
+        "bot_token",
+        "app_token",
+        "channel_secret",
+        "channel_access_token",
+        "client_secret",
+        "SLACK_BOT_TOKEN",
+        "SLACK_APP_TOKEN",
+        "EMAIL_PASSWORD",
+        "HASS_TOKEN",
+        "GLM_API_KEY",
+        "ZAI_API_KEY",
+        "Z_AI_API_KEY",
+        "KIMI_API_KEY",
+        "MINIMAX_API_KEY",
+        "MINIMAX_CN_API_KEY",
+        "ANTHROPIC_API_KEY",
+        "ANTHROPIC_TOKEN",
+        "AUXILIARY_VISION_API_KEY",
+        "AUXILIARY_WEB_EXTRACT_API_KEY",
     }
 
     def __init__(self):
         super().__init__()
-        self.config_dir = Path(os.environ.get("PICOCLAW_HOME", Path.home() / ".picoclaw"))
+        self.config_dir = Path(
+            os.environ.get("PICOCLAW_HOME", Path.home() / ".picoclaw")
+        )
         self.config_path = self.config_dir / "config.json"
 
     def get_command(self) -> tuple[str, ...]:
@@ -415,7 +495,11 @@ class PicoClawManager(BaseGatewayManager):
                 or re.search(r"\.mcp\.servers\.[^.]+\.headers$", _path) is not None
             )
             for k, v in data.items():
-                if (k in self.SECRET_FIELDS or is_mcp_secret) and isinstance(v, str) and v:
+                if (
+                    (k in self.SECRET_FIELDS or is_mcp_secret)
+                    and isinstance(v, str)
+                    and v
+                ):
                     result[k] = v[:8] + "***" if len(v) > 8 else "***"
                 else:
                     result[k] = self.mask_secrets(v, f"{_path}.{k}")
@@ -436,10 +520,16 @@ class PicoClawManager(BaseGatewayManager):
                     result[k] = existing_data[k]
                     continue
                 v = new_data[k]
-                if (k in self.SECRET_FIELDS or is_mcp_secret) and isinstance(v, str) and (v.endswith("***") or v == ""):
+                if (
+                    (k in self.SECRET_FIELDS or is_mcp_secret)
+                    and isinstance(v, str)
+                    and (v.endswith("***") or v == "")
+                ):
                     result[k] = existing_data.get(k, "")
                 else:
-                    result[k] = self.merge_secrets(v, existing_data.get(k, {}), f"{_path}.{k}")
+                    result[k] = self.merge_secrets(
+                        v, existing_data.get(k, {}), f"{_path}.{k}"
+                    )
             return result
         return new_data
 
@@ -459,7 +549,7 @@ class HermesManager(BaseGatewayManager):
 
     def __init__(self):
         super().__init__()
-        self.config_dir = Path.home() / ".hermes"
+        self.config_dir = Path(os.environ.get("HERMES_HOME", Path.home() / ".hermes"))
         self.config_path = self.config_dir / "config.yaml"
         self.env_path = self.config_dir / ".env"
 
@@ -523,7 +613,9 @@ class HermesManager(BaseGatewayManager):
     def _ensure_default_files(self):
         self.config_dir.mkdir(parents=True, exist_ok=True)
         if not self.config_path.exists():
-            self.config_path.write_text(yaml.safe_dump(self._default_hermes_yaml(), sort_keys=False))
+            self.config_path.write_text(
+                yaml.safe_dump(self._default_hermes_yaml(), sort_keys=False)
+            )
         if not self.env_path.exists():
             self.env_path.write_text("")
 
@@ -593,12 +685,18 @@ class HermesManager(BaseGatewayManager):
             config["agents"]["defaults"]["provider"] = model_provider or "auto"
             config["agents"]["defaults"]["model"] = str(model.get("default", "") or "")
 
-        auxiliary = yaml_data.get("auxiliary", {}) if isinstance(yaml_data, dict) else {}
+        auxiliary = (
+            yaml_data.get("auxiliary", {}) if isinstance(yaml_data, dict) else {}
+        )
         if isinstance(auxiliary, dict):
             config["hermes"]["auxiliary"] = auxiliary
 
-        config["providers"]["openrouter"]["api_key"] = env_data.get("OPENROUTER_API_KEY", "")
-        config["providers"]["anthropic"]["api_key"] = env_data.get("ANTHROPIC_API_KEY", "")
+        config["providers"]["openrouter"]["api_key"] = env_data.get(
+            "OPENROUTER_API_KEY", ""
+        )
+        config["providers"]["anthropic"]["api_key"] = env_data.get(
+            "ANTHROPIC_API_KEY", ""
+        )
         config["providers"]["zhipu"]["api_key"] = env_data.get("GLM_API_KEY", "")
         config["providers"]["moonshot"]["api_key"] = env_data.get("KIMI_API_KEY", "")
 
@@ -610,9 +708,12 @@ class HermesManager(BaseGatewayManager):
             "token": env_data.get("TELEGRAM_BOT_TOKEN", ""),
             "home_channel": env_data.get("TELEGRAM_HOME_CHANNEL", ""),
             "home_channel_name": env_data.get("TELEGRAM_HOME_CHANNEL_NAME", ""),
-            "allowed_users": self._split_csv(env_data.get("TELEGRAM_ALLOWED_USERS", "")),
+            "allowed_users": self._split_csv(
+                env_data.get("TELEGRAM_ALLOWED_USERS", "")
+            ),
             "allow_from": self._split_csv(env_data.get("TELEGRAM_ALLOWED_USERS", "")),
-            "allow_all_users": env_data.get("TELEGRAM_ALLOW_ALL_USERS", "").lower() == "true",
+            "allow_all_users": env_data.get("TELEGRAM_ALLOW_ALL_USERS", "").lower()
+            == "true",
             "enabled": bool(env_data.get("TELEGRAM_BOT_TOKEN", "")),
         }
         config["channels"]["telegram"] = telegram_channel
@@ -623,8 +724,11 @@ class HermesManager(BaseGatewayManager):
             "allowed_users": self._split_csv(env_data.get("DISCORD_ALLOWED_USERS", "")),
             "allow_from": self._split_csv(env_data.get("DISCORD_ALLOWED_USERS", "")),
             "allow_bots": env_data.get("DISCORD_ALLOW_BOTS", "").lower() == "true",
-            "require_mention": env_data.get("DISCORD_REQUIRE_MENTION", "").lower() == "true",
-            "free_response_channels": env_data.get("DISCORD_FREE_RESPONSE_CHANNELS", ""),
+            "require_mention": env_data.get("DISCORD_REQUIRE_MENTION", "").lower()
+            == "true",
+            "free_response_channels": env_data.get(
+                "DISCORD_FREE_RESPONSE_CHANNELS", ""
+            ),
             "auto_thread": env_data.get("DISCORD_AUTO_THREAD", "").lower() == "true",
             "enabled": bool(env_data.get("DISCORD_BOT_TOKEN", "")),
         }
@@ -637,7 +741,8 @@ class HermesManager(BaseGatewayManager):
             "home_channel_name": env_data.get("SLACK_HOME_CHANNEL_NAME", ""),
             "allowed_users": self._split_csv(env_data.get("SLACK_ALLOWED_USERS", "")),
             "allow_from": self._split_csv(env_data.get("SLACK_ALLOWED_USERS", "")),
-            "allow_all_users": env_data.get("SLACK_ALLOW_ALL_USERS", "").lower() == "true",
+            "allow_all_users": env_data.get("SLACK_ALLOW_ALL_USERS", "").lower()
+            == "true",
             "enabled": bool(env_data.get("SLACK_BOT_TOKEN", "")),
         }
         config["channels"]["slack"] = slack_channel
@@ -645,23 +750,31 @@ class HermesManager(BaseGatewayManager):
         whatsapp_channel = {
             "enabled": env_data.get("WHATSAPP_ENABLED", "").lower() == "true",
             "mode": env_data.get("WHATSAPP_MODE", ""),
-            "allowed_users": self._split_csv(env_data.get("WHATSAPP_ALLOWED_USERS", "")),
+            "allowed_users": self._split_csv(
+                env_data.get("WHATSAPP_ALLOWED_USERS", "")
+            ),
             "allow_from": self._split_csv(env_data.get("WHATSAPP_ALLOWED_USERS", "")),
-            "allow_all_users": env_data.get("WHATSAPP_ALLOW_ALL_USERS", "").lower() == "true",
+            "allow_all_users": env_data.get("WHATSAPP_ALLOW_ALL_USERS", "").lower()
+            == "true",
         }
         config["channels"]["whatsapp"] = whatsapp_channel
 
         signal_channel = {
             "http_url": env_data.get("SIGNAL_HTTP_URL", ""),
             "account": env_data.get("SIGNAL_ACCOUNT", ""),
-            "ignore_stories": env_data.get("SIGNAL_IGNORE_STORIES", "").lower() == "true",
+            "ignore_stories": env_data.get("SIGNAL_IGNORE_STORIES", "").lower()
+            == "true",
             "home_channel": env_data.get("SIGNAL_HOME_CHANNEL", ""),
             "home_channel_name": env_data.get("SIGNAL_HOME_CHANNEL_NAME", ""),
-            "group_allowed_users": self._split_csv(env_data.get("SIGNAL_GROUP_ALLOWED_USERS", "")),
+            "group_allowed_users": self._split_csv(
+                env_data.get("SIGNAL_GROUP_ALLOWED_USERS", "")
+            ),
             "allowed_users": self._split_csv(env_data.get("SIGNAL_ALLOWED_USERS", "")),
             "allow_from": self._split_csv(env_data.get("SIGNAL_ALLOWED_USERS", "")),
-            "allow_all_users": env_data.get("SIGNAL_ALLOW_ALL_USERS", "").lower() == "true",
-            "enabled": bool(env_data.get("SIGNAL_HTTP_URL", "")) and bool(env_data.get("SIGNAL_ACCOUNT", "")),
+            "allow_all_users": env_data.get("SIGNAL_ALLOW_ALL_USERS", "").lower()
+            == "true",
+            "enabled": bool(env_data.get("SIGNAL_HTTP_URL", ""))
+            and bool(env_data.get("SIGNAL_ACCOUNT", "")),
         }
         config["channels"]["signal"] = signal_channel
 
@@ -677,8 +790,12 @@ class HermesManager(BaseGatewayManager):
             "home_address_name": env_data.get("EMAIL_HOME_ADDRESS_NAME", ""),
             "allowed_users": self._split_csv(env_data.get("EMAIL_ALLOWED_USERS", "")),
             "allow_from": self._split_csv(env_data.get("EMAIL_ALLOWED_USERS", "")),
-            "allow_all_users": env_data.get("EMAIL_ALLOW_ALL_USERS", "").lower() == "true",
-            "enabled": bool(env_data.get("EMAIL_ADDRESS", "")) and bool(env_data.get("EMAIL_PASSWORD", "")) and bool(env_data.get("EMAIL_IMAP_HOST", "")) and bool(env_data.get("EMAIL_SMTP_HOST", "")),
+            "allow_all_users": env_data.get("EMAIL_ALLOW_ALL_USERS", "").lower()
+            == "true",
+            "enabled": bool(env_data.get("EMAIL_ADDRESS", ""))
+            and bool(env_data.get("EMAIL_PASSWORD", ""))
+            and bool(env_data.get("EMAIL_IMAP_HOST", ""))
+            and bool(env_data.get("EMAIL_SMTP_HOST", "")),
         }
         config["channels"]["email"] = email_channel
 
@@ -702,7 +819,9 @@ class HermesManager(BaseGatewayManager):
             "homeassistant": homeassistant_channel,
         }
 
-        compression = yaml_data.get("compression", {}) if isinstance(yaml_data, dict) else {}
+        compression = (
+            yaml_data.get("compression", {}) if isinstance(yaml_data, dict) else {}
+        )
         if isinstance(compression, dict):
             config["hermes"]["compression"] = compression
 
@@ -710,7 +829,9 @@ class HermesManager(BaseGatewayManager):
         if isinstance(display, dict):
             config["hermes"]["display"] = display
 
-        mcp_servers_dict = yaml_data.get("mcp_servers", {}) if isinstance(yaml_data, dict) else {}
+        mcp_servers_dict = (
+            yaml_data.get("mcp_servers", {}) if isinstance(yaml_data, dict) else {}
+        )
         mcp_servers_list = []
         for name, srv in mcp_servers_dict.items():
             srv_copy = dict(srv)
@@ -718,19 +839,27 @@ class HermesManager(BaseGatewayManager):
             if isinstance(srv_copy.get("args"), list):
                 srv_copy["args"] = ",".join(srv_copy["args"])
             if isinstance(srv_copy.get("env"), dict):
-                srv_copy["env"] = ",".join(f"{k}={v}" for k, v in srv_copy["env"].items())
+                srv_copy["env"] = ",".join(
+                    f"{k}={v}" for k, v in srv_copy["env"].items()
+                )
             mcp_servers_list.append(srv_copy)
         config["hermes"]["mcp_servers"] = mcp_servers_list
 
-        provider_routing = yaml_data.get("provider_routing", {}) if isinstance(yaml_data, dict) else {}
+        provider_routing = (
+            yaml_data.get("provider_routing", {}) if isinstance(yaml_data, dict) else {}
+        )
         if isinstance(provider_routing, dict):
             config["hermes"]["provider_routing"] = provider_routing
 
-        fallback_model = yaml_data.get("fallback_model", {}) if isinstance(yaml_data, dict) else {}
+        fallback_model = (
+            yaml_data.get("fallback_model", {}) if isinstance(yaml_data, dict) else {}
+        )
         if isinstance(fallback_model, dict):
             config["hermes"]["fallback_model"] = fallback_model
 
-        custom_providers = yaml_data.get("custom_providers", []) if isinstance(yaml_data, dict) else []
+        custom_providers = (
+            yaml_data.get("custom_providers", []) if isinstance(yaml_data, dict) else []
+        )
         if isinstance(custom_providers, list):
             processed_providers = []
             for provider in custom_providers:
@@ -743,7 +872,7 @@ class HermesManager(BaseGatewayManager):
 
         if "gateway" not in config["hermes"]:
             config["hermes"]["gateway"] = {}
-            
+
         agent = yaml_data.get("agent", {}) if isinstance(yaml_data, dict) else {}
         if isinstance(agent, dict):
             config["hermes"]["agent"] = agent
@@ -753,15 +882,21 @@ class HermesManager(BaseGatewayManager):
         # 2. DM pairing
         # 3. Combined platform + global allowlist
         # 4. Global allow-all (GATEWAY_ALLOW_ALL_USERS) — only if both lists empty
-        config["hermes"]["gateway"]["allowed_users"] = self._split_csv(env_data.get("GATEWAY_ALLOWED_USERS", ""))
-        config["hermes"]["gateway"]["allow_all_users"] = env_data.get("GATEWAY_ALLOW_ALL_USERS", "").lower() == "true"
+        config["hermes"]["gateway"]["allowed_users"] = self._split_csv(
+            env_data.get("GATEWAY_ALLOWED_USERS", "")
+        )
+        config["hermes"]["gateway"]["allow_all_users"] = (
+            env_data.get("GATEWAY_ALLOW_ALL_USERS", "").lower() == "true"
+        )
 
         if "minimax" not in config["providers"]:
             config["providers"]["minimax"] = {"api_key": ""}
         if "minimax_cn" not in config["providers"]:
             config["providers"]["minimax_cn"] = {"api_key": ""}
         config["providers"]["minimax"]["api_key"] = env_data.get("MINIMAX_API_KEY", "")
-        config["providers"]["minimax_cn"]["api_key"] = env_data.get("MINIMAX_CN_API_KEY", "")
+        config["providers"]["minimax_cn"]["api_key"] = env_data.get(
+            "MINIMAX_CN_API_KEY", ""
+        )
 
         return config
 
@@ -777,25 +912,41 @@ class HermesManager(BaseGatewayManager):
         providers = data.get("providers", {}) if isinstance(data, dict) else {}
         channels = data.get("channels", {}) if isinstance(data, dict) else {}
         hermes_data = data.get("hermes", {}) if isinstance(data, dict) else {}
-        hermes_channels = hermes_data.get("channels", {}) if isinstance(hermes_data, dict) else {}
-        defaults = ((data.get("agents") or {}).get("defaults") or {}) if isinstance(data, dict) else {}
+        hermes_channels = (
+            hermes_data.get("channels", {}) if isinstance(hermes_data, dict) else {}
+        )
+        defaults = (
+            ((data.get("agents") or {}).get("defaults") or {})
+            if isinstance(data, dict)
+            else {}
+        )
 
         model_provider = str(defaults.get("provider", "") or "") or "auto"
         model_default = str(defaults.get("model", "") or "")
 
         yaml_out = dict(existing_yaml) if isinstance(existing_yaml, dict) else {}
-        model_out = yaml_out.get("model", {}) if isinstance(yaml_out.get("model", {}), dict) else {}
+        model_out = (
+            yaml_out.get("model", {})
+            if isinstance(yaml_out.get("model", {}), dict)
+            else {}
+        )
         model_out["provider"] = model_provider
         model_out["default"] = model_default or "anthropic/claude-3.5-sonnet"
         yaml_out["model"] = model_out
 
-        auxiliary = ((data.get("hermes") or {}).get("auxiliary")) if isinstance(data, dict) else None
+        auxiliary = (
+            ((data.get("hermes") or {}).get("auxiliary"))
+            if isinstance(data, dict)
+            else None
+        )
         if isinstance(auxiliary, dict):
             yaml_out["auxiliary"] = self._strip_secrets_for_yaml(auxiliary)
         elif "auxiliary" not in yaml_out:
             yaml_out["auxiliary"] = self._default_hermes_yaml()["auxiliary"]
 
-        compression = hermes_data.get("compression") if isinstance(hermes_data, dict) else None
+        compression = (
+            hermes_data.get("compression") if isinstance(hermes_data, dict) else None
+        )
         if isinstance(compression, dict):
             yaml_out["compression"] = compression
         elif "compression" not in yaml_out:
@@ -813,7 +964,9 @@ class HermesManager(BaseGatewayManager):
         elif "agent" not in yaml_out:
             yaml_out["agent"] = self._default_hermes_yaml()["agent"]
 
-        mcp_servers_list = hermes_data.get("mcp_servers", []) if isinstance(hermes_data, dict) else []
+        mcp_servers_list = (
+            hermes_data.get("mcp_servers", []) if isinstance(hermes_data, dict) else []
+        )
         mcp_servers_dict = {}
         for srv in mcp_servers_list:
             name = srv.get("name")
@@ -829,7 +982,7 @@ class HermesManager(BaseGatewayManager):
                 srv_out["args"] = [a.strip() for a in args_str.split(",") if a.strip()]
             else:
                 srv_out["args"] = []
-                
+
             env_str = srv.get("env", "")
             env_dict = {}
             if env_str:
@@ -839,29 +992,45 @@ class HermesManager(BaseGatewayManager):
                         env_dict[k.strip()] = v.strip()
             srv_out["env"] = env_dict
             mcp_servers_dict[name] = srv_out
-            
+
         yaml_out["mcp_servers"] = mcp_servers_dict
 
-        provider_routing = hermes_data.get("provider_routing") if isinstance(hermes_data, dict) else None
+        provider_routing = (
+            hermes_data.get("provider_routing")
+            if isinstance(hermes_data, dict)
+            else None
+        )
         if isinstance(provider_routing, dict):
             yaml_out["provider_routing"] = provider_routing
         elif "provider_routing" not in yaml_out:
-            yaml_out["provider_routing"] = self._default_hermes_yaml()["provider_routing"]
+            yaml_out["provider_routing"] = self._default_hermes_yaml()[
+                "provider_routing"
+            ]
 
-        fallback_model = hermes_data.get("fallback_model") if isinstance(hermes_data, dict) else None
+        fallback_model = (
+            hermes_data.get("fallback_model") if isinstance(hermes_data, dict) else None
+        )
         if isinstance(fallback_model, dict):
             yaml_out["fallback_model"] = fallback_model
         elif "fallback_model" not in yaml_out:
             yaml_out["fallback_model"] = self._default_hermes_yaml()["fallback_model"]
 
-        custom_providers = hermes_data.get("custom_providers") if isinstance(hermes_data, dict) else None
+        custom_providers = (
+            hermes_data.get("custom_providers")
+            if isinstance(hermes_data, dict)
+            else None
+        )
         if isinstance(custom_providers, list):
             processed_providers = []
             for provider in custom_providers:
                 if isinstance(provider, dict):
                     processed = dict(provider)
                     if isinstance(processed.get("models"), str):
-                        processed["models"] = [m.strip() for m in processed["models"].split(",") if m.strip()]
+                        processed["models"] = [
+                            m.strip()
+                            for m in processed["models"].split(",")
+                            if m.strip()
+                        ]
                     processed_providers.append(processed)
             yaml_out["custom_providers"] = processed_providers
 
@@ -875,7 +1044,9 @@ class HermesManager(BaseGatewayManager):
             env_out[key] = new_val
 
         for our_name, env_key in self.PROVIDER_ENV_KEYS.items():
-            provider_obj = providers.get(our_name, {}) if isinstance(providers, dict) else {}
+            provider_obj = (
+                providers.get(our_name, {}) if isinstance(providers, dict) else {}
+            )
             if isinstance(provider_obj, dict):
                 _safe_env_write(env_key, str(provider_obj.get("api_key", "") or ""))
 
@@ -887,65 +1058,125 @@ class HermesManager(BaseGatewayManager):
             env_out["HERMES_MODEL"] = model_default
             env_out.pop("LLM_MODEL", None)
 
-        telegram = hermes_channels.get("telegram", {}) if isinstance(hermes_channels, dict) else {}
+        telegram = (
+            hermes_channels.get("telegram", {})
+            if isinstance(hermes_channels, dict)
+            else {}
+        )
         if not isinstance(telegram, dict) or not telegram:
-            telegram = channels.get("telegram", {}) if isinstance(channels, dict) else {}
+            telegram = (
+                channels.get("telegram", {}) if isinstance(channels, dict) else {}
+            )
         if isinstance(telegram, dict):
-            _safe_env_write("TELEGRAM_BOT_TOKEN", str(telegram.get("bot_token", telegram.get("token", "")) or ""))
-            _safe_env_write("TELEGRAM_HOME_CHANNEL", str(telegram.get("home_channel", "") or ""))
-            _safe_env_write("TELEGRAM_HOME_CHANNEL_NAME", str(telegram.get("home_channel_name", "") or ""))
+            _safe_env_write(
+                "TELEGRAM_BOT_TOKEN",
+                str(telegram.get("bot_token", telegram.get("token", "")) or ""),
+            )
+            _safe_env_write(
+                "TELEGRAM_HOME_CHANNEL", str(telegram.get("home_channel", "") or "")
+            )
+            _safe_env_write(
+                "TELEGRAM_HOME_CHANNEL_NAME",
+                str(telegram.get("home_channel_name", "") or ""),
+            )
             allowed_users = telegram.get("allowed_users")
             if isinstance(allowed_users, list):
                 _safe_env_write("TELEGRAM_ALLOWED_USERS", self._join_csv(allowed_users))
             elif isinstance(allowed_users, str):
                 _safe_env_write("TELEGRAM_ALLOWED_USERS", allowed_users)
             else:
-                _safe_env_write("TELEGRAM_ALLOWED_USERS", self._join_csv(telegram.get("allow_from", [])))
-            env_out["TELEGRAM_ALLOW_ALL_USERS"] = "true" if telegram.get("allow_all_users", False) else "false"
+                _safe_env_write(
+                    "TELEGRAM_ALLOWED_USERS",
+                    self._join_csv(telegram.get("allow_from", [])),
+                )
+            env_out["TELEGRAM_ALLOW_ALL_USERS"] = (
+                "true" if telegram.get("allow_all_users", False) else "false"
+            )
 
-        discord = hermes_channels.get("discord", {}) if isinstance(hermes_channels, dict) else {}
+        discord = (
+            hermes_channels.get("discord", {})
+            if isinstance(hermes_channels, dict)
+            else {}
+        )
         if not isinstance(discord, dict) or not discord:
             discord = channels.get("discord", {}) if isinstance(channels, dict) else {}
         if isinstance(discord, dict):
-            _safe_env_write("DISCORD_BOT_TOKEN", str(discord.get("bot_token", discord.get("token", "")) or ""))
+            _safe_env_write(
+                "DISCORD_BOT_TOKEN",
+                str(discord.get("bot_token", discord.get("token", "")) or ""),
+            )
             allowed_users = discord.get("allowed_users")
             if isinstance(allowed_users, list):
                 _safe_env_write("DISCORD_ALLOWED_USERS", self._join_csv(allowed_users))
             elif isinstance(allowed_users, str):
                 _safe_env_write("DISCORD_ALLOWED_USERS", allowed_users)
             else:
-                _safe_env_write("DISCORD_ALLOWED_USERS", self._join_csv(discord.get("allow_from", [])))
-            env_out["DISCORD_ALLOW_BOTS"] = "true" if discord.get("allow_bots", False) else "false"
-            env_out["DISCORD_REQUIRE_MENTION"] = "true" if discord.get("require_mention", False) else "false"
+                _safe_env_write(
+                    "DISCORD_ALLOWED_USERS",
+                    self._join_csv(discord.get("allow_from", [])),
+                )
+            env_out["DISCORD_ALLOW_BOTS"] = (
+                "true" if discord.get("allow_bots", False) else "false"
+            )
+            env_out["DISCORD_REQUIRE_MENTION"] = (
+                "true" if discord.get("require_mention", False) else "false"
+            )
             free_response_channels = discord.get("free_response_channels", "")
             if isinstance(free_response_channels, list):
-                _safe_env_write("DISCORD_FREE_RESPONSE_CHANNELS", self._join_csv(free_response_channels))
+                _safe_env_write(
+                    "DISCORD_FREE_RESPONSE_CHANNELS",
+                    self._join_csv(free_response_channels),
+                )
             else:
-                _safe_env_write("DISCORD_FREE_RESPONSE_CHANNELS", str(free_response_channels or ""))
-            env_out["DISCORD_AUTO_THREAD"] = "true" if discord.get("auto_thread", False) else "false"
+                _safe_env_write(
+                    "DISCORD_FREE_RESPONSE_CHANNELS", str(free_response_channels or "")
+                )
+            env_out["DISCORD_AUTO_THREAD"] = (
+                "true" if discord.get("auto_thread", False) else "false"
+            )
 
-        slack = hermes_channels.get("slack", {}) if isinstance(hermes_channels, dict) else {}
+        slack = (
+            hermes_channels.get("slack", {})
+            if isinstance(hermes_channels, dict)
+            else {}
+        )
         if not isinstance(slack, dict) or not slack:
             slack = channels.get("slack", {}) if isinstance(channels, dict) else {}
         if isinstance(slack, dict):
             _safe_env_write("SLACK_BOT_TOKEN", str(slack.get("bot_token", "") or ""))
             _safe_env_write("SLACK_APP_TOKEN", str(slack.get("app_token", "") or ""))
-            _safe_env_write("SLACK_HOME_CHANNEL", str(slack.get("home_channel", "") or ""))
-            _safe_env_write("SLACK_HOME_CHANNEL_NAME", str(slack.get("home_channel_name", "") or ""))
+            _safe_env_write(
+                "SLACK_HOME_CHANNEL", str(slack.get("home_channel", "") or "")
+            )
+            _safe_env_write(
+                "SLACK_HOME_CHANNEL_NAME", str(slack.get("home_channel_name", "") or "")
+            )
             allowed_users = slack.get("allowed_users")
             if isinstance(allowed_users, list):
                 _safe_env_write("SLACK_ALLOWED_USERS", self._join_csv(allowed_users))
             elif isinstance(allowed_users, str):
                 _safe_env_write("SLACK_ALLOWED_USERS", allowed_users)
             else:
-                _safe_env_write("SLACK_ALLOWED_USERS", self._join_csv(slack.get("allow_from", [])))
-            env_out["SLACK_ALLOW_ALL_USERS"] = "true" if slack.get("allow_all_users", False) else "false"
+                _safe_env_write(
+                    "SLACK_ALLOWED_USERS", self._join_csv(slack.get("allow_from", []))
+                )
+            env_out["SLACK_ALLOW_ALL_USERS"] = (
+                "true" if slack.get("allow_all_users", False) else "false"
+            )
 
-        whatsapp = hermes_channels.get("whatsapp", {}) if isinstance(hermes_channels, dict) else {}
+        whatsapp = (
+            hermes_channels.get("whatsapp", {})
+            if isinstance(hermes_channels, dict)
+            else {}
+        )
         if not isinstance(whatsapp, dict) or not whatsapp:
-            whatsapp = channels.get("whatsapp", {}) if isinstance(channels, dict) else {}
+            whatsapp = (
+                channels.get("whatsapp", {}) if isinstance(channels, dict) else {}
+            )
         if isinstance(whatsapp, dict):
-            env_out["WHATSAPP_ENABLED"] = "true" if whatsapp.get("enabled", False) else "false"
+            env_out["WHATSAPP_ENABLED"] = (
+                "true" if whatsapp.get("enabled", False) else "false"
+            )
             _safe_env_write("WHATSAPP_MODE", str(whatsapp.get("mode", "") or ""))
             allowed_users = whatsapp.get("allowed_users")
             if isinstance(allowed_users, list):
@@ -953,33 +1184,66 @@ class HermesManager(BaseGatewayManager):
             elif isinstance(allowed_users, str):
                 _safe_env_write("WHATSAPP_ALLOWED_USERS", allowed_users)
             else:
-                _safe_env_write("WHATSAPP_ALLOWED_USERS", self._join_csv(whatsapp.get("allow_from", [])))
-            env_out["WHATSAPP_ALLOW_ALL_USERS"] = "true" if whatsapp.get("allow_all_users", False) else "false"
+                _safe_env_write(
+                    "WHATSAPP_ALLOWED_USERS",
+                    self._join_csv(whatsapp.get("allow_from", [])),
+                )
+            env_out["WHATSAPP_ALLOW_ALL_USERS"] = (
+                "true" if whatsapp.get("allow_all_users", False) else "false"
+            )
 
-        signal_data = hermes_channels.get("signal", {}) if isinstance(hermes_channels, dict) else {}
+        signal_data = (
+            hermes_channels.get("signal", {})
+            if isinstance(hermes_channels, dict)
+            else {}
+        )
         if not isinstance(signal_data, dict) or not signal_data:
-            signal_data = channels.get("signal", {}) if isinstance(channels, dict) else {}
+            signal_data = (
+                channels.get("signal", {}) if isinstance(channels, dict) else {}
+            )
         if isinstance(signal_data, dict):
-            _safe_env_write("SIGNAL_HTTP_URL", str(signal_data.get("http_url", "") or ""))
+            _safe_env_write(
+                "SIGNAL_HTTP_URL", str(signal_data.get("http_url", "") or "")
+            )
             _safe_env_write("SIGNAL_ACCOUNT", str(signal_data.get("account", "") or ""))
-            env_out["SIGNAL_IGNORE_STORIES"] = "true" if signal_data.get("ignore_stories", False) else "false"
-            _safe_env_write("SIGNAL_HOME_CHANNEL", str(signal_data.get("home_channel", "") or ""))
-            _safe_env_write("SIGNAL_HOME_CHANNEL_NAME", str(signal_data.get("home_channel_name", "") or ""))
+            env_out["SIGNAL_IGNORE_STORIES"] = (
+                "true" if signal_data.get("ignore_stories", False) else "false"
+            )
+            _safe_env_write(
+                "SIGNAL_HOME_CHANNEL", str(signal_data.get("home_channel", "") or "")
+            )
+            _safe_env_write(
+                "SIGNAL_HOME_CHANNEL_NAME",
+                str(signal_data.get("home_channel_name", "") or ""),
+            )
             group_allowed_users = signal_data.get("group_allowed_users", "")
             if isinstance(group_allowed_users, list):
-                _safe_env_write("SIGNAL_GROUP_ALLOWED_USERS", self._join_csv(group_allowed_users))
+                _safe_env_write(
+                    "SIGNAL_GROUP_ALLOWED_USERS", self._join_csv(group_allowed_users)
+                )
             else:
-                _safe_env_write("SIGNAL_GROUP_ALLOWED_USERS", str(group_allowed_users or ""))
+                _safe_env_write(
+                    "SIGNAL_GROUP_ALLOWED_USERS", str(group_allowed_users or "")
+                )
             allowed_users = signal_data.get("allowed_users")
             if isinstance(allowed_users, list):
                 _safe_env_write("SIGNAL_ALLOWED_USERS", self._join_csv(allowed_users))
             elif isinstance(allowed_users, str):
                 _safe_env_write("SIGNAL_ALLOWED_USERS", allowed_users)
             else:
-                _safe_env_write("SIGNAL_ALLOWED_USERS", self._join_csv(signal_data.get("allow_from", [])))
-            env_out["SIGNAL_ALLOW_ALL_USERS"] = "true" if signal_data.get("allow_all_users", False) else "false"
+                _safe_env_write(
+                    "SIGNAL_ALLOWED_USERS",
+                    self._join_csv(signal_data.get("allow_from", [])),
+                )
+            env_out["SIGNAL_ALLOW_ALL_USERS"] = (
+                "true" if signal_data.get("allow_all_users", False) else "false"
+            )
 
-        email = hermes_channels.get("email", {}) if isinstance(hermes_channels, dict) else {}
+        email = (
+            hermes_channels.get("email", {})
+            if isinstance(hermes_channels, dict)
+            else {}
+        )
         if not isinstance(email, dict) or not email:
             email = channels.get("email", {}) if isinstance(channels, dict) else {}
         if isinstance(email, dict):
@@ -989,28 +1253,55 @@ class HermesManager(BaseGatewayManager):
             _safe_env_write("EMAIL_SMTP_HOST", str(email.get("smtp_host", "") or ""))
             _safe_env_write("EMAIL_IMAP_PORT", str(email.get("imap_port", "") or ""))
             _safe_env_write("EMAIL_SMTP_PORT", str(email.get("smtp_port", "") or ""))
-            _safe_env_write("EMAIL_POLL_INTERVAL", str(email.get("poll_interval", "") or ""))
-            _safe_env_write("EMAIL_HOME_ADDRESS", str(email.get("home_address", "") or ""))
-            _safe_env_write("EMAIL_HOME_ADDRESS_NAME", str(email.get("home_address_name", "") or ""))
+            _safe_env_write(
+                "EMAIL_POLL_INTERVAL", str(email.get("poll_interval", "") or "")
+            )
+            _safe_env_write(
+                "EMAIL_HOME_ADDRESS", str(email.get("home_address", "") or "")
+            )
+            _safe_env_write(
+                "EMAIL_HOME_ADDRESS_NAME", str(email.get("home_address_name", "") or "")
+            )
             allowed_users = email.get("allowed_users")
             if isinstance(allowed_users, list):
                 _safe_env_write("EMAIL_ALLOWED_USERS", self._join_csv(allowed_users))
             elif isinstance(allowed_users, str):
                 _safe_env_write("EMAIL_ALLOWED_USERS", allowed_users)
             else:
-                _safe_env_write("EMAIL_ALLOWED_USERS", self._join_csv(email.get("allow_from", [])))
-            env_out["EMAIL_ALLOW_ALL_USERS"] = "true" if email.get("allow_all_users", False) else "false"
+                _safe_env_write(
+                    "EMAIL_ALLOWED_USERS", self._join_csv(email.get("allow_from", []))
+                )
+            env_out["EMAIL_ALLOW_ALL_USERS"] = (
+                "true" if email.get("allow_all_users", False) else "false"
+            )
 
-        homeassistant = hermes_channels.get("homeassistant", {}) if isinstance(hermes_channels, dict) else {}
+        homeassistant = (
+            hermes_channels.get("homeassistant", {})
+            if isinstance(hermes_channels, dict)
+            else {}
+        )
         if not isinstance(homeassistant, dict) or not homeassistant:
-            homeassistant = channels.get("homeassistant", {}) if isinstance(channels, dict) else {}
+            homeassistant = (
+                channels.get("homeassistant", {}) if isinstance(channels, dict) else {}
+            )
         if isinstance(homeassistant, dict):
-            _safe_env_write("HASS_TOKEN", str(homeassistant.get("token", homeassistant.get("hass_token", "")) or ""))
+            _safe_env_write(
+                "HASS_TOKEN",
+                str(
+                    homeassistant.get("token", homeassistant.get("hass_token", ""))
+                    or ""
+                ),
+            )
             _safe_env_write("HASS_URL", str(homeassistant.get("url", "") or ""))
 
-        gateway_data = hermes_data.get("gateway", {}) if isinstance(hermes_data, dict) else {}
+        gateway_data = (
+            hermes_data.get("gateway", {}) if isinstance(hermes_data, dict) else {}
+        )
         if isinstance(gateway_data, dict):
-            _safe_env_write("GATEWAY_ALLOWED_USERS", self._join_csv(gateway_data.get("allowed_users", [])))
+            _safe_env_write(
+                "GATEWAY_ALLOWED_USERS",
+                self._join_csv(gateway_data.get("allowed_users", [])),
+            )
             allow_all = gateway_data.get("allow_all_users", False)
             if isinstance(allow_all, str):
                 allow_all = allow_all.lower() == "true"
@@ -1047,10 +1338,16 @@ class HermesManager(BaseGatewayManager):
                     result[k] = existing_data[k]
                     continue
                 v = new_data[k]
-                if k in self.SECRET_FIELDS and isinstance(v, str) and (v.endswith("***") or v == ""):
+                if (
+                    k in self.SECRET_FIELDS
+                    and isinstance(v, str)
+                    and (v.endswith("***") or v == "")
+                ):
                     result[k] = existing_data.get(k, "")
                 else:
-                    result[k] = self.merge_secrets(v, existing_data.get(k, {}), f"{_path}.{k}")
+                    result[k] = self.merge_secrets(
+                        v, existing_data.get(k, {}), f"{_path}.{k}"
+                    )
             return result
         return new_data
 
@@ -1069,7 +1366,7 @@ class HermesManager(BaseGatewayManager):
         platform: str | None = None,
         code: str | None = None,
         user_id: str | None = None,
-        timeout_seconds: int = 20
+        timeout_seconds: int = 20,
     ) -> dict:
         if operation not in self.PAIRING_COMMANDS:
             return {
@@ -1145,8 +1442,7 @@ class HermesManager(BaseGatewayManager):
 
             try:
                 stdout_bytes, stderr_bytes = await asyncio.wait_for(
-                    process.communicate(),
-                    timeout=timeout_seconds
+                    process.communicate(), timeout=timeout_seconds
                 )
                 duration_ms = int((time.time() - start_time) * 1000)
                 return {
@@ -1232,22 +1528,22 @@ def get_active_manager() -> BaseGatewayManager:
 
 def _append_pairing_audit(event: dict) -> None:
     """Append a pairing operation event to the audit log.
-    
+
     Writes JSONL to ~/.hermes/pairing-audit.log.
     Handles write failures gracefully without crashing the API.
     Redacts sensitive pairing codes before logging.
-    
+
     Args:
-        event: Dict with fields: operation, platform, actor, ok, exit_code, 
+        event: Dict with fields: operation, platform, actor, ok, exit_code,
                duration_ms, stderr_summary, and optionally code (will be redacted)
     """
     try:
-        audit_dir = Path.home() / ".hermes"
+        audit_dir = Path(os.environ.get("HERMES_HOME", Path.home() / ".hermes"))
         audit_file = audit_dir / "pairing-audit.log"
-        
+
         # Create directory if needed
         audit_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # Redact sensitive data
         audit_entry = dict(event)
         if "code" in audit_entry and audit_entry["code"]:
@@ -1255,11 +1551,11 @@ def _append_pairing_audit(event: dict) -> None:
             full_code = str(audit_entry["code"])
             audit_entry["code_last2"] = full_code[-2:] if len(full_code) >= 2 else "**"
             del audit_entry["code"]
-        
+
         # Ensure timestamp
         if "timestamp" not in audit_entry:
             audit_entry["timestamp"] = time.time()
-        
+
         # Append as JSONL
         with open(audit_file, "a") as f:
             f.write(json.dumps(audit_entry) + "\n")
@@ -1267,301 +1563,290 @@ def _append_pairing_audit(event: dict) -> None:
         # Fail silently - audit logging should never break operations
         print(f"Failed to write pairing audit log: {e}")
 
+
 async def api_hermes_pairing_list(request: Request):
     """List pending Hermes pairing requests.
-    
+
     GET /api/hermes/pairing/list
-    
+
     Requires active_backend == "hermes".
     """
     # 1. Auth check
     auth_err = require_auth(request)
     if auth_err:
         return auth_err
-    
+
     # 2. Backend guard
     if active_backend != "hermes":
-        return JSONResponse(
-            {"error": "Hermes backend not active"},
-            status_code=409
-        )
-    
+        return JSONResponse({"error": "Hermes backend not active"}, status_code=409)
+
     # 3. Acquire lock and run operation
     async with pairing_ops_lock:
         result = await hermes_gateway.run_pairing_operation("list")
-    
+
     # 4. Append audit
-    _append_pairing_audit({
-        "operation": "list",
-        "actor": request.user.display_name,
-        "ok": result.get("ok", False),
-        "exit_code": result.get("exit_code", -1),
-        "duration_ms": result.get("duration_ms", 0),
-        "stderr_summary": result.get("stderr", "")[:200],
-    })
-    
+    _append_pairing_audit(
+        {
+            "operation": "list",
+            "actor": request.user.display_name,
+            "ok": result.get("ok", False),
+            "exit_code": result.get("exit_code", -1),
+            "duration_ms": result.get("duration_ms", 0),
+            "stderr_summary": result.get("stderr", "")[:200],
+        }
+    )
+
     # 5. Return response based on status mapping
     if not result.get("ok"):
         exit_code = result.get("exit_code", -1)
         if exit_code == -1 and "timed out" in result.get("stderr", "").lower():
             return JSONResponse(
                 {"error": "Operation timed out", "details": result.get("stderr", "")},
-                status_code=504
+                status_code=504,
             )
         return JSONResponse(
             {"error": "Operation failed", "details": result.get("stderr", "")},
-            status_code=502
+            status_code=502,
         )
-    
-    return JSONResponse({
-        "ok": True,
-        "operation": "list",
-        "stdout": result.get("stdout", ""),
-        "duration_ms": result.get("duration_ms", 0),
-    })
+
+    return JSONResponse(
+        {
+            "ok": True,
+            "operation": "list",
+            "stdout": result.get("stdout", ""),
+            "duration_ms": result.get("duration_ms", 0),
+        }
+    )
 
 
 async def api_hermes_pairing_approve(request: Request):
     """Approve a Hermes pairing request.
-    
+
     POST /api/hermes/pairing/approve
     Body: {platform: string, code: string}
-    
+
     Requires active_backend == "hermes".
     """
     # 1. Auth check
     auth_err = require_auth(request)
     if auth_err:
         return auth_err
-    
+
     # 2. Backend guard
     if active_backend != "hermes":
-        return JSONResponse(
-            {"error": "Hermes backend not active"},
-            status_code=409
-        )
-    
+        return JSONResponse({"error": "Hermes backend not active"}, status_code=409)
+
     # 3. Parse and validate payload
     try:
         body = await request.json()
     except Exception:
         return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
-    
+
     platform = body.get("platform")
     code = body.get("code")
-    
+
     if not platform or not code:
         return JSONResponse(
             {"error": "Missing required fields: platform and code are required"},
-            status_code=400
+            status_code=400,
         )
-    
+
     # Validate using validators from Task 1
     try:
         validated_platform = _validate_pairing_platform(platform)
     except ValueError as e:
-        return JSONResponse(
-            {"error": f"Invalid platform: {str(e)}"},
-            status_code=400
-        )
-    
+        return JSONResponse({"error": f"Invalid platform: {str(e)}"}, status_code=400)
+
     try:
         validated_code = _validate_pairing_code(code)
     except ValueError as e:
-        return JSONResponse(
-            {"error": f"Invalid code: {str(e)}"},
-            status_code=400
-        )
-    
+        return JSONResponse({"error": f"Invalid code: {str(e)}"}, status_code=400)
+
     # 4. Acquire lock and run operation
     async with pairing_ops_lock:
         result = await hermes_gateway.run_pairing_operation(
-            "approve",
-            platform=validated_platform,
-            code=validated_code
+            "approve", platform=validated_platform, code=validated_code
         )
-    
+
     # 5. Append audit
-    _append_pairing_audit({
-        "operation": "approve",
-        "platform": validated_platform,
-        "actor": request.user.display_name,
-        "ok": result.get("ok", False),
-        "exit_code": result.get("exit_code", -1),
-        "duration_ms": result.get("duration_ms", 0),
-        "stderr_summary": result.get("stderr", "")[:200],
-        "code": validated_code,  # Will be redacted by audit function
-    })
-    
+    _append_pairing_audit(
+        {
+            "operation": "approve",
+            "platform": validated_platform,
+            "actor": request.user.display_name,
+            "ok": result.get("ok", False),
+            "exit_code": result.get("exit_code", -1),
+            "duration_ms": result.get("duration_ms", 0),
+            "stderr_summary": result.get("stderr", "")[:200],
+            "code": validated_code,  # Will be redacted by audit function
+        }
+    )
+
     # 6. Return response based on status mapping
     if not result.get("ok"):
         exit_code = result.get("exit_code", -1)
         if exit_code == -1 and "timed out" in result.get("stderr", "").lower():
             return JSONResponse(
                 {"error": "Operation timed out", "details": result.get("stderr", "")},
-                status_code=504
+                status_code=504,
             )
         return JSONResponse(
             {"error": "Operation failed", "details": result.get("stderr", "")},
-            status_code=502
+            status_code=502,
         )
-    
-    return JSONResponse({
-        "ok": True,
-        "operation": "approve",
-        "platform": validated_platform,
-        "stdout": result.get("stdout", ""),
-        "duration_ms": result.get("duration_ms", 0),
-    })
+
+    return JSONResponse(
+        {
+            "ok": True,
+            "operation": "approve",
+            "platform": validated_platform,
+            "stdout": result.get("stdout", ""),
+            "duration_ms": result.get("duration_ms", 0),
+        }
+    )
 
 
 async def api_hermes_pairing_revoke(request: Request):
     """Revoke a Hermes pairing for a specific user.
-    
+
     POST /api/hermes/pairing/revoke
     Body: {platform: string, user_id: string}
-    
+
     Requires active_backend == "hermes".
     """
     # 1. Auth check
     auth_err = require_auth(request)
     if auth_err:
         return auth_err
-    
+
     # 2. Backend guard
     if active_backend != "hermes":
-        return JSONResponse(
-            {"error": "Hermes backend not active"},
-            status_code=409
-        )
-    
+        return JSONResponse({"error": "Hermes backend not active"}, status_code=409)
+
     # 3. Parse and validate payload
     try:
         body = await request.json()
     except Exception:
         return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
-    
+
     platform = body.get("platform")
     user_id = body.get("user_id")
-    
+
     if not platform or not user_id:
         return JSONResponse(
             {"error": "Missing required fields: platform and user_id are required"},
-            status_code=400
+            status_code=400,
         )
-    
+
     # Validate using validators from Task 1
     try:
         validated_platform = _validate_pairing_platform(platform)
     except ValueError as e:
-        return JSONResponse(
-            {"error": f"Invalid platform: {str(e)}"},
-            status_code=400
-        )
-    
+        return JSONResponse({"error": f"Invalid platform: {str(e)}"}, status_code=400)
+
     try:
         validated_user_id = _validate_pairing_user_id(user_id)
     except ValueError as e:
-        return JSONResponse(
-            {"error": f"Invalid user_id: {str(e)}"},
-            status_code=400
-        )
-    
+        return JSONResponse({"error": f"Invalid user_id: {str(e)}"}, status_code=400)
+
     # 4. Acquire lock and run operation
     async with pairing_ops_lock:
         result = await hermes_gateway.run_pairing_operation(
-            "revoke",
-            platform=validated_platform,
-            user_id=validated_user_id
+            "revoke", platform=validated_platform, user_id=validated_user_id
         )
-    
+
     # 5. Append audit
-    _append_pairing_audit({
-        "operation": "revoke",
-        "platform": validated_platform,
-        "actor": request.user.display_name,
-        "ok": result.get("ok", False),
-        "exit_code": result.get("exit_code", -1),
-        "duration_ms": result.get("duration_ms", 0),
-        "stderr_summary": result.get("stderr", "")[:200],
-    })
-    
+    _append_pairing_audit(
+        {
+            "operation": "revoke",
+            "platform": validated_platform,
+            "actor": request.user.display_name,
+            "ok": result.get("ok", False),
+            "exit_code": result.get("exit_code", -1),
+            "duration_ms": result.get("duration_ms", 0),
+            "stderr_summary": result.get("stderr", "")[:200],
+        }
+    )
+
     # 6. Return response based on status mapping
     if not result.get("ok"):
         exit_code = result.get("exit_code", -1)
         if exit_code == -1 and "timed out" in result.get("stderr", "").lower():
             return JSONResponse(
                 {"error": "Operation timed out", "details": result.get("stderr", "")},
-                status_code=504
+                status_code=504,
             )
         return JSONResponse(
             {"error": "Operation failed", "details": result.get("stderr", "")},
-            status_code=502
+            status_code=502,
         )
-    
-    return JSONResponse({
-        "ok": True,
-        "operation": "revoke",
-        "platform": validated_platform,
-        "user_id": validated_user_id,
-        "stdout": result.get("stdout", ""),
-        "duration_ms": result.get("duration_ms", 0),
-    })
+
+    return JSONResponse(
+        {
+            "ok": True,
+            "operation": "revoke",
+            "platform": validated_platform,
+            "user_id": validated_user_id,
+            "stdout": result.get("stdout", ""),
+            "duration_ms": result.get("duration_ms", 0),
+        }
+    )
 
 
 async def api_hermes_pairing_clear_pending(request: Request):
     """Clear all pending Hermes pairing requests.
-    
+
     POST /api/hermes/pairing/clear-pending
     Body: none (global clear operation)
-    
+
     Requires active_backend == "hermes".
     """
     # 1. Auth check
     auth_err = require_auth(request)
     if auth_err:
         return auth_err
-    
+
     # 2. Backend guard
     if active_backend != "hermes":
-        return JSONResponse(
-            {"error": "Hermes backend not active"},
-            status_code=409
-        )
-    
+        return JSONResponse({"error": "Hermes backend not active"}, status_code=409)
+
     # 3. Acquire lock and run operation (no payload validation needed)
     async with pairing_ops_lock:
         result = await hermes_gateway.run_pairing_operation("clear-pending")
-    
+
     # 4. Append audit
-    _append_pairing_audit({
-        "operation": "clear-pending",
-        "actor": request.user.display_name,
-        "ok": result.get("ok", False),
-        "exit_code": result.get("exit_code", -1),
-        "duration_ms": result.get("duration_ms", 0),
-        "stderr_summary": result.get("stderr", "")[:200],
-    })
-    
+    _append_pairing_audit(
+        {
+            "operation": "clear-pending",
+            "actor": request.user.display_name,
+            "ok": result.get("ok", False),
+            "exit_code": result.get("exit_code", -1),
+            "duration_ms": result.get("duration_ms", 0),
+            "stderr_summary": result.get("stderr", "")[:200],
+        }
+    )
+
     # 5. Return response based on status mapping
     if not result.get("ok"):
         exit_code = result.get("exit_code", -1)
         if exit_code == -1 and "timed out" in result.get("stderr", "").lower():
             return JSONResponse(
                 {"error": "Operation timed out", "details": result.get("stderr", "")},
-                status_code=504
+                status_code=504,
             )
         return JSONResponse(
             {"error": "Operation failed", "details": result.get("stderr", "")},
-            status_code=502
+            status_code=502,
         )
-    
-    return JSONResponse({
-        "ok": True,
-        "operation": "clear-pending",
-        "stdout": result.get("stdout", ""),
-        "duration_ms": result.get("duration_ms", 0),
-    })
+
+    return JSONResponse(
+        {
+            "ok": True,
+            "operation": "clear-pending",
+            "stdout": result.get("stdout", ""),
+            "duration_ms": result.get("duration_ms", 0),
+        }
+    )
 
 
 async def homepage(request: Request):
@@ -1612,27 +1897,29 @@ async def api_config_put(request: Request):
 
 
 async def api_status(request: Request):
-     auth_err = require_auth(request)
-     if auth_err:
-         return auth_err
+    auth_err = require_auth(request)
+    if auth_err:
+        return auth_err
 
-     manager = get_active_manager()
-     config = manager.read_config()
+    manager = get_active_manager()
+    config = manager.read_config()
 
-     providers = {}
-     for name, prov in config.get("providers", {}).items():
-         providers[name] = {"configured": bool(prov.get("api_key"))}
+    providers = {}
+    for name, prov in config.get("providers", {}).items():
+        providers[name] = {"configured": bool(prov.get("api_key"))}
 
-     channels = {}
-     for name, chan in config.get("channels", {}).items():
-         channels[name] = {"enabled": chan.get("enabled", False)}
+    channels = {}
+    for name, chan in config.get("channels", {}).items():
+        channels[name] = {"enabled": chan.get("enabled", False)}
 
-     return JSONResponse({
-         "backend": active_backend,
-         "gateway": manager.get_status(),
-         "providers": providers,
-         "channels": channels,
-     })
+    return JSONResponse(
+        {
+            "backend": active_backend,
+            "gateway": manager.get_status(),
+            "providers": providers,
+            "channels": channels,
+        }
+    )
 
 
 async def api_audit(request: Request):
@@ -1666,11 +1953,15 @@ async def api_audit(request: Request):
             session_files = []
         for f in session_files:
             try:
-                sessions.append({
-                    "id": f.stem,
-                    "date": f.stat().st_mtime,
-                    "message_count": len([l for l in f.read_text().splitlines() if l.strip()]),
-                })
+                sessions.append(
+                    {
+                        "id": f.stem,
+                        "date": f.stat().st_mtime,
+                        "message_count": len(
+                            [l for l in f.read_text().splitlines() if l.strip()]
+                        ),
+                    }
+                )
             except Exception:
                 pass
 
@@ -1685,28 +1976,36 @@ async def api_audit(request: Request):
                 meta = json.loads((d / "_meta.json").read_text())
             except Exception:
                 pass
-            skills.append({
-                "name": meta.get("name", d.name),
-                "description": meta.get("description", ""),
-                "version": meta.get("version", ""),
-            })
+            skills.append(
+                {
+                    "name": meta.get("name", d.name),
+                    "description": meta.get("description", ""),
+                    "version": meta.get("version", ""),
+                }
+            )
 
     if active_backend == "picoclaw":
         mcp_servers = []
-        for name, srv in config.get("tools", {}).get("mcp", {}).get("servers", {}).items():
-            mcp_servers.append({
-                "name": name,
-                "type": srv.get("type", "command"),
-                "command_or_url": srv.get("command") or srv.get("url", ""),
-            })
+        for name, srv in (
+            config.get("tools", {}).get("mcp", {}).get("servers", {}).items()
+        ):
+            mcp_servers.append(
+                {
+                    "name": name,
+                    "type": srv.get("type", "command"),
+                    "command_or_url": srv.get("command") or srv.get("url", ""),
+                }
+            )
     else:
         mcp_servers = []
         for srv in config.get("hermes", {}).get("mcp_servers", []):
-            mcp_servers.append({
-                "name": srv.get("name", ""),
-                "type": srv.get("type", "command"),
-                "command_or_url": srv.get("command", ""),
-            })
+            mcp_servers.append(
+                {
+                    "name": srv.get("name", ""),
+                    "type": srv.get("type", "command"),
+                    "command_or_url": srv.get("command", ""),
+                }
+            )
 
     if active_backend == "picoclaw":
         tools = {}
@@ -1718,14 +2017,16 @@ async def api_audit(request: Request):
     else:
         tools = {}
 
-    return JSONResponse({
-        "backend": active_backend,
-        "cron": {"count": len(cron_jobs), "jobs": cron_jobs},
-        "sessions": sessions,
-        "skills": skills,
-        "mcp_servers": mcp_servers,
-        "tools": tools,
-    })
+    return JSONResponse(
+        {
+            "backend": active_backend,
+            "cron": {"count": len(cron_jobs), "jobs": cron_jobs},
+            "sessions": sessions,
+            "skills": skills,
+            "mcp_servers": mcp_servers,
+            "tools": tools,
+        }
+    )
 
 
 async def api_logs(request: Request):
@@ -1765,63 +2066,67 @@ async def api_backend_get(request: Request):
     auth_err = require_auth(request)
     if auth_err:
         return auth_err
-    return JSONResponse({
-        "backend": active_backend,
-        "available": AVAILABLE_BACKENDS,
-    })
+    return JSONResponse(
+        {
+            "backend": active_backend,
+            "available": AVAILABLE_BACKENDS,
+        }
+    )
 
 
 async def api_backend_post(request: Request):
     """Switch active backend."""
     global active_backend, switching_backend
-    
+
     auth_err = require_auth(request)
     if auth_err:
         return auth_err
-    
+
     # Prevent concurrent switches
     if switching_backend:
-        return JSONResponse({"error": "Backend switch already in progress"}, status_code=409)
-    
+        return JSONResponse(
+            {"error": "Backend switch already in progress"}, status_code=409
+        )
+
     try:
         body = await request.json()
     except Exception:
         return JSONResponse({"error": "Invalid JSON"}, status_code=400)
-    
+
     new_backend = body.get("backend")
-    
+
     # Validate backend name
     if new_backend not in AVAILABLE_BACKENDS:
         return JSONResponse(
             {"error": f"Invalid backend. Available: {AVAILABLE_BACKENDS}"},
-            status_code=400
+            status_code=400,
         )
-    
+
     # Early return if already on requested backend
     if new_backend == active_backend:
         return JSONResponse({"backend": new_backend, "status": "ok"})
-    
+
     # Check if requested backend manager exists
     if new_backend not in managers:
         return JSONResponse(
             {"error": f"Backend '{new_backend}' not installed or not available yet"},
-            status_code=503
+            status_code=503,
         )
-    
+
     try:
         switching_backend = True
-        
+
         # Stop current gateway if running
         current_manager = get_active_manager()
         if current_manager.process and current_manager.process.returncode is None:
             await current_manager.stop()
-        
+
         # Switch backend
         active_backend = new_backend
-        
+
         # Persist choice
         save_backend_meta(new_backend)
-        
+
         return JSONResponse({"backend": new_backend, "status": "ok"})
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)
@@ -1831,13 +2136,13 @@ async def api_backend_post(request: Request):
 
 async def auto_start_gateway():
     global active_backend
-    
+
     meta = load_backend_meta()
     active_backend = meta.get("backend", "picoclaw")
-    
+
     if active_backend not in managers:
         active_backend = "picoclaw"
-    
+
     manager = get_active_manager()
     config = manager.read_config()
     has_key = False
@@ -1874,7 +2179,11 @@ routes = [
     Route("/api/hermes/pairing/list", api_hermes_pairing_list, methods=["GET"]),
     Route("/api/hermes/pairing/approve", api_hermes_pairing_approve, methods=["POST"]),
     Route("/api/hermes/pairing/revoke", api_hermes_pairing_revoke, methods=["POST"]),
-    Route("/api/hermes/pairing/clear-pending", api_hermes_pairing_clear_pending, methods=["POST"]),
+    Route(
+        "/api/hermes/pairing/clear-pending",
+        api_hermes_pairing_clear_pending,
+        methods=["POST"],
+    ),
 ]
 
 app = Starlette(
@@ -1895,7 +2204,9 @@ if __name__ == "__main__":
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
-    config = uvicorn.Config(app, host="0.0.0.0", port=port, log_level="info", loop="asyncio")
+    config = uvicorn.Config(
+        app, host="0.0.0.0", port=port, log_level="info", loop="asyncio"
+    )
     server = uvicorn.Server(config)
 
     def handle_signal():

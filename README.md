@@ -120,6 +120,7 @@ python server.py
 | `ADMIN_PASSWORD` | *(auto-generated)* | Basic Auth password. Printed at startup if not set. |
 | `PICOCLAW_VERSION` | `main` | Git branch/tag to build PicoClaw from |
 | `PORT` | `8080` | Server listen port |
+| `HERMES_HOME` | `/data/.hermes` | Hermes Agent config directory (config.yaml, .env, skills symlink) |
 
 ### Persistent Data
 

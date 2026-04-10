@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Allow custom Hermes home directory via HERMES_HOME env var (default: /data/.hermes)
+HERMES_HOME="${HERMES_HOME:-/data/.hermes}"
+
 mkdir -p /data/.picoclaw/workspace
 mkdir -p /data/.picoclaw/sessions
 mkdir -p /data/.picoclaw/cron
@@ -30,24 +33,24 @@ if [ ! -f /data/.picoclaw/config.json ]; then
 fi
 
 # Ensure Hermes directory exists
-mkdir -p /data/.hermes
+mkdir -p "$HERMES_HOME"
 
 # Hermes skill discovery path remediation
 # Keep /data/.picoclaw/workspace/skills as canonical source-of-truth
-# Create symlink /data/.hermes/skills -> /data/.picoclaw/workspace/skills
-HERMES_SKILLS_PATH="/data/.hermes/skills"
+# Create symlink $HERMES_HOME/skills -> /data/.picoclaw/workspace/skills
+HERMES_SKILLS_PATH="$HERMES_HOME/skills"
 PICOCLAW_SKILLS_PATH="/data/.picoclaw/workspace/skills"
 
-# Handle edge case: if /data/.hermes/skills exists as a real directory (not symlink)
+# Handle edge case: if $HERMES_HOME/skills exists as a real directory (not symlink)
 # Merge missing entries into canonical path, then archive the legacy directory
 if [ -d "$HERMES_SKILLS_PATH" ] && [ ! -L "$HERMES_SKILLS_PATH" ]; then
     echo "Found legacy Hermes skills directory, migrating to canonical path..."
-    
+
     # Copy any skills from legacy location that don't exist in canonical path (non-clobber)
     cp -rn "$HERMES_SKILLS_PATH"/* "$PICOCLAW_SKILLS_PATH"/ 2>/dev/null || true
-    
+
     # Archive legacy directory with timestamp
-    LEGACY_ARCHIVE="/data/.hermes/skills.backup.$(date +%Y%m%d%H%M%S)"
+    LEGACY_ARCHIVE="$HERMES_HOME/skills.backup.$(date +%Y%m%d%H%M%S)"
     mv "$HERMES_SKILLS_PATH" "$LEGACY_ARCHIVE"
     echo "Archived legacy skills to $LEGACY_ARCHIVE"
 fi
@@ -66,8 +69,8 @@ ln -s "$PICOCLAW_SKILLS_PATH" "$HERMES_SKILLS_PATH"
 echo "Linked Hermes skills path to canonical location"
 
 # Create default Hermes config if not exists
-if [ ! -f /data/.hermes/config.yaml ]; then
-    cat > /data/.hermes/config.yaml << 'EOF'
+if [ ! -f "$HERMES_HOME/config.yaml" ]; then
+    cat > "$HERMES_HOME/config.yaml" << 'EOF'
 model:
   provider: "auto"
   default: "anthropic/claude-3.5-sonnet"
@@ -80,8 +83,8 @@ EOF
 fi
 
 # Create empty .env if not exists
-if [ ! -f /data/.hermes/.env ]; then
-    touch /data/.hermes/.env
+if [ ! -f "$HERMES_HOME/.env" ]; then
+    touch "$HERMES_HOME/.env"
 fi
 
 # Create gateway meta file if not exists
