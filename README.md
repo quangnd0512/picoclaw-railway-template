@@ -1,211 +1,261 @@
-# PicoClaw Railway Template (1-click deploy)
+# Agent Gateway UI
 
-This repo packages **PicoClaw** for Railway with a web-based configuration UI and gateway management dashboard.
+A unified web dashboard for managing AI agent backends — configure providers, channels, tools, and monitor gateway status across multiple agent runtimes from a single interface.
 
-## What you get
+**Supported Backends:** [PicoClaw](https://github.com/sipeed/picoclaw) · [Hermes Agent](https://github.com/NousResearch/hermes-agent)
 
-- **PicoClaw Gateway** managed as a subprocess with auto-restart
-- A web **Configuration UI** at `/` (protected by Basic Auth) for editing providers, channels, agent defaults, and tools
-- A **Status Dashboard** with live gateway state, provider/channel status, cron jobs, and real-time logs
-- Persistent state via **Railway Volume** (config, workspace, sessions, and cron survive redeploys)
+---
 
-## How it works
+## Architecture
 
-- The container builds PicoClaw from source and runs a Python web server alongside it
-- The web server provides a configuration editor that reads/writes `~/.picoclaw/config.json` directly
-- On startup, if any provider API key is configured, the gateway starts automatically
-- The gateway subprocess output is captured into a 500-line log buffer viewable from the Status tab
+```
+┌─────────────────────────────────────────────────────┐
+│                   Browser (React)                    │
+│  Dashboard · Providers · Channels · Tools · Status   │
+└───────────────────────┬─────────────────────────────┘
+                        │ HTTP (Basic Auth)
+┌───────────────────────┴─────────────────────────────┐
+│              Python Server (Starlette)               │
+│  Config API · Secret Masking · Process Lifecycle     │
+└──────────┬─────────────────────────────┬────────────┘
+           │                             │
+    ┌──────┴──────┐              ┌───────┴──────┐
+    │  PicoClaw   │              │    Hermes    │
+    │  Gateway    │              │    Agent     │
+    └─────────────┘              └──────────────┘
+```
 
-## Environment variables
+The server runs your chosen agent backend as a subprocess, intercepts stdout/stderr for live log streaming, and exposes a REST API for the React frontend to manage everything — no shell access needed for most operations.
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `ADMIN_USERNAME` | `admin` | Username for Basic Auth |
-| `ADMIN_PASSWORD` | *(auto-generated)* | Password for Basic Auth. **Check deploy logs for the generated password if not set.** |
-| `PICOCLAW_VERSION` | `main` | Git branch/tag to build PicoClaw from |
+## Features
 
-## Getting chat tokens
+### Multi-Backend Support
+- **PicoClaw** — lightweight gateway with JSON config
+- **Hermes Agent** — full-featured agent with YAML config, .env secrets, and MCP server support
+- One-click backend switching from the UI — the server stops the current gateway, persists your choice, and starts the new one
 
-### Telegram bot token
+### Configuration Management
+- **Providers** — Anthropic, OpenAI, OpenRouter, DeepSeek, Groq, Gemini, Zhipu, vLLM, NVIDIA, Moonshot, MiniMax
+- **Channels** — Telegram, Discord, Slack, WhatsApp, Signal, Email, HomeAssistant, Feishu, DingTalk, QQ, Line, MaixCam
+- **Agent Defaults** — model selection, token limits, temperature, workspace restrictions
+- **Secrets** — API keys are masked on read (`sk-abc...***`) and preserved on write (masked values never overwrite real keys)
 
-1. Open Telegram and message **@BotFather**
-2. Run `/newbot` and follow the prompts
-3. BotFather will give you a token like: `123456789:AA...`
-4. Paste it into the Telegram channel config and add your user ID to the allow list
+### Tools & Integrations
+- **Web Search** — Brave, DuckDuckGo, Perplexity, Tavily
+- **MCP Servers** — configure external MCP tool servers (Context7, filesystem, GitHub, custom)
+- **Cron Jobs** — scheduled agent tasks with configurable timeouts
+- **Exec Tool** — command execution with allow/deny pattern lists (PicoClaw backend)
+- **Skills** — 14 pre-installed skills, ClawHub registry integration
 
-### Discord bot token
+### Operations
+- **Live Logs** — real-time gateway output with ANSI stripping, 500-line rolling buffer
+- **Status Dashboard** — gateway state, PID, uptime, restart count, provider/channel status
+- **Hermes Pairing** — manage channel pairings (list, approve, revoke, clear-pending) directly from the UI
+- **Audit Trail** — pairing operations logged to JSONL with code redaction
+- **Auto-Restart** — gateway crashes trigger automatic recovery
 
-1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
-2. **New Application** → pick a name
-3. Open the **Bot** tab → **Add Bot**
-4. Enable **MESSAGE CONTENT INTENT** under Privileged Gateway Intents
-5. Copy the **Bot Token** and paste it into the Discord channel config
-6. Invite the bot to your server (OAuth2 URL Generator → scopes: `bot`, `applications.commands`)
+### Frontend
+- React 19 + TypeScript + Vite + Tailwind CSS v4
+- Dark mode (follows system preference)
+- TanStack Query for data fetching
+- Unsaved changes detection with review modal
+- Floating apply button with change count
 
-## Local testing
+## Quick Start
+
+### Deploy to Railway
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/)
+
+1. Click deploy — Railway builds from the Dockerfile automatically
+2. Set `ADMIN_PASSWORD` in Railway Variables (or check deploy logs for the auto-generated one)
+3. Open your Railway URL, log in with `admin` / your password
+4. Configure a provider API key → gateway starts automatically
+
+### Run Locally (Docker)
 
 ```bash
-docker build -t picoclaw-railway-template .
+# Build
+make build
+
+# Run (default password: test)
+make run
+
+# Open http://localhost:8080
+# Username: admin | Password: test
+```
+
+Or manually:
+
+```bash
+docker build -t agent-gateway-ui .
 
 docker run --rm -p 8080:8080 \
   -e PORT=8080 \
   -e ADMIN_PASSWORD=test \
   -v $(pwd)/.tmpdata:/data \
-  picoclaw-railway-template
-
-# Open http://localhost:8080 (username: admin, password: test)
+  agent-gateway-ui
 ```
 
-## FAQ
-
-**Q: How do I access the configuration page?**
-
-A: Go to your deployed instance's URL. When prompted for credentials, use `admin` as the username and the `ADMIN_PASSWORD` from your Railway Variables as the password.
-
-**Q: Where do I find the auto-generated password?**
-
-A: Check the deploy logs in Railway. The password is printed at startup: `Generated admin password: ...`
-
-**Q: How do I change the AI model?**
-
-A: Go to the Configuration tab → Agent Defaults → Model field. Set it to `provider/model-name` format (e.g., `anthropic/claude-opus-4-5`, `openai/gpt-4.1`).
-
-**Q: The gateway isn't starting. What should I check?**
-
-A: Make sure at least one provider has an API key configured. The gateway auto-starts only when an API key is present. You can also manually start it from the Status tab.
-
-## When Shell Access is Still Required
-
-Most operations can be performed via the Web UI, but some channels still require shell access for initial setup:
-
-| Channel | Setup | Pairing Operations | Notes |
-|---------|-------|-------------------|-------|
-| Telegram | Web UI | Web UI | Pairing via UI |
-| Discord | Web UI | Web UI | Pairing via UI |
-| Slack | Web UI | Web UI | Pairing via UI |
-| WhatsApp | **Shell** | Web UI | Initial setup requires shell |
-| Signal | **Shell** | Web UI | Initial setup requires shell |
-| Email | Web UI | N/A | No pairing needed |
-| HomeAssistant | Web UI | N/A | No pairing needed |
-
-**V1 Scope**: The Web UI pairing operations cover Telegram, Discord, and Slack. WhatsApp and Signal initial setup is **out of scope for V1** and still requires shell access.
-
-## Pairing Operations from Web UI
-
-When using the Hermes backend, you can manage pairings directly from the Status tab:
-
-### Prerequisites
-1. Ensure your backend is set to **Hermes** (Configuration → Agent Defaults → Backend)
-2. Navigate to the **Status** tab
-
-### Available Operations
-
-**Refresh List** - View current pairings
-- Click "Refresh List" to see all active and pending pairings
-- Results display in JSON format below the buttons
-
-**Approve Pairing** - Approve a pending pairing code
-1. Select the platform from the dropdown
-2. Enter the 8-character pairing code (uppercase letters and numbers, excluding 0, 1, O, I)
-3. Click "Approve"
-4. The list refreshes automatically on success
-
-**Revoke Pairing** - Remove a user's pairing
-1. Select the platform from the dropdown
-2. Enter the user ID to revoke
-3. Click "Revoke"
-4. The list refreshes automatically on success
-
-**Clear Pending** - Clear all pending pairing requests
-- Click "Clear Pending" to remove all pending pairing requests
-- Use with caution - this affects all platforms
-
-## Security Notes
-
-- **No arbitrary command execution**: The Web UI only allows predefined pairing operations
-- **Allowlisted operations**: Only `list`, `approve`, `revoke`, and `clear-pending` are available
-- **Audit logging**: All pairing operations are logged to `~/.hermes/pairing-audit.log`
-- **Code redaction**: Pairing codes are partially redacted in logs (only last 2 characters stored)
-- **Authentication required**: All pairing endpoints require valid Basic Auth credentials
-- **Backend guard**: Operations only work when Hermes is the active backend
-- **Input validation**: All inputs are validated against strict patterns before processing
-
-## Hermes Custom Skill Verification
-
-This section describes how to verify that custom skills are correctly installed and discoverable by the Hermes backend.
-
-### Prerequisites
-
-- **Docker**: Required for containerized testing
-- **Python 3.12+**: For running pytest
-- **pytest**: Test framework (`pip install pytest`)
-
-### One-Command Verification
-
-Run the full skill verification suite:
+### Run Without Docker
 
 ```bash
-# Build and run all verification tests
-docker build -t picoclaw-railway-template . && \
-pytest tests/test_skill_runtime_matrix.py -v
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Build frontend
+cd frontend && npm install && npm run build && cd ..
+
+# Start server
+python server.py
 ```
 
-For a quick check without full matrix:
+## Configuration
 
-```bash
-# Run Hermes discovery baseline test
-pytest tests/test_hermes_skill_discovery.py -v
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `ADMIN_USERNAME` | `admin` | Basic Auth username |
+| `ADMIN_PASSWORD` | *(auto-generated)* | Basic Auth password. Printed at startup if not set. |
+| `PICOCLAW_VERSION` | `main` | Git branch/tag to build PicoClaw from |
+| `PORT` | `8080` | Server listen port |
+
+### Persistent Data
+
+All state is stored under `/data` (mounted as a Docker volume):
+
+```
+/data/
+├── .picoclaw/
+│   ├── config.json          # PicoClaw config
+│   ├── workspace/skills/    # Installed skills
+│   ├── sessions/            # Agent session history
+│   └── cron/                # Scheduled job definitions
+├── .hermes/
+│   ├── config.yaml          # Hermes config
+│   ├── .env                 # Channel/provider secrets
+│   └── skills -> ../picoclaw/workspace/skills  # Symlink
+└── .gateway-meta.json       # Active backend selection
 ```
 
-### Status Interpretations
+## Getting Chat Tokens
 
-Each skill receives a terminal status:
+<details>
+<summary><strong>Telegram</strong></summary>
 
-| Status | Meaning |
-|--------|---------|
-| `pass` | All verification dimensions passed. Skill is fully functional. |
-| `gated-env` | Skill structure is valid but requires API keys. Not a failure - just needs configuration. |
-| `fail` | Critical issue detected. Missing files, invalid YAML, or unmet dependencies. |
+1. Message **@BotFather** on Telegram
+2. Run `/newbot`, follow the prompts
+3. Copy the token (`123456789:AA...`)
+4. Paste into the Telegram channel config + add your user ID to the allow list
+</details>
 
-### Verification Dimensions
+<details>
+<summary><strong>Discord</strong></summary>
 
-The test suite checks four dimensions per skill:
+1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
+2. **New Application** → **Bot** tab → **Add Bot**
+3. Enable **MESSAGE CONTENT INTENT**
+4. Copy the Bot Token
+5. Invite to your server (OAuth2 URL Generator → scopes: `bot`, `applications.commands`)
+</details>
 
-1. **Packaging**: SKILL.md and _meta.json exist with valid YAML frontmatter
-2. **Dependencies**: Required binaries and environment variables are available
-3. **Hermes Discovery**: Skill exists in `/data/.hermes/skills` (Hermes canonical path)
-4. **Wrapper**: CLI wrapper (if applicable) is executable
+<details>
+<summary><strong>Slack</strong></summary>
 
-### Important: Wrapper Success ≠ Hermes Discovery
+1. Create a [Slack App](https://api.slack.com/apps)
+2. Enable Socket Mode (generates App Token)
+3. Add Bot Token Scopes: `app_mentions:read`, `chat:write`, `channels:history`, `im:history`
+4. Install to workspace, copy Bot Token and App Token
+</details>
 
-**Warning**: A skill wrapper executing successfully does NOT guarantee Hermes discovery.
+## API Endpoints
 
-- **Wrapper check**: Verifies `/usr/local/bin/<skill>` exists and runs
-- **Hermes discovery**: Verifies skill exists in `/data/.hermes/skills`
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/health` | Health check |
+| `GET` | `/api/config` | Get config (secrets masked) |
+| `PUT` | `/api/config` | Update config (secrets preserved) |
+| `GET` | `/api/status` | Gateway state + provider/channel status |
+| `GET` | `/api/audit` | Cron jobs, sessions, skills, MCP servers |
+| `GET` | `/api/logs` | Live gateway log lines |
+| `POST` | `/api/gateway/start` | Start gateway |
+| `POST` | `/api/gateway/stop` | Stop gateway |
+| `POST` | `/api/gateway/restart` | Restart gateway |
+| `GET` | `/api/backend` | Current backend + available options |
+| `POST` | `/api/backend` | Switch backend |
+| `GET` | `/api/hermes/pairing/list` | List Hermes pairings |
+| `POST` | `/api/hermes/pairing/approve` | Approve a pairing |
+| `POST` | `/api/hermes/pairing/revoke` | Revoke a pairing |
+| `POST` | `/api/hermes/pairing/clear-pending` | Clear all pending pairings |
 
-These are independent dimensions. A skill can have a working wrapper but fail Hermes discovery if the skill directory is not properly synchronized to the Hermes path.
+All endpoints require Basic Auth.
 
-### Evidence Files
+## Adding a New Backend
 
-Test results are written to `.sisyphus/evidence/`:
+The `BaseGatewayManager` abstract class defines the interface. To add a new backend:
 
-- `task-10-runtime-matrix.json` - Full verification report for all 14 skills
-- `task-5-hermes-baseline.txt` - Hermes discovery gap analysis
-- `task-6-wrapper-divergence.json` - Wrapper vs Hermes divergence report
+```python
+class MyBackendManager(BaseGatewayManager):
+    def get_command(self) -> tuple[str, ...]:
+        return ("my-agent", "serve")
 
-### Troubleshooting
+    def get_config_path(self) -> Path:
+        return Path.home() / ".myagent" / "config.yaml"
 
-**Skills not discovered by Hermes:**
-- Check that `start.sh` copies skills to `/data/.hermes/skills`
-- Verify the Hermes backend is configured correctly
-- Run `ls -la /data/.hermes/skills/` inside the container
+    def read_config(self) -> dict: ...
+    def write_config(self, data: dict): ...
+    def get_env(self) -> dict[str, str] | None: ...
+    def mask_secrets(self, data, _path=""): ...
+    def merge_secrets(self, new_data, existing_data, _path=""): ...
+```
 
-**Wrapper not found:**
-- Verify Dockerfile creates the wrapper in `/usr/local/bin/`
-- Check wrapper has executable permissions (`chmod +x`)
-- Ensure wrapper script has correct shebang (`#!/bin/bash` or `#!/usr/bin/env python3`)
+Then register it in `server.py`:
 
-**Gated by API keys:**
-- Set required environment variables in Railway
-- Common keys: `GEMINI_API_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`
-- Gated status is NOT a failure - skills are structurally valid
+```python
+managers = {
+    "picoclaw": gateway,
+    "hermes": hermes_gateway,
+    "my-backend": MyBackendManager(),
+}
+AVAILABLE_BACKENDS = ["picoclaw", "hermes", "my-backend"]
+```
+
+The frontend automatically picks up the new backend from `/api/backend`.
+
+## Pre-Installed Skills
+
+| Skill | Description |
+|-------|-------------|
+| stock-analysis | Stock scanning, portfolio tracking, dividend analysis |
+| finance-news | Market briefings, portfolio-aware news aggregation |
+| trading-research | Technical indicators, strategy backtesting |
+| crypto-market-data | Real-time crypto prices and market data |
+| news-aggregator-skill | Multi-source news fetching and deduplication |
+| reddit-insights | Reddit thread analysis and trending topics |
+| x-research | Twitter/X research and monitoring |
+| web-search | Enhanced web search with content extraction |
+| github | GitHub API operations |
+| blogwatcher | RSS/Atom feed monitoring |
+| summarize | Content summarization |
+| gemini-deep-research | Deep research using Gemini |
+| find-skills | Skill discovery from registries |
+| self-improving-agent | Agent self-improvement and learning loops |
+
+## Troubleshooting
+
+**Gateway won't start**
+→ Ensure at least one provider has an API key. The gateway auto-starts only when a key is present. Manually start from the Status tab if needed.
+
+**Auto-generated password**
+→ Check Railway deploy logs. Look for: `Generated admin password: ...`
+
+**Hermes skills not discovered**
+→ `start.sh` creates a symlink from `/data/.hermes/skills` → `/data/.picoclaw/workspace/skills`. Verify with `ls -la /data/.hermes/skills` inside the container.
+
+**Channel requires shell setup**
+→ WhatsApp and Signal initial setup still require shell access. See channel docs for details.
+
+## License
+
+See [LICENSE](LICENSE) for details.
