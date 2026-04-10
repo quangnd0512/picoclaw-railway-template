@@ -520,6 +520,9 @@ class PicoClawManager(BaseGatewayManager):
                     result[k] = existing_data[k]
                     continue
                 v = new_data[k]
+                # Null value signals deletion - skip adding to result
+                if v is None:
+                    continue
                 if (
                     (k in self.SECRET_FIELDS or is_mcp_secret)
                     and isinstance(v, str)
@@ -541,6 +544,9 @@ class HermesManager(BaseGatewayManager):
         "openrouter": "OPENROUTER_API_KEY",
         "anthropic": "ANTHROPIC_API_KEY",
         "openai": "OPENAI_API_KEY",
+        "google": "GOOGLE_API_KEY",
+        "groq": "GROQ_API_KEY",
+        "deepseek": "DEEPSEEK_API_KEY",
         "zhipu": "GLM_API_KEY",
         "moonshot": "KIMI_API_KEY",
         "minimax": "MINIMAX_API_KEY",
@@ -1044,16 +1050,28 @@ class HermesManager(BaseGatewayManager):
             env_out[key] = new_val
 
         for our_name, env_key in self.PROVIDER_ENV_KEYS.items():
-            provider_obj = (
-                providers.get(our_name, {}) if isinstance(providers, dict) else {}
-            )
-            if isinstance(provider_obj, dict):
-                _safe_env_write(env_key, str(provider_obj.get("api_key", "") or ""))
+            if not isinstance(providers, dict):
+                continue
+            if our_name in providers:
+                provider_obj = providers.get(our_name, {})
+                if isinstance(provider_obj, dict):
+                    _safe_env_write(env_key, str(provider_obj.get("api_key", "") or ""))
+            else:
+                # Provider was removed - clear the env var
+                env_out.pop(env_key, None)
 
-        openai = providers.get("openai", {}) if isinstance(providers, dict) else {}
-        if isinstance(openai, dict):
-            _safe_env_write("OPENAI_API_KEY", str(openai.get("api_key", "") or ""))
-            _safe_env_write("OPENAI_BASE_URL", str(openai.get("api_base", "") or ""))
+        # Handle OpenAI base_url separately (API key is handled in PROVIDER_ENV_KEYS loop)
+        if isinstance(providers, dict):
+            if "openai" in providers:
+                openai = providers.get("openai", {})
+                if isinstance(openai, dict):
+                    _safe_env_write(
+                        "OPENAI_BASE_URL", str(openai.get("api_base", "") or "")
+                    )
+            else:
+                # OpenAI provider was removed - clear base_url
+                env_out.pop("OPENAI_BASE_URL", None)
+
         if model_default:
             env_out["HERMES_MODEL"] = model_default
             env_out.pop("LLM_MODEL", None)
@@ -1338,6 +1356,9 @@ class HermesManager(BaseGatewayManager):
                     result[k] = existing_data[k]
                     continue
                 v = new_data[k]
+                # Null value signals deletion - skip adding to result
+                if v is None:
+                    continue
                 if (
                     k in self.SECRET_FIELDS
                     and isinstance(v, str)

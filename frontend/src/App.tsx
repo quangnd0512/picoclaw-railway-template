@@ -55,7 +55,9 @@ function App() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showRestartConfirm, setShowRestartConfirm] = useState(false);
     const [saveError, setSaveError] = useState<string | null>(null);
-    const [pendingBackendSwitch, setPendingBackendSwitch] = useState<'picoclaw' | 'hermes' | null>(null);
+    const [pendingBackendSwitch, setPendingBackendSwitch] = useState<
+        "picoclaw" | "hermes" | null
+    >(null);
 
     useEffect(() => {
         if (configData) {
@@ -118,7 +120,11 @@ function App() {
                 };
                 current = current[key] as Record<string, unknown>;
             }
-            current[lastKey] = value;
+            if (value === undefined || value === null) {
+                delete current[lastKey];
+            } else {
+                current[lastKey] = value;
+            }
             return newConfig as AppConfig;
         });
     };
@@ -148,18 +154,22 @@ function App() {
                     }
                 },
                 onError: (error) => {
-                    setSaveError(error instanceof Error ? error.message : 'Failed to save configuration');
+                    setSaveError(
+                        error instanceof Error
+                            ? error.message
+                            : "Failed to save configuration",
+                    );
                 },
             },
         );
     };
 
-    const handleApplyAndSwitch = (newBackend: 'picoclaw' | 'hermes') => {
+    const handleApplyAndSwitch = (newBackend: "picoclaw" | "hermes") => {
         setPendingBackendSwitch(newBackend);
         setIsModalOpen(true);
     };
 
-    const handleDiscardAndSwitch = (newBackend: 'picoclaw' | 'hermes') => {
+    const handleDiscardAndSwitch = (newBackend: "picoclaw" | "hermes") => {
         if (configData) {
             setLocalConfig(configData);
             setLastLoadedConfigString(stableStringify(configData));
@@ -358,7 +368,7 @@ function App() {
             )}
 
             <Toast
-                message={saveError || ''}
+                message={saveError || ""}
                 type="error"
                 isVisible={!!saveError}
                 onDismiss={() => setSaveError(null)}
