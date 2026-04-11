@@ -1017,7 +1017,13 @@ class HermesManager(BaseGatewayManager):
             hermes_data.get("fallback_model") if isinstance(hermes_data, dict) else None
         )
         if isinstance(fallback_model, dict):
-            yaml_out["fallback_model"] = fallback_model
+            # Only include fallback_model if both provider and model are non-empty
+            provider = fallback_model.get("provider", "")
+            model = fallback_model.get("model", "")
+            if provider and model:
+                yaml_out["fallback_model"] = fallback_model
+            elif "fallback_model" in yaml_out:
+                del yaml_out["fallback_model"]
         elif "fallback_model" not in yaml_out:
             yaml_out["fallback_model"] = self._default_hermes_yaml()["fallback_model"]
 

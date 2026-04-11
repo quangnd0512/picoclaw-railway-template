@@ -3,18 +3,19 @@ set -e
 
 # Allow custom Hermes home directory via HERMES_HOME env var (default: /data/.hermes)
 HERMES_HOME="${HERMES_HOME:-/data/.hermes}"
+PICOCLAW_HOME="${PICOCLAW_HOME:-/data/agents/.picoclaw}"
 
-mkdir -p /data/.picoclaw/workspace
-mkdir -p /data/.picoclaw/sessions
-mkdir -p /data/.picoclaw/cron
-mkdir -p /data/.picoclaw/workspace/skills
+mkdir -p ${PICOCLAW_HOME}/workspace
+mkdir -p ${PICOCLAW_HOME}/sessions
+mkdir -p ${PICOCLAW_HOME}/cron
+mkdir -p ${PICOCLAW_HOME}/workspace/skills
 # mkdir -p /data/.config/gogcli
 if [ -d /app/skills ]; then
-    cp -rn /app/skills/* /data/.picoclaw/workspace/skills/ || true
+    cp -rn /app/skills/* ${PICOCLAW_HOME}/workspace/skills/ || true
 fi
-echo "Bootstrapped $(ls -d /data/.picoclaw/workspace/skills/*/ 2>/dev/null | wc -l) skills"
+echo "Bootstrapped $(ls -d ${PICOCLAW_HOME}/workspace/skills/*/ 2>/dev/null | wc -l) skills"
 
-if [ ! -f /data/.picoclaw/config.json ]; then
+if [ ! -f ${PICOCLAW_HOME}/config.json ]; then
     picoclaw onboard
 
     # Pre-configure blogwatcher feeds
@@ -36,10 +37,10 @@ fi
 mkdir -p "$HERMES_HOME"
 
 # Hermes skill discovery path remediation
-# Keep /data/.picoclaw/workspace/skills as canonical source-of-truth
-# Create symlink $HERMES_HOME/skills -> /data/.picoclaw/workspace/skills
+# Keep ${PICOCLAW_HOME}/workspace/skills as canonical source-of-truth
+# Create symlink $HERMES_HOME/skills -> ${PICOCLAW_HOME}/workspace/skills
 HERMES_SKILLS_PATH="$HERMES_HOME/skills"
-PICOCLAW_SKILLS_PATH="/data/.picoclaw/workspace/skills"
+PICOCLAW_SKILLS_PATH="${PICOCLAW_HOME}/workspace/skills"
 
 # Handle edge case: if $HERMES_HOME/skills exists as a real directory (not symlink)
 # Merge missing entries into canonical path, then archive the legacy directory

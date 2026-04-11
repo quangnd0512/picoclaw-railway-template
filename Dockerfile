@@ -79,7 +79,7 @@ RUN bun install -g @steipete/summarize && \
 
 # Add wrapper for stock-analysis
 RUN echo '#!/bin/sh\n\
-    DIR="/data/.picoclaw/workspace/skills/stock-analysis"\n\
+    DIR="/data/agents/.picoclaw/workspace/skills/stock-analysis"\n\
     CMD="$1"\n\
     if [ -z "$CMD" ]; then\n\
     echo "Usage: stock-analysis <command> [args]"\n\
@@ -99,7 +99,7 @@ RUN echo '#!/bin/sh\n\
 
 # Add wrapper for finance-news
 RUN echo '#!/bin/sh\n\
-    DIR="/data/.picoclaw/workspace/skills/finance-news"\n\
+    DIR="/data/agents/.picoclaw/workspace/skills/finance-news"\n\
     CMD="$1"\n\
     if [ -z "$CMD" ]; then\n\
     echo "Usage: finance-news <command> [args]"\n\
@@ -120,7 +120,7 @@ RUN echo '#!/bin/sh\n\
 
 # Add wrapper for news-aggregator-skill
 RUN echo '#!/bin/sh\n\
-    DIR="/data/.picoclaw/workspace/skills/news-aggregator-skill"\n\
+    DIR="/data/agents/.picoclaw/workspace/skills/news-aggregator-skill"\n\
     if [ "$1" = "fetch" ]; then\n\
     shift\n\
     exec python3 "$DIR/scripts/fetch_news.py" "$@"\n\
@@ -128,7 +128,7 @@ RUN echo '#!/bin/sh\n\
     exec python3 "$DIR/scripts/fetch_news.py" "$@"\n\
     fi' > /usr/local/bin/news-aggregator-skill && chmod +x /usr/local/bin/news-aggregator-skill
 
-RUN mkdir -p /data/.picoclaw
+RUN mkdir -p /data/agents/.picoclaw /data/agents/.hermes
 
 COPY server.py /app/server.py
 COPY --from=frontend-builder /app/dist /app/frontend/dist
@@ -139,7 +139,9 @@ RUN chmod +x /app/start.sh
 RUN ln -s /opt/hermes/venv/bin/hermes /usr/local/bin/hermes
 
 ENV HOME=/data
-ENV PICOCLAW_AGENTS_DEFAULTS_WORKSPACE=/data/.picoclaw/workspace
+ENV PICOCLAW_HOME=/data/agents/.picoclaw
+ENV PICOCLAW_AGENTS_DEFAULTS_WORKSPACE=/data/agents/.picoclaw/workspace
+ENV HERMES_HOME=/data/agents/.hermes
 ENV FINANCE_NEWS_VENV_BOOTSTRAPPED=1
 
 # Prevent Python from writing pyc files

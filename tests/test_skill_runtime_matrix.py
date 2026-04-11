@@ -38,7 +38,7 @@ CONTRACT_PATH = EVIDENCE_DIR / "task-1-skill-contract.json"
 REPORT_PATH = EVIDENCE_DIR / "task-10-runtime-matrix.json"
 
 # Container paths
-PICOCLAW_SKILLS_PATH = "/data/.picoclaw/workspace/skills"
+PICOCLAW_SKILLS_PATH = "/data/agents/.picoclaw/workspace/skills"
 HERMES_SKILLS_PATH = "/data/.hermes/skills"
 
 # Wrapper commands that have CLI binaries

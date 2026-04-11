@@ -49,21 +49,21 @@ REPORT_PATH = EVIDENCE_DIR / "task-6-wrapper-divergence.json"
 WRAPPER_COMMANDS = {
     "stock-analysis": {
         "path": "/usr/local/bin/stock-analysis",
-        "skill_dir": "/data/.picoclaw/workspace/skills/stock-analysis",
+        "skill_dir": "/data/agents/.picoclaw/workspace/skills/stock-analysis",
         "skill_md": "/app/skills/stock-analysis/SKILL.md",
         "safe_command": ["stock-analysis"],  # No args shows usage
         "expected_output_pattern": "Usage: stock-analysis",
     },
     "finance-news": {
         "path": "/usr/local/bin/finance-news",
-        "skill_dir": "/data/.picoclaw/workspace/skills/finance-news",
+        "skill_dir": "/data/agents/.picoclaw/workspace/skills/finance-news",
         "skill_md": "/app/skills/finance-news/SKILL.md",
         "safe_command": ["finance-news"],  # No args shows usage
         "expected_output_pattern": "Usage: finance-news",
     },
     "news-aggregator-skill": {
         "path": "/usr/local/bin/news-aggregator-skill",
-        "skill_dir": "/data/.picoclaw/workspace/skills/news-aggregator-skill",
+        "skill_dir": "/data/agents/.picoclaw/workspace/skills/news-aggregator-skill",
         "skill_md": "/app/skills/news-aggregator-skill/SKILL.md",
         "safe_command": ["news-aggregator-skill", "--help"],
         "expected_output_pattern": "fetch_news.py",  # Script name in help

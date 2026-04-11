@@ -5,7 +5,7 @@ This test proves the gap between skills installed in the PicoClaw workspace path
 and the Hermes canonical discovery path.
 
 Expected behavior BEFORE remediation:
-- Skills exist at /data/.picoclaw/workspace/skills (copied by start.sh)
+- Skills exist at /data/agents/.picoclaw/workspace/skills (copied by start.sh)
 - Skills are MISSING from /data/.hermes/skills (Hermes canonical path)
 - This test MUST FAIL to prove the gap exists
 
@@ -41,7 +41,7 @@ EXPECTED_SKILLS = [
 ]
 
 # The PicoClaw workspace path where skills are copied on startup
-PICOCLAW_SKILLS_PATH = "/data/.picoclaw/workspace/skills"
+PICOCLAW_SKILLS_PATH = "/data/agents/.picoclaw/workspace/skills"
 
 # The Hermes canonical discovery path (should contain skills for Hermes to discover)
 HERMES_SKILLS_PATH = "/data/.hermes/skills"
@@ -119,7 +119,7 @@ def test_hermes_skill_discovery_gap(container):
     Test that proves the gap between PicoClaw workspace skills and Hermes discovery path.
 
     This test MUST FAIL before Task 7 remediation to prove:
-    1. Skills exist in /data/.picoclaw/workspace/skills (start.sh copies them)
+    1. Skills exist in /data/agents/.picoclaw/workspace/skills (start.sh copies them)
     2. Skills are MISSING from /data/.hermes/skills (Hermes canonical path)
 
     After Task 7 (path remediation), this test should pass.
